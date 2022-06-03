@@ -1381,8 +1381,8 @@ class ReportView extends Component {
   //Default layout settings size, width, height
   getDefaultLayoutSettings(grid_size = null) {
     let defaultViewCanvasWidth = this.getDefaultViewModeCanvsWidth();
-    let defaultWidth = (Math.round(defaultViewCanvasWidth / grid_size.gridColWidth) * grid_size.gridColWidth);
-    let defaultHeight = (Math.round(((defaultWidth * 9) / 16) / grid_size.gridColWidth) * grid_size.gridColWidth);
+    let defaultWidth = grid_size ? (Math.round(defaultViewCanvasWidth / grid_size.gridColWidth) * grid_size.gridColWidth) : CHART_DIMENSIONS.defaultWidth;
+    let defaultHeight = grid_size ? (Math.round(((defaultWidth * 9) / 16) / grid_size.gridColWidth) * grid_size.gridColWidth) : CHART_DIMENSIONS.defaultHeight;
     return { 'type': 'auto', 'width': defaultWidth, 'height': defaultHeight };
   }
 
@@ -1411,7 +1411,7 @@ class ReportView extends Component {
             // let updateChartsGridLayout = [];
 
             //if not saved for earlier 
-            if (savedDashboardOtherSettings.layout_setting === undefined) {
+            if (savedDashboardOtherSettings && savedDashboardOtherSettings.layout_setting === undefined) {
               savedDashboardOtherSettings['layout_setting'] = this.getDefaultLayoutSettings({ gridColWidth: this.state.gridColWidth, gridRowHeight: this.state.gridRowHeight });
             }
 

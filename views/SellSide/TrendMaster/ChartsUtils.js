@@ -6999,9 +6999,9 @@ function drawHeatMapChart(args) {
 
   /* Define and create yScale, yAxis, ticks */
   let y_steps = args.yAxisTicksCount !== undefined ? args.yAxisTicksCount : initialConfig.defaultYAxisTicksCount;
-  if (args.chartFormat.yaxis.tick !== '' && args.chartFormat.yaxis.tick > 0) {
-    y_steps = Math.floor(yScaleLimits['upperLimit'] / args.chartFormat.yaxis.tick) + 1;
-  }
+  // if (args.chartFormat.yaxis.tick !== '' && args.chartFormat.yaxis.tick > 0) {
+  //   y_steps = Math.floor(yScaleLimits['upperLimit'] / args.chartFormat.yaxis.tick) + 1;
+  // }
 
   function getTickValuesForYAxis() {
     let totalHeight = yStartPoint - yEndPoint;
@@ -7042,9 +7042,6 @@ function drawHeatMapChart(args) {
       .domain(yDomainsAxis)
       .range([yStartPoint, yEndPoint])
       .paddingInner(.25)
-    // .padding(0, 2, 0, 2)
-    // .align(0.5);
-    // .round(true);
 
     //Define the ticks
     yAxis = d3.axisLeft(yScale)
@@ -7059,10 +7056,6 @@ function drawHeatMapChart(args) {
       .call(yAxis)
       .attr('font-size', tickFontSize + 'px');
   }
-  defineYScale().then(() => {
-    //Change x axis first and last tick position
-    // alignYAxisTicks(innerHeight, args.unique_key, initialConfig, yAxisTickTopPos);
-  });
 
   //if no data available
   if (args.isEmpty) {
@@ -7932,7 +7925,7 @@ function drawWaterFallChart(args) {
   let yStartPoint = xAxisBottomPos - initialConfig.inbetweenChartAndXAxisPadding - 1;
   let yEndPoint = initialConfig.chartTopPadding;
 
-  let yScaleLimits;
+  // let yScaleLimits;
   let series;
   let totalSegmentData = {};
   let segmentedBarHeights = {};

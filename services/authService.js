@@ -86,44 +86,44 @@ const APIService = {
 export default APIService;
 
 
-import * as Constants from '../components/Constants.js';
+// import * as Constants from '../components/Constants.js';
 
-const authService = {
-    isLoggedIn() {
-        return new Promise((res, rej) => {
-            window.SSO.isLoggedIn((status) => res(status));
-        });
-    },
-    saveToken(token) {
-        return new Promise((res, rej) => {
-            window.SSO.saveToken(token, () => res());
-        });
-    },
+// const authService = {
+//     isLoggedIn() {
+//         return new Promise((res, rej) => {
+//             window.SSO.isLoggedIn((status) => res(status));
+//         });
+//     },
+//     saveToken(token) {
+//         return new Promise((res, rej) => {
+//             window.SSO.saveToken(token, () => res());
+//         });
+//     },
 
-    getAndSaveUserInfo() {
-        return new Promise((res, rej) => {
-            axios.get(Constants.API_BASE_URL + '/profile')
-            .then(resp => {
-                const userData = resp.data;
-                window.SSO.saveUserInfo(JSON.stringify(userData), () => res(resp));
-            });
-        });
-    },
-    clearToken() {
-        localStorage.removeItem('access_token');
-    },
-    login(data) {
-        return axios.post(Constants.API_BASE_URL + '/auth/login', data);
-    },
-    logout() {
-        return new Promise((res, rej) => {
-            localStorage.clear();
-            window.SSO.clearData(() => res());
-        });
-    },
-    register(userInfo) {
-        return axios.post(Constants.API_BASE_URL + '/auth/register', userInfo);
-    }
-};
+//     getAndSaveUserInfo() {
+//         return new Promise((res, rej) => {
+//             axios.get(Constants.API_BASE_URL + '/profile')
+//             .then(resp => {
+//                 const userData = resp.data;
+//                 window.SSO.saveUserInfo(JSON.stringify(userData), () => res(resp));
+//             });
+//         });
+//     },
+//     clearToken() {
+//         localStorage.removeItem('access_token');
+//     },
+//     login(data) {
+//         return axios.post(Constants.API_BASE_URL + '/auth/login', data);
+//     },
+//     logout() {
+//         return new Promise((res, rej) => {
+//             localStorage.clear();
+//             window.SSO.clearData(() => res());
+//         });
+//     },
+//     register(userInfo) {
+//         return axios.post(Constants.API_BASE_URL + '/auth/register', userInfo);
+//     }
+// };
 
-export default authService;
+// export default authService;
