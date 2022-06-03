@@ -1,0 +1,143 @@
+
+/***********************
+ === SELECT BOX ===
+*************************/
+.custom-select{
+	position: relative;
+
+  label{
+    display: block;
+    position: relative;
+    width: auto;
+    height: auto;
+    margin: 0 0 .34vw 0;
+    padding: 0;
+    font-size: .875rem;
+    font-weight: 400;
+    line-height: 1.2;
+    background: #000;
+    
+
+    span{ 
+      font-size: 1rem; // 16px;
+      color: theme-color('primary','red'); 
+    }
+  }
+
+  
+  .select {
+    width: 100%;
+    padding: .83vw; //12px
+    font-size: .875rem;
+    line-height: 1.2;
+    border: 1px solid #fff;
+    @include border-radius(4px);
+    background: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    color: #fff;
+    outline: none;
+
+    option {
+      font-size: .875rem;
+    }
+  }
+  &:after {
+    content: '';
+    position: absolute;
+    top: 2.38vw;
+    right: 1.32vw;
+    width: 4px;
+    height: 4px;
+    z-index: 99;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 2px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }
+
+  
+  &.outlined{
+    label{
+      position: absolute;
+      top: -.69vw;
+      left: .69vw;
+      padding: .13vw .27vw; //2px 4px;
+      margin: 0;
+    }
+    &:after { top: .94vw; }
+
+    &.primary{
+      label{ color: theme-color('primary', 'base'); }
+      .select {
+        border-color: theme-color('primary', 'base'); 
+        color: #fff;
+      }
+    }
+    &.secondary{ 
+      label{ color: theme-color('primary', 'green'); }
+      .select {
+        border-color: theme-color('primary', 'green'); 
+        color: #fff;
+      }
+    }
+    &.has-error{ 
+      label{ color: theme-color('alert', 'error-text'); }
+      .select {
+        border-color: theme-color('alert', 'error'); 
+        color: #fff;
+      }
+    }
+
+    &.large{
+      &:after { top: 1.24vw; }
+    }
+    &.small{
+      &:after { top: .80vw; }
+    }
+    &.xs{
+      &:after { top: .46vw; }
+    }
+  }
+
+
+  //Different Sizes
+  &.large{
+    label{ font-size: .9375rem; }
+    &:after { top: 2.76vw; }
+    .select {
+      padding: 1.04vw; //15px;
+      font-size: 1rem;
+    }
+    &.outlined{
+      label { left: 1.04vw; }
+    }
+  }
+  &.medium{
+    label{ font-size: .875rem; }
+    .select {
+      padding: .83vw .83vw; //12px
+      font-size: .875rem;
+    }
+  }
+  &.small{
+    label{ font-size: .8125rem; }
+    &:after { top: 2.14vw; }
+    .select {
+      padding: .69vw .83vw; //10px 12px
+      font-size: .8125rem;
+    }
+  }
+  &.xs{
+    label{ font-size: .763rem; }
+    &:after { top: 1.74vw; }
+    .select {
+      padding: .41vw .83vw; //6px 12px
+      font-size: .763rem;
+    }
+  }
+}

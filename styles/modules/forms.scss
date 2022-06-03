@@ -1,0 +1,82 @@
+@import 'utilities/check-box.scss';
+@import 'utilities/radio-button.scss';
+@import 'utilities/text-field.scss';
+@import 'utilities/switch-toggle.scss';
+@import 'utilities/sumo-select.scss';
+@import 'utilities/select-box.scss';
+
+/************************
+  === Form Style ===
+**************************/
+.field-wrapper {
+  width: 100%;
+  position: relative;
+  border: none;
+  // margin: 0 0 1.38vw 0;
+  margin: 0 0 1.04vw 0;
+  
+  &.mar-t20{
+    margin-top: 2.08vw; //30px
+  }
+}
+
+
+.form-group{
+  .form-control{
+    border: 1px solid #666;
+    @include border-radius(0.2rem);
+    width: 100%;
+    max-width: 100%;
+    padding: .27vw .55vw; //4px 12px;
+    font-size: .83vw;
+    font-weight: 400;
+    line-height: 1.4;
+    resize: none;
+    color: #000;
+
+    &:focus,
+    &:active{
+      outline: none;
+      -webkit-appearance: none;
+      -webkit-box-shadow: 0 0 0 0 theme-color('primary', 'blue');
+      -moz-box-shadow: 0 0 0 0 theme-color('primary', 'blue');
+      box-shadow: 0 0 0 0 theme-color('primary', 'blue');
+    }
+    &.has-error{
+      border: 1px solid red;
+    }
+  }
+}
+.field-control{
+  border: 1px solid #666;
+  @include border-radius(0.2rem);
+  width: 100%;
+  max-width: 100%;
+  padding: .27vw .55vw; //4px 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  resize: none;
+  color: #000;
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+}
+
+
+
+//Custom React Select
+.custom-form{
+  .react-select-container{
+    font-size: .825rem;
+  
+    .select-box{
+      padding: 5px 12px !important; //12px
+      font-size: .825rem;
+      line-height: 1;
+      height: 29px;
+  
+      .dropdown-icon-wrapper{
+        top: 12px; right: 8px;
+      }
+    }
+  }
+}

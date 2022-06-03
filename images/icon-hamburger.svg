@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="14" viewBox="0 0 16 14">
+  <g id="thin-hamburger" transform="translate(0 -1)">
+    <path id="Path_156" data-name="Path 156" d="M15,7H1A.945.945,0,0,0,0,8,.945.945,0,0,0,1,9H15a.945.945,0,0,0,1-1A.945.945,0,0,0,15,7Z" fill="#fff"/>
+    <path id="Path_157" data-name="Path 157" d="M15,1H1A.945.945,0,0,0,0,2,.945.945,0,0,0,1,3H15a.945.945,0,0,0,1-1A.945.945,0,0,0,15,1Z" fill="#fff"/>
+    <path id="Path_158" data-name="Path 158" d="M15,13H1a1,1,0,0,0,0,2H15a1,1,0,0,0,0-2Z" fill="#fff"/>
+  </g>
+</svg>

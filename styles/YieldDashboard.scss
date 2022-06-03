@@ -1,0 +1,195 @@
+@import 'modules/variables.scss';
+
+/***************************
+  === Views Styling ===
+****************************/
+.yield-dashbord-view{
+  #app-sub-header{
+    .page-title{
+      display: inline-block;
+      width: auto;
+      vertical-align: top;
+      &.link{ cursor: pointer; }
+    }
+
+    .filters-wrapper{
+      margin-left: 10px;
+    }
+  }
+
+  .inner-wrapper{
+    padding: 15px 15px 0 15px;
+  }
+}
+
+
+
+/*******************************
+ ====== YIELD CAHRT =====
+*****************************/
+.yield-chart-wrapper{
+  margin: 0 0 2.08vw 0; //30px
+
+  .chart-title{
+    padding: 6px 10px;
+    font-size: 14px;
+    text-transform: uppercase;
+    background: #666;
+    position: relative;
+    // border-left: 1px solid #000;
+
+    .max-potential-revenue{
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 12px;
+      text-transform: uppercase;
+
+      .label{
+        display: inline-block;
+        margin: 0 10px 0 0;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .val{
+        display: inline-block;
+        color: theme-color('primary', 'yellow');
+      }
+    }
+  }
+
+
+  .col-wrapper{ 
+    .col{
+      display: inline-block;
+      width: 25%;
+      padding: 0;
+      vertical-align: top;
+
+      .col-val-wrapper{
+        // border-left: 1px solid #424242;
+        width: 100%;
+        position: relative;
+        padding: 6px 10px;
+        min-height: 50px;
+        
+        .col-label{
+          // padding: 0 10px;
+          text-transform: capitalize;
+          font-size: 15px;
+          line-height: 32px;
+        }
+      }
+    }
+  }
+
+  .headings-wrapper{
+    background: #525252;
+    margin: 1px 0;
+
+    .col-title{
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .col-wrapper{ 
+      .col{
+        .col-val-wrapper{
+          min-height: auto;
+        }
+      }
+    }
+  }
+
+  .values-wrapper{
+    margin: 0 0 30px 0;
+    font-size: 14px;
+
+    .value-wrapper{
+      background: #000;
+      border: 1px solid #424242;
+      border-bottom: none;
+      border-collapse: collapse;
+      color: #fff;
+
+      &:last-child {
+        border-bottom: 1px solid #424242 !important;
+      }
+
+      .col-val-wrapper{
+        border-left: 1px solid #424242;
+        width: 100%;
+        position: relative;
+        padding: 6px 10px;
+        min-height: 50px;
+        
+        .col-label{
+          font-size: 15px;
+          line-height: 32px;
+          text-transform: capitalize;
+        }
+        .col-chart{
+          width: 0%;
+          height: 20px;
+          background: theme-color('primary', 'green');
+          margin-top: 4px;
+          position: relative;
+
+          &:before{
+            display: block;
+            content: "";
+            width: 1px;
+            height: 20px;
+            background: theme-color('primary', 'green');
+          }
+        }
+        .col-val{
+          font-size: 11px;
+          font-weight: 600 !important;
+          display: block;
+
+          .number{
+            display: inline-block;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important; 
+          }
+
+          .change{
+            font-size: 11px;
+            display: inline-block;
+            margin-left: 10px;
+            color: theme-color('primary', 'yellow');
+          }
+        }
+        &.cpm{
+          .col-chart{
+            background: #fd5f00;
+            &:before{
+              background: #fd5f00;
+            }
+          }
+          .col-val{
+            top: 8px;
+            font-size: 11px;
+          }
+        }
+        &.total_revenue{
+          .col-chart{
+            background: #00f9ff;
+            &:before{
+              background: #00f9ff;
+            }
+          }
+        }
+      }
+      
+
+      .col:first-child{
+        .col-val-wrapper{ 
+          border-left: none;
+        }
+      }
+    }
+  }
+}

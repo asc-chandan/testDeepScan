@@ -1,0 +1,711 @@
+import React, { Component } from 'react';
+import moment from 'moment';
+import * as d3 from 'd3';
+import * as Constants from '../../components/Constants.js';
+
+import '../../styles/MarketIndex.scss';
+import { getClients, getUser, getKeyByValue, formatDate, parseChartDate, parseChartData } from '../../utils/Common'; //Import Common Functions
+import APIService from '../../services/apiService'; //Import Services
+
+import subjectObj from '../../subjects/Subject1';
+import SpeedSelect from '../../components/SpeedSelect/SpeedSelect';
+import { isDateGreater } from '../../components/ReactCalendar/components/utils';
+import RangePicker from '../../components/ReactCalendar/RangePicker';
+import HideSubHeader from '../../components/HideSubHeader';
+
+class AdIndex extends Component {
+  constructor(props) {
+    super(props);
+    // console.time('sight: Home - total');
+
+    //Get Client & View Type & User
+    this.page_title = 'Ad Index';
+    this.clients = getClients();
+    this.user = getUser();
+    this.view_type = 'ad_index';
+    this.controller = new AbortController();
+
+    this.multiChartsWrapper = React.createRef();
+    this.multiChartsXAxisWrapper = React.createRef();
+
+    //Get Initial Variables Set
+    this.state = this.getInitVariables();
+
+    //events
+    this.getIndexData = this.getIndexData.bind(this);
+    this.handleDatePeriodChange = this.handleDatePeriodChange.bind(this);
+    this.getLastSelectedClient = this.getLastSelectedClient.bind(this);
+    this.skeletonLoading = this.skeletonLoading.bind(this);
+
+    this.handleTabClick = this.handleTabClick.bind(this);
+    this.updateTabs = this.updateTabs.bind(this);
+    this.handleApplyTrendFilters = this.handleApplyTrendFilters.bind(this);
+    this.handleResetTrendFilters = this.handleResetTrendFilters.bind(this);
+    this.handleAddNewDimensions = this.handleAddNewDimensions.bind(this);
+    this.handleRemoveDimensions = this.handleRemoveDimensions.bind(this);
+  }
+
+  //Get Initial Variables Set
+  getInitVariables() {
+    return {
+      inprocess: false,
+      error: '',
+      message: '',
+      client: getKeyByValue(this.clients, this.user.last_fetched_client, 'id'),
+      terminal_type: this.user.terminal_type.id,
+      lastUpdatedDate: '',
+      lastUpdatedDateObj: '',
+      selectedDateRange: '',
+      dimensions: {},
+      selectedDimensions: [this.getInitDimension()],
+      indexData: [],
+      values_tabs: [true, false],
+      isAnyChartSegmented: false,
+      chartsFormattedData: {},
+      chartsSegmentation: {},
+      chartsFormattedSegmentation: {}
+    };
+  }
+
+  // returns the initial values for a single dimensions
+  getInitDimension() { return { device_category: null, region: null, monetization_channel: null }; }
+
+  handleLoadScripts() {
+    this.getAllDimensions(); //Get Dimensions of View Type
+
+    this.getLastUpdatedDate(); //Get Last Updated Date
+  }
+
+  componentDidMount() {
+    subjectObj.notify({ page_title: this.page_title });
+
+    //Get Last Updated Date
+    if (this.state.client) {
+      this.handleLoadScripts();
+    }
+  }
+
+  //Reload the page if client id/name change from url
+  componentDidUpdate(prev_props, prevState) {
+    this.user = getUser();
+
+    if (this.user.last_fetched_client !== this.state.client.id) {
+      this.multiChartsWrapper = React.createRef();
+      this.multiChartsXAxisWrapper = React.createRef();
+
+      this.setState(this.getInitVariables(), () => this.handleLoadScripts());
+    }
+  }
+
+  componentWillUnmount(){
+    //Cancel Previous API Requests
+    console.log('cancel previous view running apis');
+    APIService.abortAPIRequests(this.controller);
+  }
+
+  //Get Last Updated Date
+  getLastUpdatedDate() {
+    // console.timeEnd('sight: getLastUpdatedDate - init');
+
+    //Input Validations
+    this.setState({ error: '', inprocess: true });
+
+    const datePayLoad = {
+      "client_id": this.state.client.id,
+      "view_type": this.view_type
+    };
+
+    // console.time('sight: getLastUpdatedDate - API call');
+    APIService.apiRequest(Constants.API_BASE_URL + '/getLastUpdatedDates', datePayLoad, false, 'POST', this.controller)
+      .then(response => {
+        if (response.status === 1 && response.data !== undefined) {
+          let lastupdateddate = JSON.parse(response.data);
+          let defaultCount = 2;
+          let defaultFormat = 'years';
+
+          if (!lastupdateddate[0]['last_updated_date']) return false;
+
+          //Set last updated date and last 30days date range under analysis period input box
+          let formattedDate = moment(lastupdateddate[0]['last_updated_date']).utc().format('MMM DD, YYYY');
+          let endDate = moment(lastupdateddate[0]['last_updated_date']).utc().toDate();
+          let formattedEndDate = moment(endDate.getTime() + endDate.getTimezoneOffset() * 60000).toDate(); //convert to utc time
+          let formattedStartDate = moment(formattedEndDate).subtract(defaultCount, defaultFormat).toDate();
+          let formattedDateRange = [formattedStartDate, formattedEndDate];
+
+
+          console.log('formattedDate', formattedDate);
+          console.log('endDate', endDate);
+          console.log('formattedEndDate', formattedEndDate);
+
+          this.setState({
+            lastUpdatedDate: formattedDate,
+            lastUpdatedDateObj: formattedEndDate,
+            selectedDateRange: formattedDateRange,
+            inprocess: false
+          }, () => {
+            subjectObj.notify({
+              last_updated_date: this.state.lastUpdatedDate,
+              client: this.state.client
+            });
+
+            //Load Chart Data
+            const chartsPayLoad = { ...this.getChartsFilters() }
+            this.getIndexData(chartsPayLoad);
+          });
+        } else {
+          this.setState({ inprocess: false, error: response.msg });
+        }
+      })
+      .catch(err => {
+        this.setState({ inprocess: false, error: err.msg });
+      });
+  }
+
+
+  //Handle Date Period Change
+  handleDatePeriodChange(date_range) {
+    //Input Validations and Send Fetch Request
+    this.setState({
+      selectedDateRange: date_range,
+    });
+  }
+
+  //Get Dimension using API
+  getAllDimensions(evt) {
+    //Input Validations and Send Fetch Request
+    //For Site Specific Access - Fetch tha perticular dimensions only
+    let dimension_filters = "";
+    if (this.user.parent_organization_id > 1) {
+      let filters = [];
+      if (Array.isArray(this.user.attributes)) {
+        this.user.attributes.forEach((item) => {
+          filters.push(item.site_name);
+        });
+      }
+      dimension_filters = { "property": filters };
+    }
+
+    const dimensionPayLoad = {
+      "client_id": this.state.client.id,
+      "view_type": this.view_type,
+      "dimension": "device_category,monetization_channel,region",
+      "dimension_filter": dimension_filters,
+    };
+    // this.logInfo('Home: Get All Dimensions');
+
+    APIService.apiRequest(Constants.API_BASE_URL + '/getAllDimensions', dimensionPayLoad, false, 'POST', this.controller)
+      .then(response => {
+        if (response.status === 1 && response.data !== undefined) {
+          let dimensions = JSON.parse(response.data);
+          let allDimensions = [];
+          Object.keys(dimensions).forEach(function (key) {
+            let options = JSON.parse(dimensions[key]);
+            allDimensions[key] = options;
+          });
+          this.setState({ dimensions: allDimensions });
+        } else {
+          this.setState({ inprocess: false, error: response.msg });
+        }
+      })
+      .catch(err => {
+        this.setState({ inprocess: false, error: err.msg });
+      });
+  }
+
+  //Chart Filters to get charts data
+  getChartsFilters() {
+    var start_date = formatDate(this.state.selectedDateRange[0], 'MM/DD/YYYY');
+    var end_date = formatDate(this.state.selectedDateRange[1], 'MM/DD/YYYY');
+    var formatted_date_range = start_date + ' - ' + end_date;
+    let obj = {
+      "daterange": formatted_date_range,
+      "scaling_type": "same_starting",
+    };
+
+    let combinations = [];
+    this.state.selectedDimensions.forEach((item, i) => {
+      let device_category = item.device_category;
+      let monetization_channel = item.monetization_channel;
+      let region = item.region;
+      combinations.push({ device_category, monetization_channel, region });
+    });
+    obj['combinations'] = combinations;
+
+    return obj;
+  }
+
+  //Get Dashboard
+  getIndexData(apiPayload) {
+    //Input Validations and Send Fetch Request
+    this.setState({
+      error: '',
+      inprocess: true
+    });
+
+    let api_url = '/get_indexes/';
+
+
+    //Input Validations and Send Fetch Request
+    APIService.apiRequest(Constants.API_BASE_URL + api_url, apiPayload, false, 'POST', this.controller)
+      .then(response => {
+        if (response.status === 1 && response.data !== undefined) {
+          // console.timeEnd('sight: get_index - API call'); 
+          let data = response.data;
+          this.setState({
+            indexData: this.state.selectedDimensions.length > 1? data : data['index0'] ,
+            inprocess: false
+          }, () => {
+            let chartsDataArr = {}; //to store charts data
+            let chartsSegmentation = {}; //to store charts data
+            let isAnyChartSegmented = false;
+            let hover_chart_value = '';
+            // let dataLen = (this.state.selectedDimensions.length > 1) ? Object.keys(data).length : data.length;
+            let dataLen =  Object.keys(this.state.indexData).length ;
+
+            if (dataLen > 0) {
+              //Net details data array
+              var chartsNetData = {};
+
+              if (this.state.selectedDimensions.length > 1) { //is comparision enabled
+                let comparisonData = { 'index': this.state.indexData };
+                //Get data for each chart
+                for (var key in comparisonData) {
+                  if (comparisonData.hasOwnProperty(key)) {
+                    let chart_type = key;
+                    let chartResponse = comparisonData[chart_type]; //Columns Data
+
+                    let colx = 'date';
+                    let coly = chart_type;
+
+                    //Display Hover Value Table Structure for Charts
+                    let chart_selector = chart_type.replace("/", ""); //using for performance impr/pv chart only
+
+                    hover_chart_value += '<table class="crosshover-table ' + chart_selector + '">';
+                    hover_chart_value += '<tr>';
+                    hover_chart_value += '<th width="4%"><span class="color"></span><span class="bg"></span></th>';
+                    hover_chart_value += '<th width="46%">Type <span class="bg"></span></th>';
+                    hover_chart_value += '<th width="30%"><span class="value">' + chart_type.replace("_", " ") + '</span><span class="bg"></span></th>';
+                    hover_chart_value += '<th width="20%"><span class="change">Change</span><span class="bg"></span></th>';
+                    hover_chart_value += '</tr>';
+                    hover_chart_value += '</table>';
+
+                    //Parse Chart Data
+                    var parseDataObj = {
+                      data: chartResponse,
+                      segmentation: '',
+                      colx: colx,
+                      coly: coly,
+                      isComparisonEnabled: true,
+                      comparisonXAxisKey: 'index_date',
+                      comparisonDataKey: 'index'
+                    };
+                    chartsDataArr[chart_type] = parseChartData(parseDataObj);;
+
+                    //Period Comparison Data
+                    var chartNumberSymbol = "";
+                    if (chart_type === 'fill_rate' || chart_type === "viewability") {
+                      chartNumberSymbol = "%";
+                    } else if (chart_type === 'revenue' || chart_type === 'cpm' || chart_type === 'rpm' || chart_type === 'rpms' || chart_type === 'rpmu') {
+                      chartNumberSymbol = "$";
+                    } else {
+                      chartNumberSymbol = "";
+                    }
+
+                    chartsNetData[chart_type] = {
+                      "title": chart_type,
+                      "symbol": chartNumberSymbol,
+                      "net_detail": chartResponse['net_details'],
+                      "change": chartResponse['change'],
+                      "period_comparison_change": null,
+                      "period_comparison_net_details": null,
+                      "prev_date_range": null,
+                      "segmented_net_details": null
+                    };
+                  }
+                }
+              } else {
+                let chart_type = 'index';
+                let colx = 'date';
+                let coly = chart_type;
+
+                if (isAnyChartSegmented) {
+                  hover_chart_value += '<table class="crosshover-table ' + chart_type + '">';
+                  hover_chart_value += '<tr>';
+                  hover_chart_value += '<th width="7.5%"><span class="color"></span><span class="bg"></span></th>';
+                  hover_chart_value += '<th width="52.5%">' + chart_type.replace("_", " ") + '<span class="bg"></span></th>';
+                  hover_chart_value += '<th width="40%"><span class="value"></span><span class="bg"></span></th>';
+                  hover_chart_value += '</tr>';
+                  hover_chart_value += '</table>';
+                } else {
+                  hover_chart_value += '<div class="crosshover-table div ' + chart_type + '">';
+                  hover_chart_value += '<div class="info">';
+                  hover_chart_value += '<div class="label">' + chart_type.replace("_", " ") + '</div>';
+                  hover_chart_value += '<div class="val"><span class="value"></span></div>';
+                  hover_chart_value += '</div>';
+                  hover_chart_value += '</div>';
+                }
+
+                //Parse Chart Data
+                var parseDataObj1 = {
+                  data: this.state.indexData,
+                  segmentation: '',
+                  colx: colx,
+                  coly: coly,
+                  isComparisonEnabled: false,
+                  comparisonXAxisKey: 'index_date',
+                  comparisonDataKey: 'period',
+                  isDateComparison: false
+                };
+                chartsDataArr[chart_type] = parseChartData(parseDataObj1);
+              }
+
+
+              //Draw MultiLine Charts
+              this.setState({
+                chartsFormattedData: chartsDataArr,
+                chartsFormattedSegmentation: chartsSegmentation,
+                inprocess: false,
+                resetFilters: false,
+                isAnyChartSegmented: isAnyChartSegmented
+              }, () => {
+                d3.select('#multicharts-details .charts-hover-value').html(hover_chart_value);
+
+                //Render Multi-Line Charts
+                let paramsObj = {
+                  chartXAxisWrapper: this.multiChartsXAxisWrapper, //ref
+                  chartWrapper: this.multiChartsWrapper, //ref
+                  chartsDataObj: this.state.chartsFormattedData, //formatted chart data
+                  chartsNetData: null, // Net details for showing total on chart mouse out
+                  chartsSegmentationObj: this.state.chartsFormattedSegmentation, //formatted chart segmentation
+                  insightnotesObj: [], //insight notes
+                  isEmpty: false,
+                  dateRange: null,
+                  isSegmented: this.state.isAnyChartSegmented, //has segmentation
+                  view_type: 'marketing_index',
+                  enableZooming: true
+                };
+
+                if (this.state.selectedDimensions.length > 1) {
+                  paramsObj['isComparisonEnabled'] = true;
+                  paramsObj['comparisonXAxisKey'] = 'index_date'; //x-axis Key 
+                  paramsObj['comparisonDataKey'] = 'index'; //data Key
+                }
+                // drawMultiLineCharts(paramsObj);
+              });
+
+            } else {
+              let minDate = parseChartDate(this.state.selectedDateRange[0]);
+              let maxDate = parseChartDate(this.state.selectedDateRange[1]);
+              chartsDataArr['index'] = {};
+
+              this.setState({
+                inprocess: false,
+                chartsFormattedData: chartsDataArr,
+                chartsFormattedSegmentation: chartsSegmentation,
+                resetFilters: false,
+                isAnyChartSegmented: isAnyChartSegmented
+              }, () => {
+                //Draw Empty Chart
+                // drawMultiLineCharts({
+                //   chartXAxisWrapper: this.multiChartsXAxisWrapper, //ref
+                //   chartWrapper: this.multiChartsWrapper, //ref
+                //   chartsDataObj: this.state.chartsFormattedData, //formatted chart data
+                //   chartsNetData: null, // Net details for showing total on chart mouse out
+                //   chartsSegmentationObj: this.state.chartsFormattedSegmentation, //formatted chart segmentation
+                //   insightnotesObj: [], //insight notes
+                //   isEmpty: true,
+                //   dateRange: [minDate, maxDate],
+                //   isSegmented: this.state.isAnyChartSegmented, //has segmentation
+                //   view_type: 'marketing_index'
+                // });
+              });
+            }
+          });
+
+        } else {
+          this.setState({ inprocess: false });
+        }
+      })
+      .catch(err => {
+        this.setState({ error: err.msg });
+      });
+  }
+
+  //Get the last selected client
+  getLastSelectedClient() {
+    //if client is not selected in state
+    if (this.props.match.params.id === undefined || this.props.match.params.id === '' || this.props.match.params.id === '404') {
+      if (this.user.last_fetched_client !== undefined && this.user.last_fetched_client !== '') {
+        let clientIndex = this.clients.findIndex(x => x.id === this.user.last_fetched_client);
+        return this.clients[clientIndex].name;
+      } else {
+        return this.clients[0].name;
+      }
+    }
+  }
+
+  //On Select Change
+  handleSelectedDimensionChange(value, id, i) {
+    let updatedSelectedDimensions = JSON.parse(JSON.stringify(this.state.selectedDimensions));
+    updatedSelectedDimensions[i][id] = value;
+    const dimensionList = this.state.selectedDimensions;
+    const dimension = this.state.selectedDimensions[i];
+    this.setState({
+      selectedDimensions: [...dimensionList.slice(0, i), { ...dimension, [id]: value }, ...dimensionList.slice(i + 1)]
+    });
+  }
+
+
+  //Skeleton Charts Loading
+  skeletonLoading() {
+    return (
+      <div id="chart-section" className="skeleton-wrapper">
+        <div id="multicharts-wrapper" className="skeleton">
+          <div id="multicharts-xaxis"></div>
+          <div id="multicharts">
+            <div key="1" className="chart"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+
+  //Update Accordion Status
+  updateTabs(index) {
+    let tabs = this.state.values_tabs;
+    let newtabs = tabs.map((tab, i) => {
+      if (index === i) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    return newtabs;
+  }
+
+  //Accordion Click
+  handleTabClick(index) {
+    this.setState({
+      values_tabs: this.updateTabs(index)
+    });
+  }
+
+
+  //Apply Filters of Trend
+  handleApplyTrendFilters(e) {
+    e.preventDefault();
+    const chartsPayLoad = { ...this.getChartsFilters() };
+    this.getIndexData(chartsPayLoad); //charts payload
+  }
+
+  //Reset Filters of Trend
+  handleResetTrendFilters(e) {
+    e.preventDefault();
+
+    let obj = {
+      resetFilters: true,
+      isAnyChartSegmented: false,
+      chartsFormattedData: {},
+      chartsSegmentation: {},
+      chartsFormattedSegmentation: {},
+      selectedDimensions: [this.getInitDimension()]
+    }
+
+    // reset the selectedDateRanges with the range = last 30 days from last_update_date 
+    let defaultCount = 2;
+    let defaultFormat = 'years';
+
+    //Set last updated date and last 30days date range under analysis period input box
+    let endDate = moment(this.state.lastUpdatedDate).utc().toDate();
+    let formattedEndDate = moment(endDate.getTime() + endDate.getTimezoneOffset() * 60000).toDate(); //convert to utc time
+    let formattedStartDate = moment(endDate).subtract(defaultCount, defaultFormat).toDate();
+    let formattedDateRange = [formattedStartDate, formattedEndDate];
+    obj['selectedDateRange'] = formattedDateRange;
+
+    this.setState(obj, () => {
+      const chartsPayLoad = this.getChartsFilters();
+      this.getIndexData(chartsPayLoad); //charts payload, show loading
+    });
+  }
+
+  //Add New Diemnsions Set
+  handleAddNewDimensions(e) {
+    e.preventDefault();
+    if (this.state.selectedDimensions.length > 4) return;
+    this.setState({ selectedDimensions: [...this.state.selectedDimensions, this.getInitDimension()] });
+  }
+
+  //Remove Diemnsions Set
+  handleRemoveDimensions(e, i) {
+    e.preventDefault();
+    const list = this.state.selectedDimensions;
+    this.setState({ selectedDimensions: [...list.slice(0, i), ...list.slice(i + 1)] });
+  }
+
+
+
+  render() {
+    const SkeletonLoading = (this.skeletonLoading) ? this.skeletonLoading : '';
+
+    return (
+      <div className="app-wrapper ad-index-wrapper">
+        {/* <div id="app-sub-header">
+          <h2 className="page-title">Ad Index</h2>
+        </div> */}
+
+        <div className="container">
+          <div className="odin-view marketing-index clearfix">
+
+            {/* CrossHair Values - Panel */}
+            <div id="col-charts-values" className={'col-view ' + (this.state.crosshairColExpanded ? 'expanded' : '')}>
+              <div className="tabs-wrapper">
+                <ul className="tabs">
+                  <li id="tab-filters" className={this.state.values_tabs[0] === true ? 'item active' : 'item'}>
+                    <a href="#" data-id="charts-filters" className="tab-title" onClick={() => this.handleTabClick(0)}>Filters</a>
+                  </li>
+                  <li id="tab-crosshair" className={this.state.values_tabs[1] === true ? 'item active' : 'item'}>
+                    <a href="#" data-id="charts-crosshair" className="tab-title" onClick={() => this.handleTabClick(1)}>Crosshair Values <span className="label date"></span></a>
+                  </li>
+                </ul>
+
+                {/* <button className={'btn-crosshair-expand-toggle '+(this.state.crosshairColExpanded ? 'expand' : 'collapse')} onClick={this.handleCrossHairColExpand}>expand</button> */}
+
+                <div className="tabs-content-wrapper">
+                  <div id="charts-filters" className={'tab-content ' + (this.state.values_tabs[0] === true ? 'active' : '')}>
+                    <div className="console-btn-wrapper">
+                      <button className="btn-run" title="Run" onClick={this.handleApplyTrendFilters}>Run</button>
+                      <button className="btn-reset" title="Reset" onClick={this.handleResetTrendFilters}>Reset</button>
+                    </div>
+
+                    <div id="view-data-filters" className="clearfix">
+                      <div className="analysis-period variable">
+                        <div className="title"><span>Period</span></div>
+                        <div className="content">
+                          {this.state.client &&
+                            <div className="date-period-wrapper">
+                              <RangePicker picker="date"
+                                range={this.state.selectedDateRange}
+                                dateForLastDaysCalculation={this.state.lastUpdatedDateObj}
+                                onChange={this.handleDatePeriodChange}
+                                disableFn={(dObj) => isDateGreater(dObj, this.state.lastUpdatedDateObj)}
+                                allowClear={false}
+                                showOkCancelBtns={true}
+                              />
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <div className="dimensions-wrapper variable clearfix">
+                        <div className="title-wrapper">
+                          <div className="title"><span>Dimensions</span></div>
+                          <button className="btn-add-dimension" disabled={(this.state.selectedDimensions.length >= 5 ? true : false)} onClick={this.handleAddNewDimensions}>add new</button>
+                        </div>
+
+                        <div className="content">
+                          {
+                            this.state.selectedDimensions.map((item, i) => {
+                              return (<div className="dimensions">
+                                {i > 0 &&
+                                  <div className="btn-remove-wrapper">
+                                    <button className="btn-remove-dimension" onClick={(e) => this.handleRemoveDimensions(e, i)}>remove</button>
+                                  </div>
+                                }
+
+                                {this.state.dimensions['monetization_channel'] !== undefined &&
+                                  <div className="form-group">
+                                    <SpeedSelect
+                                      options={this.state.dimensions['monetization_channel']}
+                                      selectedOption={(item['monetization_channel']) ? item['monetization_channel'] : []}
+                                      onSelect={(e) => this.handleSelectedDimensionChange(e, 'monetization_channel', i)}
+                                      displayKey='value'
+                                      uniqueKey='monetization_channel'
+                                      selectLabel='Select'
+                                      maxHeight={138}
+                                      prominentLabel='Monetization Channel'
+                                      isLabelClickable={true}
+                                    />
+                                  </div>
+                                }
+
+
+                                {this.state.dimensions['device_category'] !== undefined &&
+                                  <div className="form-group">
+                                    <SpeedSelect
+                                      options={this.state.dimensions['device_category']}
+                                      selectedOption={(item['device_category']) ? item['device_category'] : []}
+                                      onSelect={(e) => this.handleSelectedDimensionChange(e, 'device_category', i)}
+                                      displayKey='value'
+                                      uniqueKey='device_category'
+                                      selectLabel='Select'
+                                      maxHeight={138}
+                                      prominentLabel='Device Category'
+                                      isLabelClickable={true}
+                                    />
+                                  </div>
+                                }
+
+                                {this.state.dimensions['region'] !== undefined &&
+                                  <div className="form-group">
+                                    <SpeedSelect
+                                      options={this.state.dimensions['region']}
+                                      selectedOption={(item['region']) ? item['region'] : []}
+                                      onSelect={(e) => this.handleSelectedDimensionChange(e, 'region', i)}
+                                      displayKey='value'
+                                      uniqueKey='region'
+                                      selectLabel='Select'
+                                      maxHeight={138}
+                                      prominentLabel='Region'
+                                      isLabelClickable={true}
+                                    />
+                                  </div>
+                                }
+                              </div>)
+                            })
+                          }
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <div id="charts-crosshair" className={'tab-content ' + (this.state.values_tabs[1] === true ? 'active' : '')}>
+                    <div id="multicharts-details">
+                      {/* {isValuesTypeDefault && */}
+                      <div className="date-wrapper">
+                        <span className="date-label">DATE</span>
+                        <span className="date"></span>
+                      </div>
+                      {/* } */}
+
+                      <div className="charts-hover-value"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Charts - Panel */}
+            <div id="col-charts-wrapper" className="col-view">
+              {this.state.inprocess && <SkeletonLoading />}
+
+              {!this.state.inprocess &&
+                <div id="chart-section">
+                  <div id="multicharts-wrapper">
+                    <div id="multicharts-xaxis" ref={this.multiChartsXAxisWrapper}></div>
+                    <div id="multicharts" ref={this.multiChartsWrapper}></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+}
+
+
+export default AdIndex;

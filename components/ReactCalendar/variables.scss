@@ -1,0 +1,67 @@
+//Font Family
+$font-opensans: 'Open Sans', sans-serif, helvetica;
+
+// Dark Mode Color - 
+// #1B262C #000839 #000000 #323232 #30475E 
+// #142850 #27496D #333333 #706C61 #4D4646 
+// #5B5656 #222831 #393E46 #1B2A49 #010038 
+// #0F4C75 #5F6769 #3C4245 #23374D #000272
+
+//Theme Colors
+$theme-colors: (
+  'primary': (
+    'base': #0d22f3,
+    'light': #ffffff,
+    'dark': #000000,
+    'blue': #0d22f3,
+    'dark-blue': #090088,
+    'yellow': #F9FD00,
+    'red': #FF0000,
+    'pink': #FF00FF,
+    'aqua': #00FFFF,
+    'orange': #FFA500,
+    'green': #00FF7F,
+    'spring-green': #00FF00
+  ),
+  'foreground': (
+    'base': #ffffff,
+    'light': #ffffff,
+    'dark': #000000
+  ),
+  'background': (
+    'base': #000000,
+    'light': #ffffff,
+    'dark': #000000,
+    'dark-grey': #414141,
+    'light-grey': #494949,
+    'super-dark-grey': #232323
+  ),
+  'stroke': (
+    'base': #999999,
+    'light': #999999,
+    'dark': #333333,
+    'grey1': #434343,
+    'grey2': #666666
+  ),
+  'alert': (
+    'info': #CCE4FC,
+    'info-text': #4C77AD,
+    'warning': #FEF3CD,
+    'warning-text': #93752E,
+    'error': #F8D7DA,
+    'error-text': #721C24,
+    'success': #D4EDDA,
+    'success-text': #245824,
+  )
+);
+
+@function theme-color($key: 'primary', $variant: 'base') {
+  $map: map-get($theme-colors, $key);
+  @return map-get($map, $variant);
+}
+
+@mixin border-radius($radius) {
+  border-radius: $radius;
+  -moz-border-radius: $radius;
+  -webkit-border-radius: $radius;
+}

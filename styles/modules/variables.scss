@@ -1,0 +1,191 @@
+/* Theme Config */
+:root {
+  //Global Variables
+  --blue-color: #0d22f3;
+  --yellow-color: #F9FD00;
+  --red-color: #FF0000;
+  --orange-color: #FFA500;
+  --pink-color: #FF00FF;
+  --aqua-color: #00FFFF;
+  --primary-green-color: #00FF7F;
+  --secondary-green-color: #00bb5a;
+  --spring-green-color: #00FF00;
+  --bg-color: #000;
+  --font-color: #fff;
+  --reverse-font-color: #202124;
+  --font-size:11px;
+  --transition: 300ms all;
+
+  //Sidebar Variables
+  --sidebar-width: 0px;
+  --sidebar-bg-color: #222831;
+  --sidebar-submenu-bg-color: #fff;
+
+  //Header Variables
+  --header-bg-color: #5f6769;
+  --header-default-icon-color: #b1b2b3;
+  --header-logo: url("/images/logo/logo-sight.svg");
+  --header-logo-bg-color: #fff; 
+  --header-logo-text-color: #FFA500;
+  --header-profile-dropdown-background-color: #fff;
+  --subheader-bg-color: #393e46;
+  --subheader-title-bg-color: #222831;
+  --subheader-title-font-color: #fff;
+  --subheader-default-icon-color: #fff;
+  --subheader-dashboard-tab-bg-color: #232931;
+  --subheader-dashboard-tab-home-icon-color: rgba(255,255,255,0.37);
+  --subheader-dashboard-tab-selected-font-color: #fff;
+  --subheader-dashboard-tab-close-icon-color: #fff;
+  --breadcrumb-color: #fff;
+  --select-label-bg: #333;
+  --site-list-bg: #444444;
+  --site-settings-bg: #222;
+  --site-settings-border: transparent;
+  --site-hover-bg: #333;
+  --site-tagline-color: #efefef;
+
+
+  // Table Variables
+  --trendmaster-home-table-strip:rgba(52, 52, 52, 0.5);
+  --trendmaster-home-table-font-color:#fff;
+  --trendmaster-home-table-strip-hover-color:rgba(52, 52, 52, 0.9);
+  --trendmaster-home-table-icon:#8b8b8b;
+
+  //Calendar
+  --calendar-header-color: yellow;
+}
+
+
+[data-theme="light"] {
+  // Global Variables
+  --blue-color: #0d22f3;
+  --yellow-color: #F9FD00;
+  --red-color: #FF0000;
+  --orange-color: #FFA500;
+  --pink-color: #FF00FF;
+  --aqua-color: #00FFFF;
+  --primary-green-color: #00FF7F;
+  --secondary-green-color: #00bb5a;
+  --spring-green-color: #00FF00;
+  --bg-color: #F2F5F7;
+  --font-color: #202124;
+  --reverse-font-color: #fff;
+
+  //Sidebar Variables
+  --sidebar-width: 30px;
+  --sidebar-bg-color: #5f6367;
+  --sidebar-submenu-bg-color: #c3c3c3;
+
+  //Header and Subheader Variables
+  --header-bg-color: #fff;
+  --header-default-icon-color: #6C757D;
+  --header-logo: url("/images/logo/logo-bydata-only-text.svg");
+  --header-logo-bg-color: #000;
+  --header-logo-text-color: #0d22f3;
+  --header-profile-dropdown-background-color: #efefef;
+  --subheader-bg-color: #dbe0e5;
+  --subheader-title-bg-color: #5f6367;
+  --subheader-title-font-color: #fff;
+  --subheader-dashboard-tab-bg-color: rgba(0,0,0,0.07);
+  --subheader-dashboard-tab-home-icon-color: rgba(0,0,0,0.30);
+  --subheader-dashboard-tab-selected-font-color: #000;
+  --subheader-dashboard-tab-close-icon-color: #000;
+  --breadcrumb-color: rgba(0,0,0,0.67);
+  --select-label-bg: rgba(0,0,0,0.20);
+  --site-list-bg: #fff;
+  --site-settings-bg: rgba(17,17,17,0.03);
+  --site-settings-border: #dddddd;
+  --site-hover-bg: rgba(0,0,0,0.05);
+  --site-tagline-color: rgba(0,0,0,0.6);
+
+  // Table Variables
+  --trendmaster-home-table-strip:#fff;
+  --trendmaster-home-table-font-color:#48494B;
+  --trendmaster-home-table-strip-hover-color:rgba(52, 52, 52, 0.2);
+  --trendmaster-home-table-icon:#666;
+
+  //Calendar
+  --calendar-header-color: #202124;
+}
+/* End - Theme Config */
+
+
+
+//Font Family
+$font-opensans: 'Open Sans', sans-serif, helvetica;
+$font-montserrat: 'Montserrat', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$header_height: 30px;
+$sub_header_height: 30px;
+$sidebar_width: 0px;
+
+//Theme Colors
+$theme-colors: (
+  'primary': (
+    'base': #0d22f3,
+    'light': #ffffff,
+    'dark': #000000,
+    'blue': #0d22f3,
+    'dark-blue': #090088,
+    'yellow': #F9FD00,
+    'red': #FF0000,
+    'pink': #FF00FF,
+    'aqua': #00FFFF,
+    'orange': #FFA500,
+    'green': #00FF7F,
+    'spring-green': #00FF00,
+    'run-btn-green': #00bb5a
+  ),
+  'foreground': (
+    'base': #ffffff,
+    'light': #ffffff,
+    'dark': #000000
+  ),
+  'background': (
+    'base': #000000,
+    'light': #ffffff,
+    'dark': #000000,
+    'dark-grey': #414141,
+    'light-grey': #494949,
+    'super-dark-grey': #232323
+  ),
+  'stroke': (
+    'base': #999999,
+    'light': #999999,
+    'dark': #333333,
+    'grey1': #434343,
+    'grey2': #666666
+  ),
+  'alert': (
+    'info': #CCE4FC,
+    'info-text': #4C77AD,
+    'warning': #FEF3CD,
+    'warning-text': #93752E,
+    'error': #F8D7DA,
+    'error-text': #721C24,
+    'success': #D4EDDA,
+    'success-text': #245824,
+  )
+);
+
+
+@function theme-color($key: 'primary', $variant: 'base') {
+  $map: map-get($theme-colors, $key);
+  @return map-get($map, $variant);
+}
+
+@mixin border-radius($radius) {
+  border-radius: $radius;
+  -moz-border-radius: $radius;
+  -webkit-border-radius: $radius;
+}
+
+@mixin box-shadow($hoffset, $voffset, $blur, $spread, $color) {
+  -webkit-box-shadow: $hoffset $voffset $blur $spread $color;
+  -moz-box-shadow: $hoffset $voffset $blur $spread $color;
+  box-shadow: $hoffset $voffset $blur $spread $color;
+}
+@mixin mask-size($size) {
+  -webkit-mask-size: $size;
+  mask-size: $size;
+}

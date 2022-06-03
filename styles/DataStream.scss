@@ -1,0 +1,325 @@
+@import 'modules/variables.scss';
+
+/***************************
+  === Views Styling ===
+****************************/
+#app-main-wrapper{
+  &.data-stream{
+    padding-top: $header_height;
+    
+    #app-header{
+      .sites-list-wrapper{
+        top: $header_height + 5;
+      }
+    }
+  }
+}
+
+
+.data-stream-view{
+  .inner-wrapper{
+    padding: 15px 15px 0 15px;
+  }
+
+  .row{
+    margin: 0;
+    padding: 0;
+  
+    .col-30,
+    .col-40,
+    .col-50,
+    .col-60{ 
+      display: inline-block; 
+      vertical-align: top; 
+      margin-right: 1%;
+    }
+    .col-30{ width: 29%; }
+    .col-40{ width: 39%; }
+    .col-50{ width: 49%; }
+    .col-60{ width: 59%; }
+  }
+ 
+  .api-details-wrapper{
+    .row{
+      margin: 0;
+      padding: 0;
+      
+      .col-60,
+      .col-40{
+        display: inline-block;
+        vertical-align: top;
+        margin: 0 1% 0 0;
+        padding: 0;
+
+        .section{ margin: 0; padding: 0;}
+      }
+      .col-60{ width: 56.4%; }
+      .col-40{ width: 42.6%; margin-right: 0; }
+    }
+  }
+
+
+  #app-sub-header{
+    .page-title{
+      display: inline-block;
+      width: auto;
+      vertical-align: top;
+      &.link{ cursor: pointer; }
+    }
+  }
+
+  #query-parameter,
+  #segmentation,
+  #generate-token{
+    .custom-table{
+      td{ text-transform: none; }
+    }
+  }
+
+  #generate-token{
+    .custom-table{
+      min-width: auto;
+
+      .field-control{ max-width: 180px; outline: none; }
+      .alert{ display: inline-block; vertical-align: middle; margin: 0; }
+      .btn-revoke-submit{ margin-right: 5px;}
+      .access-token{ 
+        display: inline-block;
+        vertical-align: middle;
+        width: 220px; 
+        max-width: 220px;
+        height: 25px;
+        overflow: auto; 
+        background: #333; 
+        color: #fff;
+        border: none;
+        outline: none;
+        padding: 2px 6px; 
+        margin: 0 10px 0 0;
+        font-size: .825rem;
+      }
+
+      .btn-copy{
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 2px;
+        width: 18px; height: 18px;
+        -webkit-mask: url('../images/icon-copy.svg') no-repeat center center;
+        mask: url('../images/icon-copy.svg') no-repeat center center;
+        mask-repeat: no-repeat;
+        mask-position: center center;
+        -webkit-mask-size: 18px;
+        mask-size: 18px;
+        background: #fff;
+        border: none;
+        outline: none;
+        text-indent: -9999em;
+        cursor: pointer;
+
+        &.disabled{
+          background: #999;
+          cursor: block;
+        }
+      }
+      .copy-msg{
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 5px;
+        font-size: .85rem;
+        // color: theme-color('primary','spring-green');
+        color: #fff;
+      }
+      .btn-submit{
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 4px;
+        width: 22px; height: 22px;
+        -webkit-mask: url('../images/icon-next.svg') no-repeat center center;
+        mask: url('../images/icon-next.svg') no-repeat center center;
+        mask-repeat: no-repeat;
+        mask-position: center center;
+        -webkit-mask-size: 22px;
+        mask-size: 22px;
+        background: #fff;
+        border: none;
+        outline: none;
+        text-indent: -9999em;
+        cursor: pointer;
+      }
+    }
+  }
+
+
+  #query-parameter{
+    .custom-table{
+      min-width: auto;
+    }
+  }
+  #segmentation{
+    .table-wrapper{
+      width: auto;
+      min-width: auto;
+      max-width: auto;
+      overflow-x: auto;
+
+      th, td{  
+        white-space: pre-wrap !important;
+      }
+
+      th{
+        &:after{
+          top: auto;
+          bottom: 0;
+          background: rgb(61,122,252);
+          // background: theme-color('primary', 'base');
+        }
+        .bg{
+          position: absolute;
+          top: 0; left: 0; 
+          bottom: 0; right: 0;
+          background: rgba(61,122,252, .15);
+          z-index: -1;
+        }
+      }
+
+      .html-val{
+        span{ display: inline-block; }
+      }
+      
+    }
+  }
+
+  #token-wrapper{
+    .api-example{
+      margin: 0 0 35px 0;
+      width: 405px;
+      
+      .header{
+        background: #000;
+        margin: 0;
+        height: 25px;
+        position: relative;
+        border-top-left-radius: 2px;
+        border-top-right-radius: 2px;
+
+        .inner-wrapper{
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 25px;
+          padding: 0 6px;
+          z-index: 9;
+          vertical-align: top;
+          background: rgba(249,253,0, .15); //yellow
+          border-bottom: 1px solid theme-color('primary', 'yellow');
+          font-size: .9rem;
+          line-height: 25px;
+          border-top-left-radius: 2px;
+          border-top-right-radius: 2px;
+        }
+      }
+
+      .details{
+        display: block;
+        position: relative;
+        margin: 0;
+        padding: 4px 6px;
+        background: rgba(255,255,255,.1);
+        border-bottom-left-radius: 2px;
+        border-bottom-right-radius: 2px;
+        color: #fff;
+      }
+      
+    }
+  }
+
+
+  .section{
+    padding: 0 !important;
+
+    .section-header{
+      .section-title{
+        display: inline-block;
+        font-size: .875rem;
+        font-weight: 400;
+        margin: 0;
+        padding: 1px 6px;
+        border: none;
+        border-top-left-radius: 2px;
+        border-top-right-radius: 2px;
+        background: theme-color('primary', 'yellow');
+        color: #000;
+      }
+    }
+  }
+
+  #generate-token{
+    margin: 0 0 45px 0;
+
+    .action-button-wrapper{
+      margin: 0 0 20px 0;
+      .btn{ margin-right: 10px; }
+    }
+
+    .token-wrapper{
+      display: inline-block;
+      margin-left: 20px;
+      width: 580px;
+
+      .token,
+      .btn-copy,
+      .copy-msg{
+        display: inline-block;
+        margin: 0 10px 0 0;
+      }
+    }
+
+    .token{
+      width: 100%;
+      max-width: 310px;
+      padding: 0 6px;
+      background: #dedede;
+      border: none;
+      border-radius: 2px;
+      display: inline-block;
+      vertical-align: top;
+      overflow-x: auto;
+      font-size: .825rem;
+      line-height: 1;
+      word-break: none;
+      margin-left: 20px;
+      outline: none;
+    }
+
+    .alert{ max-width: 380px; }
+
+
+    .form-wrapper{
+      max-width: 380px;
+      position: relative;
+
+      .showloading{
+        position: absolute;
+        
+        object{
+          top: 50%;
+          width: 32px; 
+          height: 32px;
+        }
+      }
+
+      #frm-generate-token{
+        max-width: 380px;
+      }
+    
+      .field-control{
+        padding: 6px 10px;
+        outline: none;
+        font-size: .9rem;
+    
+        &:disabled{ background: #999; }
+      }
+
+    }
+    
+  }
+}

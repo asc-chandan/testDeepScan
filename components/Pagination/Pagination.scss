@@ -1,0 +1,73 @@
+/***************************
+  == Pagination ==
+***************************/
+.pagination-wrapper{
+    margin: 15px 0;
+    
+    .records-info,
+    .records-per-page,
+    .pagination{
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: top;
+    }
+  
+    .records-per-page{
+      margin-left: 10px;
+      padding-left: 20px;
+      border-left: 1px solid #333;
+    }
+  
+    .pagination{
+      margin-left: 10px;
+      padding-left: 20px;
+      border-left: 1px solid #333;
+  
+      .input-field,
+      .total-pages,
+      .controls{
+        display: inline-block;
+        margin-right: 10px;
+        vertical-align: top;
+      }
+  
+      .input-field{
+        border: 1px solid #fff;
+        border-radius: 2px;
+        min-width: 30px;
+        max-width: 30px;
+        height: 22px;
+        outline: none;
+        line-height: 22px;
+        padding: 0 4px;
+        text-align: center;
+      }
+      .controls{
+        .btn-prev,
+        .btn-next{
+          display: inline-block;
+          width: 28px;
+          height: 24px;
+          border: none;
+          outline: none;
+          -webkit-mask: url('../../images/icon-next.svg') no-repeat center center;
+          mask: url('../../images/icon-next.svg');
+          mask-repeat: no-repeat;
+          mask-position: center center;
+          -webkit-mask-size: 22px;
+          mask-size: 22px;
+          text-indent: -999em;
+          background: #fff;
+          cursor: pointer;
+
+          &:disabled{
+            background: #999;
+            cursor: not-allowed;
+          }
+        }
+        .btn-prev{
+          transform: rotate(-180deg);
+        }
+      }
+    }
+}

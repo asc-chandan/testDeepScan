@@ -1,0 +1,197 @@
+/************************
+  === Checkbox & Radio ===
+**************************/
+.checkbox, .radio{
+  position: relative;
+  input{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    &:disabled {
+      ~ label {
+        opacity: 0.3;
+      }
+    }
+  }
+  label{
+    display: block;
+    width: 100%;
+    margin-bottom: 0;
+    padding-left: 20px;
+    line-height: 14px;
+    text-transform: capitalize;
+    transition: 300ms all;
+    border-radius: 2px;
+    &:before{
+      width: 12px;
+      height: 12px;
+      border: 1px solid var(--font-color);
+      left: 0px;
+      top: 50%;
+      transform: translateY(-50%);
+      position: absolute;
+      content: "";
+    }
+  }
+}
+.checkbox{
+  label{
+    &:before {
+      border-radius: 2px;
+    }
+  }
+  input{
+    &:checked{
+      ~ label {
+        &:after {
+          left: 2px;
+          top: 50%;
+          transform: translateY(-50%);
+          position: absolute;
+          content: "";
+          -webkit-mask: url("../../../images/icon-check-sign.svg") no-repeat center center;
+          mask: url("../../../images/icon-check-sign.svg") no-repeat center center;
+          background: #fff;
+          @include mask-size(10px);
+          width: 10px;
+          height: 8px;
+        }
+        &:before {
+          background: #0d21f2;
+          border: 1px solid #0d21f2;
+        }
+      }
+    }
+  }
+}
+.radio{  
+  label{
+    &:before {
+      border-radius: 50%;
+    }
+    &:after {
+      width: 8px;
+      height: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 3px;
+      opacity: 0;
+      visibility: hidden;
+      content: "";
+      border-radius: 50%;
+      background-color: var(--font-color);
+      position: absolute;
+    }
+  }
+  input{
+    &:checked{
+      ~ label{
+        &:after {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+    }
+  }
+}
+
+
+// /**********************
+//   === Checkboxes ===
+// ************************/
+// .checkbox{
+//   position: relative;
+//   margin: 0;
+//   padding: 0;
+
+//   input[type="checkbox"] {
+//     position: absolute;
+//     opacity: 0;
+//     margin: 0;
+//     padding: 0;
+//     width: 100%;
+//     height: 22px;
+//     z-index: 9;
+//   }
+
+//   label {
+//     position: relative;
+//     display: inline-block;
+//     padding-left: 28px;
+
+//     &:before,
+//     &:after{
+//       position: absolute;
+//       content: "";
+//       display: inline-block;
+//     }
+//     &:before{
+//       width: 16px; height: 16px;
+//       border: 1px solid;
+//       left: 0px;
+//       top: 2px;
+//     }
+//     &:after {
+//       height: 5px;
+//       width: 9px;
+//       border-left: 2px solid;
+//       border-bottom: 2px solid;
+//       transform: rotate(-45deg);
+//       left: 4px;
+//       top: 6px;
+//     }
+//   }
+
+
+//   /*Hide the checkmark by default*/
+//   input[type="checkbox"] + label::after {
+//     content: none;
+//   }
+//   /*Unhide on the checked state*/
+//   input[type="checkbox"]:checked + label::after {
+//     content: "";
+//   }
+//   /*Adding focus styles on the outer-box of the fake checkbox*/
+//   input[type="checkbox"]:focus + label::before {
+//     outline: rgb(59, 153, 252) auto 5px;
+//   }
+
+
+//   //Different Colors
+//   &.dark{ 
+//     label {
+//       color: #000;
+//       &:before, &:after {
+//         border-color: #000;
+//       }
+//     }
+//   }
+//   &.primary{ 
+//     label {
+//       &:before, &:after {
+//         border-color: theme-color('primary', 'base');
+//       }
+//     }
+//   }
+//   &.secondary{ 
+//     label {
+//       &:before, &:after {
+//         border-color: theme-color('primary', 'green');
+//       }
+//     }
+//   }
+//   &.has-error{ 
+//     label {
+//       &:before, &:after {
+//         border-color: theme-color('primary', 'red');
+//       }
+//     }
+//   }
+// }

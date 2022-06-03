@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <defs>
+    <style>
+      .cls-1 {
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path id="account-circle_1" data-name="account-circle 1" class="cls-1" d="M10,20A10,10,0,1,1,20,10,10.029,10.029,0,0,1,10,20ZM10,3A2.946,2.946,0,0,0,7,6a2.946,2.946,0,0,0,3,3,2.946,2.946,0,0,0,3-3A2.946,2.946,0,0,0,10,3Zm0,7.9C8,10.9,4,12,4,14a7.225,7.225,0,0,0,12,0C16,12,12,10.9,10,10.9Z"/>
+</svg>

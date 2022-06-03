@@ -1,0 +1,104 @@
+.toast-wrapper {
+  width: auto;
+  background: #fff;
+  border-radius: 3px;
+  position: fixed;
+  right: 20px;
+  margin-right: 20px;
+  padding: 5px 25px 5px 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  z-index: 999999;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 20px;
+  cursor: pointer;
+  color: #000;
+  font-weight: 600;
+  .toast-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 10px;
+  }
+
+  &.success {
+    .toast-icon {
+      -webkit-mask: url("../../images/icon-success.svg") no-repeat center center;
+      mask: url("../../images/icon-success.svg") no-repeat center center;
+      -webkit-mask-size: 14px;
+      mask-size: 14px;
+      background: #2ECC71;
+    }
+  }
+
+  &.error {
+    .toast-icon {
+      -webkit-mask: url("../../images/icon-error.svg") no-repeat center center;
+      mask: url("../../images/icon-error.svg") no-repeat center center;
+      -webkit-mask-size: 14px;
+      mask-size: 14px;
+      background: red;
+    }
+  }
+
+  &.process {
+    .toast-icon {
+      width: 14px;
+      height: 14px;
+      background: url("../../images/loading2.svg") no-repeat center center;
+      background-size: 14px;
+      animation-name: alertLoader;
+      animation-duration: 1s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+    }
+
+    @keyframes alertLoader {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  &.warn {
+    .toast-icon {
+      -webkit-mask: url("../../images/icon-warning.svg") no-repeat center center;
+      mask: url("../../images/icon-warning.svg") no-repeat center center;
+      -webkit-mask-size: 14px;
+      mask-size: 14px;
+      background: #F1C40F;
+    }
+  }
+  &.info {
+    .toast-icon {
+      -webkit-mask: url("../../images/icon-information.svg") no-repeat center center;
+      mask: url("../../images/icon-information.svg") no-repeat center center;
+      -webkit-mask-size: 14px;
+      mask-size: 14px;
+      background: #0099FF;
+    }
+  }
+  &.alert {
+    margin-bottom: 0;
+    .toast-icon {
+      -webkit-mask: url("../../images/icon-alert.svg") no-repeat center center;
+      mask: url("../../images/icon-alert.svg") no-repeat center center;
+      -webkit-mask-size: 14px;
+      mask-size: 14px;
+      background: #FFA500;
+    }
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}

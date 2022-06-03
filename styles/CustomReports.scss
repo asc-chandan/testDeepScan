@@ -1,0 +1,91 @@
+@import 'modules/variables.scss';
+
+/*********************************
+  === Pages Styling ===
+**********************************/
+$total_header_height: $header_height + $sub_header_height;
+
+.custom-report{
+  .container{
+    .section{
+      padding: 0;
+      margin: 0;
+      position: fixed;
+      top: $total_header_height;
+      right: 0;
+      left: $sidebar_width;
+      bottom: 0px;
+      overflow: scroll;
+    }
+  }
+
+  .action-buttons-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+
+    .download-button-wrapper {
+      display: inline-block;
+      margin: 0 15px 0 0;
+      position: relative;
+      width: 20px;
+      height: 20px;
+
+      .showloading2 {
+        display: block;
+        position: absolute;
+        top: 3px;
+        left: 0;
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .btn {
+      display: inline-block;
+      width: 18px;
+      margin: 0 15px 0 0;
+      background-color: #fff;
+      text-indent: -999em;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &.btn-view {
+        -webkit-mask: url("../images/icon-view.svg") no-repeat center center;
+        mask: url("../images/icon-view.svg") no-repeat center center;
+        -webkit-mask-size: 18px;
+        mask-size: 18px;
+      }
+      &.btn-share {
+        -webkit-mask: url("../images/icon-share.svg") no-repeat center center;
+        mask: url("../images/icon-share.svg") no-repeat center center;
+        -webkit-mask-size: 18px;
+        mask-size: 18px;
+      }
+      &.btn-download {
+        margin: 0;
+        -webkit-mask: url("../images/icon-download.svg") no-repeat center center;
+        mask: url("../images/icon-download.svg") no-repeat center center;
+        -webkit-mask-size: 16px;
+        mask-size: 16px;
+      }
+      &.btn-schedule {
+        -webkit-mask: url("../images/icon-schedule.svg") no-repeat center center;
+        mask: url("../images/icon-schedule.svg") no-repeat center center;
+        -webkit-mask-size: 18px;
+        mask-size: 18px;
+      }
+      &.btn-delete {
+        -webkit-mask: url("../images/icon-delete.svg") no-repeat center center;
+        mask: url("../images/icon-delete.svg") no-repeat center center;
+        -webkit-mask-size: 18px;
+        mask-size: 18px;
+      }
+    }
+  }
+}
+
+

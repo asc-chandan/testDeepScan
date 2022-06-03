@@ -1,0 +1,159 @@
+/**********************************
+  === Text Field / Text Area ===
+**********************************/
+.text-field,
+.text-area{
+  position: relative;
+
+  label{
+    display: block;
+    position: relative;
+    width: auto;
+    height: auto;
+    margin: 0 0 5px 0;
+    padding: 0;
+    font-size: .825rem;
+    font-weight: 400;
+    line-height: 1.2;
+    background: #000;
+
+    span{ 
+      font-size: 1rem; // 16px;
+      color: theme-color('primary','red'); 
+    }
+  }
+
+  .input-field {
+    width: 100%;
+    max-width: 100%;
+    background: none;
+    padding: 5px 12px; //12px
+    font-size: .825rem;
+    line-height: 1;
+    background: #fff;
+    color: #000;
+    border: 1px solid #999;
+    @include border-radius(3px);
+
+    &:focus{
+      outline:none !important;
+      outline-width: 0 !important;
+      box-shadow: none;
+      -moz-box-shadow: none;
+      -webkit-box-shadow: none;
+      border: 1px solid #999;
+      color: #000;
+    }
+    &:disabled{
+      color: #d3d3d3;
+    }
+  }
+
+  ::placeholder { color: #000; }
+  :-ms-input-placeholder { color: #000; }
+  ::-ms-input-placeholder { color: #000; }
+
+  &.primary{
+    label{ color: theme-color('primary', 'base'); }
+  }
+  &.secondary{
+    label{ color: theme-color('primary', 'green'); }
+  }
+  &.disabled{
+    label{ color: #dedede; }
+    .input-field{ 
+      border-color: #999; 
+      color: #999; 
+    }
+  }
+
+  &.outlined{
+    background: none;
+    color: #fff;
+   
+    ::placeholder { color: #f8f8f8; }
+    :-ms-input-placeholder { color: #f8f8f8; }
+    ::-ms-input-placeholder { color: #f8f8f8; }
+
+    &.primary{ 
+      label{ color: theme-color('primary', 'base'); }
+      .input-field{ 
+        border-color: theme-color('primary', 'base'); 
+        color: #fff;
+      }
+    }
+    &.secondary{ 
+      label{ color: theme-color('primary', 'green'); }
+      .input-field{ 
+        border-color: theme-color('primary', 'green'); 
+        color: #fff;
+      }
+    }
+    &.has-error{ 
+      label{ color: theme-color('primary', 'red'); }
+      .input-field{ 
+        border-color: theme-color('primary', 'red'); 
+        color: #fff;
+      }
+    }
+  }
+
+
+
+
+  //Different Sizes
+  &.large{
+    label{ font-size: .9375rem; }
+    .input-field{
+      padding: 15px; //15px;
+      font-size: 1rem;
+    }
+    &.outlined{
+      label { left: 15px; }
+    }
+  }
+  &.medium{
+    label{ font-size: .875rem; }
+    .input-field{
+      padding: 10px 12px; //12px
+      font-size: .875rem;
+    }
+  }
+  &.small{
+    label{ font-size: .8125rem; }
+    .input-field{
+      padding: 8px 12px; //10px 12px
+      font-size: .8125rem;
+    }
+  }
+  &.xs{
+    label{ font-size: .763rem; }
+    .input-field{
+      padding: 4px 12px; //4px 12px
+      font-size: .937rem;
+      font-weight: 400;
+    }
+  }
+}
+
+
+/**********************************
+  === Text Areas - Specific ===
+***********************************/
+.text-area{
+  .input-field { height: 80px; }
+  
+  //Different Sizes
+  &.large{
+    .input-field{ height: 120px; }
+  }
+  &.medium{
+    .input-field{ height: 80px; }
+  }
+  &.small{
+    .input-field{ height: 60px;}
+  }
+  &.xs{
+    .input-field{ height: 50px; }
+  }
+}

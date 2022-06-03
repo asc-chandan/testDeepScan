@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="12.001" height="12.002" viewBox="0 0 12.001 12.002">
+  <g id="Untitled-1" transform="translate(0.001 0.001)">
+    <rect id="Rectangle_705" data-name="Rectangle 705" width="7.5" height="1.5" transform="translate(4.5 0.75)" fill="#b1b2b3"/>
+    <rect id="Rectangle_706" data-name="Rectangle 706" width="7.5" height="1.5" transform="translate(4.5 5.25)" fill="#b1b2b3"/>
+    <rect id="Rectangle_707" data-name="Rectangle 707" width="7.5" height="1.5" transform="translate(4.5 9.75)" fill="#b1b2b3"/>
+    <path id="Path_407" data-name="Path 407" d="M2.25,0H.75A.71.71,0,0,0,0,.75v1.5A.71.71,0,0,0,.75,3h1.5A.71.71,0,0,0,3,2.25V.75A.71.71,0,0,0,2.25,0Z" fill="#b1b2b3"/>
+    <path id="Path_408" data-name="Path 408" d="M2.25,4.5H.75A.71.71,0,0,0,0,5.25v1.5a.71.71,0,0,0,.75.75h1.5A.71.71,0,0,0,3,6.75V5.25a.71.71,0,0,0-.75-.75Z" fill="#b1b2b3"/>
+    <path id="Path_409" data-name="Path 409" d="M2.25,9H.75A.71.71,0,0,0,0,9.75v1.5A.71.71,0,0,0,.75,12h1.5A.71.71,0,0,0,3,11.25V9.75A.71.71,0,0,0,2.25,9Z" fill="#b1b2b3"/>
+  </g>
+</svg>

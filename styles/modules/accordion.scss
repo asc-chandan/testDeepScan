@@ -1,0 +1,94 @@
+/******************************
+    === Accordion ====
+******************************/
+.accordion{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+ 
+  .item{
+    position: relative;
+    
+    .accordion-title{
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      padding: .97vw 1.73vw .97vw 1.73vw; //12px 25px 12px 52px;
+      background: #464646;
+      border-top: 1px solid #333;
+      font-size: .97vw; //14px;
+      font-weight: 300;
+      line-height: 1;
+      text-transform: uppercase;
+      color: theme-color('primary', 'yellow');
+      text-decoration: none;
+      position: relative;
+
+      .label {
+        display: none;
+        padding: .20vw .55vw;
+        margin: 0;
+        margin-left: 1.38vw;
+        color: #fff;
+        border: 1px solid #fff;
+        border-radius: .27vw;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: .05em;
+      }
+
+      &:hover{
+        background: #343434;
+      }
+    }
+
+    &:first-child{
+      .accordion-title{
+        border-top: none;
+      }
+    }
+     
+    .accordion-content{ 
+      display: none; 
+      padding: 1.04vw 1.73vw 0 1.73vw; //15px 25px 10px 25px;
+      background: #282828;
+    }
+
+    &.active{
+      .accordion-title{
+        &:before{
+          display: block;
+          content: "\e93a";
+          top: .97vw; //14px;
+          right: 1.73vw //25px;
+        }
+      }
+      .accordion-content{ display: block; }
+    }
+  }
+}
+
+
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+
+}

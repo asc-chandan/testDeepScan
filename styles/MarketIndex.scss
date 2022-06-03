@@ -1,0 +1,226 @@
+@import 'modules/variables.scss';
+
+/*************************
+  === Dashboard ====
+****************************/
+#app-main-wrapper{
+  &.ad-index{
+    padding-top: $header_height;
+
+    #app-header{
+      .sites-list-wrapper{
+        top: $header_height + 5;
+      }
+    }
+  }
+}
+
+.marketing-index{
+  .date-period-wrapper{
+    width: 100%;
+
+    .asc-date-picker{
+      display: block;
+      .asc-picker-input{
+        width: 100%;
+      }
+  
+      .asc-picker-container{
+        position: relative;
+        margin-top: 5px;
+
+        .asc-picker-date-panel,
+        .asc-picker-month-panel,
+        .asc-picker-year-panel {
+          width: 160px;
+        }
+      }
+    }
+  }
+
+  #col-charts-values{
+    .crosshover-table{
+      td{
+        .color{
+          left: 5px;
+          right: 5px;
+        }
+      }
+    } 
+  } 
+
+  
+
+  #charts-filters{
+    .title-wrapper{
+      position: relative;
+
+      .btn-add-dimension{
+        display: block;
+        position: absolute;
+        top: 2px; right: 0;
+        width: 12px; height: 12px;
+        -webkit-mask: url('../images/icon-plus_round.svg') no-repeat center center;
+        mask: url('../images/icon-plus_round.svg') no-repeat center center;
+        -webkit-mask-size: 12px;
+        mask-size: 12px;
+        background: #fff;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        text-indent: -999em;
+
+        &:disabled{
+          cursor: not-allowed;
+          background: #787878;
+        }
+      }
+    }
+    .dimensions-wrapper{
+      .dimensions{
+        padding: 8px;
+        margin: 0 0 15px 0;
+        background: rgba(0,0,0,.6);
+        border-radius: 4px;
+        position: relative;
+
+        .btn-remove-wrapper{
+          display: block;
+          position: absolute;
+          top: -6px; right: -15px;
+          width: 18px; height: 18px;
+          background: rgba(0,0,0,.6);
+          text-align: center;
+          border-radius: 2px;
+          border-bottom-left-radius: 0;
+          
+          .btn-remove-dimension{
+            display: block;
+            width: 12px; height: 12px;
+            margin: 3px auto 0 auto;
+            -webkit-mask: url('../images/icon-minus_round.svg') no-repeat center center;
+            mask: url('../images/icon-minus_round.svg') no-repeat center center;
+            -webkit-mask-size: 12px;
+            mask-size: 12px;
+            background: red;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            text-indent: -999em;
+    
+            &:disabled{
+              cursor: not-allowed;
+              background: #787878;
+            }
+          }
+        }
+        
+        
+        .form-group:last-child{
+          margin: 0;
+        }
+      }
+    }
+  }
+  
+
+  //Column - Charts Wrapper
+  #col-charts-wrapper{
+    left: calc(25vw + 48px);
+    width: 71.67vw;
+    max-width: 71.67vw;
+    background: #000;
+    z-index: 97;
+
+    #multicharts-wrapper{
+      max-width: 100%;
+      margin: 0;
+      position: relative;
+      height: 86.5vh;
+      overflow-y: scroll; 
+
+      #multicharts-xaxis{
+        position: fixed;
+        background: #000;
+        z-index: 999;
+        top: 76px;
+        height: 60px;
+        width: 100%;
+      }
+    }
+
+    //Skeleton Loading
+    #chart-section{
+      &.skeleton-wrapper{
+        .skeleton{
+          #multicharts-xaxis{
+            width: 63.2%;
+          }
+  
+          #multicharts{
+            .chart{
+              width: 90% !important;
+              height: 380px;
+            }
+          }
+        }
+      }
+    }
+    
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #666;
+      stroke-opacity: 1;
+    }
+    .line {
+      fill: none;
+      stroke-width: 2px;
+
+      &.thin{ stroke-width: 1px; }
+    }
+    .axis-label{
+      fill:#ffffff;
+      color: #ffffff;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .hover-date-obj{
+      padding: 2px;
+    }
+    .hover-date{
+      z-index: 9999;
+    }
+    .hover-line-ai,
+    .hover-line-note{
+      path{ fill: theme-color('primary', 'dark-grey'); }
+      &.highlight{
+        path{ fill: theme-color('primary', 'yellow'); }
+      }
+      &.hidden{ display: none; }
+    }
+
+    /* Chart's Tooltip */
+    .tooltip{
+      display: none;
+      position: absolute;
+      width: 266px;
+      height: auto;
+      padding: 0 2px;
+      z-index: -1;
+      word-wrap: break-word;
+      color: #fff;
+    }
+    .hover-line {
+      stroke: #c3c3c3;
+      stroke-dasharray: 3,3; 
+      stroke-opacity: .7;
+      position: relative;
+    }
+    .hover-line-status{
+      z-index: 9999999;
+    }
+  }
+}

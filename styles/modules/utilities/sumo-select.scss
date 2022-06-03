@@ -1,0 +1,36 @@
+
+/*************************
+  == Sumo Select ==
+****************************/
+//View Default Sump DropDown Style
+.SumoSelect{
+  font-size: .83vw !important; //12px;
+
+  .CaptionCont > label > i { 
+    top: 0px !important; 
+  }
+  .CaptionCont > span{
+    font-size: .83vw !important; //12px;
+    line-height: 1.4 !important;
+    color: #000 !important;
+  }
+  .optWrapper > .options {
+    // max-height: 6.25vw !important; //90px !important;
+    max-height: 8.33vw !important; //120px !important;
+    z-index: 9999;
+  }
+  .optWrapper > .options li.opt label,
+  .CaptionCont,
+  .select-all > label {
+    color: #000 !important;
+  }
+
+  .optWrapper>.options li.opt label{
+    font-size: .83vw !important; //12px;
+    margin: 0 !important;
+    padding: .13vw 0 !important; //2px
+  }
+  .optWrapper.multiple.okCancelInMulti > .MultiControls > p{
+    color: #000 !important;
+  }
+}

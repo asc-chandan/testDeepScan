@@ -1,0 +1,78 @@
+#app-main-wrapper {
+    .app-wrapper {
+        &.profile {
+            // background: #222;
+            // position: absolute;
+            // left: 0;
+            // right: 0;
+            // margin: auto;
+            // width: 590px;
+            // height: auto;
+            // top: 50%;
+            // transform: translateY(-50%);
+          
+            border-radius: 10px;
+            .section {
+                padding: 0;
+                width: 590px;
+                height: auto;
+                margin: auto;
+                padding: 30px;
+                background: #222;
+                border-radius: 10px;
+
+                .select-box {
+                    position: relative;
+                    &:after {
+                        content: "";
+                        width: 0;
+                        height: 0;
+                        border-left: 4px solid transparent;
+                        border-right: 4px solid transparent;
+                        border-top: 6px solid #fff;
+                        position: absolute;
+                        right: 10px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                    }
+                }
+                +section{
+                    margin-top: 10px;
+                }
+            }
+            .field-wrapper {
+                margin-bottom: 15px;
+            }
+            .field-with-label {
+                label {
+                    &:after {
+                        background: #222;
+                    }
+                }
+                .field-control {
+                    border: none;
+                    &.select {
+                        appearance: none;
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+                }
+                &.disabled {
+                    input {
+                        opacity: 0.3;
+                    }
+                }
+            }
+            .profile-btn {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin: 0;
+                .btn-large {
+                    font-size: 11px;
+                }
+            }
+        }
+    }
+}

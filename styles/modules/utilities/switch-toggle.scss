@@ -1,0 +1,133 @@
+/****************************
+  === Switch Toggle ===
+****************************/
+.switch-toggle{ 
+  position: relative;
+  display: flex;
+  align-items: center;
+  .switch{ display: inline-block; position: relative;}
+  .label{ 
+    margin: 0 10px 0 0;
+    line-height: 14px;
+    display: inline-block;
+    color: var(--font-color);
+  }
+
+  input[type=checkbox]{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+  }  
+  label {
+    position: relative;
+    width: 32px;
+    height: 16px;
+    background: grey;
+    display: block;
+    border-radius: 2px;
+    cursor: pointer;
+    text-indent: -9999px;
+    
+    &:after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: #fff;
+      transition: 0.2s;
+      box-shadow: 0px 0px 1px rgba(0,0,0,0.2);
+    }
+  }
+  input:checked + label {
+    background: #00BB5A;
+  }
+  input:checked + label:after {
+    left: calc(100% - 3px);
+    transform: translateX(-100%);
+  }
+  label:active:after {
+    // width: 130px;
+  }
+
+
+  &.small{
+    label {
+      width: 24px;
+      height: 12px;
+      border-radius: 2px;
+      
+      &:after {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        top: 2px;
+        left: 2px;
+      }
+    }
+    input:checked + label:after {
+      left: calc(100% - 3px);
+      transform: translateX(-100%);
+    }
+  }
+  
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  &.xs{
+    .label{
+      font-size: .725rem;
+      line-height: 1.4;
+      vertical-align: top;
+      margin: 0 0 0 9px;
+    }
+    label {
+      width: 28px;
+      height: 14px;
+      border-radius: 14px;
+      
+      &:after {
+        width: 10px; height: 10px;
+        border-radius: 10px;
+        top: 2px;
+      }
+    }
+    input:checked + label:after {
+      left: calc(100% - 2px);
+      transform: translateX(-100%);
+    }
+  }
+
+  //Different Colors
+  &.dark{ 
+    label {
+      &:after { background: #000; }
+    }
+  }
+  &.primary{ 
+    input:checked + label {
+      background: theme-color('primary', 'base');
+    }
+  }
+  &.secondary{ 
+    input:checked + label {
+      background: theme-color('primary', 'spring-green');
+    }
+  }
+  &.has-error{ 
+    input:checked + label {
+      background: theme-color('primary', 'red');
+    }
+  }
+}

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+  <g id="Group_1917" data-name="Group 1917" transform="translate(-171 -187)">
+    <path id="Icon_material-donut-large" data-name="Icon material-donut-large" d="M19.5,25.716V28.95a10.112,10.112,0,0,0,9.45-9.45H25.768A7.523,7.523,0,0,1,19.5,25.716Z" transform="translate(163.05 179.05)" fill="#fff"/>
+    <path id="Icon_material-donut-large-2" data-name="Icon material-donut-large" d="M25.768,12.45H28.95A10.112,10.112,0,0,0,19.5,3V6.234A7.523,7.523,0,0,1,25.768,12.45Z" transform="translate(163.05 184)" fill="#fff"/>
+    <path id="Icon_material-donut-large-3" data-name="Icon material-donut-large" d="M12.45,6.234V3a10.558,10.558,0,0,0,0,21V20.766A7.729,7.729,0,0,1,6.15,13.5,7.729,7.729,0,0,1,12.45,6.234Z" transform="translate(168 184)" fill="lime"/>
+  </g>
+</svg>

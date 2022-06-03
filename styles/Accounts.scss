@@ -1,0 +1,117 @@
+@import 'modules/variables.scss';
+
+/*********************************
+  === Accounts Pages Styling ===
+**********************************/
+$total_header_height: $header_height + $sub_header_height;
+
+.accounts-view{
+  .section{
+    padding: 0;
+    margin: 0;
+    position: fixed;
+    top: $total_header_height;
+    right: 0px;
+    left: $sidebar_width;
+    bottom: 0px;
+    overflow: scroll;
+  }
+
+  .filters-wrapper{
+    margin-left: 0;
+    
+    .col{
+      display: inline-block;
+      margin: 0 15px 0 0;
+      vertical-align: top;
+      position: relative;
+      width: auto;
+
+      .form-group{ 
+        width: 100%; 
+        .react-select-container {
+          .select-box{
+            padding: 0 14px 0 6px !important;
+            border: none;
+          }
+        }
+        .asc-date-picker{
+          vertical-align: text-bottom;
+          .asc-picker-input{
+            border: none;
+            line-height: 20px;
+          }
+        } 
+      }
+
+      &.year{ width: 110px; }
+      &.month{ width: 110px; }
+      &.advertiser{ width: 175px; }
+      &.filter-property{ width: 100px; }
+      &.payment-expected-period{
+        width: 198px;
+        padding: 0;
+      }
+      &.payment-received{ width: 155px; }
+      &.date-type{ width: 180px; }
+
+      .date-range-selector {
+        margin: 1px 0 0 0;
+        vertical-align: top;
+
+        .select-btn {
+          display: block;
+          width: 100%;
+          max-width: 100%;
+          background: #fff;
+        }
+      }
+
+      .date-range-selector{
+        .action-buttons{
+          .btn{
+            line-height: 1.17;
+          }
+        }
+      }
+
+      #group-by-wrapper{
+        width: 160px;
+        height: auto;
+        padding: 1px 0;
+      
+        .label{
+          font-size: .75rem;
+        }
+      }
+    }
+
+    #payment-expected-period{
+      min-width: 155px;
+    }
+  }
+
+  .custom-table{
+    th, td{
+      overflow: visible !important;
+    }
+
+    #advertiser,
+    #isnet{
+      width: 100%;
+    }
+
+    .form-group{
+      width: auto;
+
+      .react-select-container{
+        width: auto !important;
+        max-width: 100% !important;
+      }
+      .field-control{
+        outline: none;
+      }
+    }
+  }
+}
+

@@ -1,0 +1,108 @@
+/************************
+  === Buttons ===
+**************************/
+.btn{
+  display: inline-block;
+  background: #646464;
+  border: none;
+  line-height: 1.75;
+  text-transform: capitalize;
+  color: #dedede;
+  cursor: pointer;
+  outline: none;
+  @include border-radius(2px);
+  transition: 300ms all;
+
+  &:hover{
+    background-color: #fff;
+    color: #000;
+  }
+
+  &.primary{ 
+    background: theme-color('primary', 'base'); 
+    border-color: theme-color('primary', 'base');
+  }
+  &.secondary{ 
+    background: theme-color('primary', 'green'); 
+    border-color: theme-color('primary', 'green');
+    color: #000;
+  }
+  &.disabled{ 
+    background: #666; 
+    color: #c3c3c3; 
+  }
+  &.outline{
+    border: 1px solid #fff;
+    background: none;
+    color: #fff;
+
+    &.primary{ 
+      border: 1px solid theme-color('primary', 'base'); 
+      color: theme-color('primary', 'base');
+    }
+    &.secondary{ 
+      border: 1px solid theme-color('primary', 'green');
+      color: theme-color('primary', 'green');
+    }
+    &.disabled{
+      border: 1px solid #666;
+      color: #666;
+    }
+    &.active{ 
+      border: 1px solid theme-color('primary', 'green');
+    }
+    &:hover{
+      border: 1px solid theme-color('primary', 'spring-green');
+      background-color: theme-color('primary', 'spring-green');
+      color: #000;
+    }
+    &.btn-small{
+      line-height: 14px;
+    }
+  }
+
+  &.disabled{
+    &:hover{
+      border: 1px solid #666;
+    }
+  }
+  &.btn-small{
+    line-height: 17px;
+    padding: 0 5px;
+    font-size: 10px;
+  }
+  &.btn-medium{
+    line-height: 20px;
+    padding: 0 10px;
+  }
+  &.btn-large{
+    line-height: 24px;
+    padding: 0 10px;
+  }
+}
+
+button{
+  transition: 300ms all;
+  &:hover{
+    background-color: var(--font-color);
+  }
+  &:disabled{
+    pointer-events: none;
+  }
+}
+
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {}

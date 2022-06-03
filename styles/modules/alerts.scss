@@ -1,0 +1,68 @@
+/************************
+  === Alert  ===
+**************************/
+.alert{
+  display: block;
+  // padding: .34vw .69vw; // 5px 10px;
+  @include border-radius(4px);
+  margin: 0 0 1.73vw 0; //25px;
+  background: theme-color('alert', 'info');
+  color: theme-color('alert', 'info-text');
+  font-size: .875rem;
+  line-height: 1.2;
+  max-width: 100%;
+
+  &.info{
+    background: theme-color('alert', 'info');
+    color: theme-color('alert', 'info-text');
+  }
+  &.warning{
+    background: theme-color('alert', 'warning');
+    color: theme-color('alert', 'warning-text');
+  }
+  &.error{
+    background: theme-color('alert', 'error');
+    color: theme-color('alert', 'error-text');
+  }
+  &.success{
+    background: theme-color('alert', 'success');
+    color: theme-color('alert', 'success-text');
+  }
+
+
+  &.outline{
+    background: none;
+    border: 1px solid theme-color('alert', 'info');
+
+    &.info{
+      border-color: theme-color('alert', 'info');
+    }
+    &.warning{
+      border-color: theme-color('alert', 'warning');
+    }
+    &.error{
+      border-color: theme-color('alert', 'error');
+    }
+    &.success{
+      border-color: theme-color('alert', 'success');
+    }
+  }
+
+  &.large{
+    padding: .48vw 1.45vw; //7px 21px;
+    font-size: .9375rem;
+  }
+  &.medium{
+    padding: .34vw 1.04vw; // 5px 15px;
+    font-size: .875rem;
+  }
+  &.small{
+    padding: .20vw .62vw; /// 3px 9px;
+    font-size: .8125rem;
+  }
+  &.xs{
+    padding: .13vw .41vw; /// 2px 6px;
+    font-size: .763rem;
+    line-height: 1.4;
+  }
+}

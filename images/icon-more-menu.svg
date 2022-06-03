@@ -1,0 +1,5 @@
+<svg id="hamburger" xmlns="http://www.w3.org/2000/svg" width="14" height="12.004" viewBox="0 0 14 12.004">
+  <path id="Path_156" data-name="Path 156" d="M13.125,7H.875A.827.827,0,0,0,0,7.876a.827.827,0,0,0,.875.876h12.25A.827.827,0,0,0,14,7.876.827.827,0,0,0,13.125,7Z" transform="translate(0 -1.874)" fill="#b1b2b3"/>
+  <path id="Path_157" data-name="Path 157" d="M13.125,1H.875A.827.827,0,0,0,0,1.876a.827.827,0,0,0,.875.876h12.25A.827.827,0,0,0,14,1.876.827.827,0,0,0,13.125,1Z" transform="translate(0 -1)" fill="#b1b2b3"/>
+  <path id="Path_158" data-name="Path 158" d="M13.125,13H.875a.876.876,0,0,0,0,1.752h12.25a.876.876,0,0,0,0-1.752Z" transform="translate(0 -2.748)" fill="#b1b2b3"/>
+</svg>

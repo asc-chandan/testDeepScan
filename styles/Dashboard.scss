@@ -1,0 +1,568 @@
+@import 'modules/variables.scss';
+
+/* Theme Config */
+:root {
+  --sellside-home-widget-border-color: #333;
+}
+
+/*************************
+  === Dashboard ====
+****************************/
+.sellside-home{
+  .date-period-wrapper{
+    display: inline-block;
+    vertical-align: top;
+  }
+  
+  .filters-wrapper{
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 15px;
+    
+    .form-group{
+      display: inline-flex;
+      margin: 0 15px 0 0;
+    }
+  }
+
+  /*******************************
+  ====== YIELD CAHRT =====
+  *****************************/
+  .summary-reports-wrapper{
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .summary-report-wrapper{
+    margin: 0 0 2.08vw 0; //30px
+    padding: 15px 0 0 15px;
+    width: 50%;
+
+    .chart-title{
+      padding: 6px 10px;
+      font-size: 14px;
+      text-transform: uppercase;
+      background: #666;
+      position: relative;
+
+      .max-potential-revenue{
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        font-size: 12px;
+        text-transform: uppercase;
+
+        .label{
+          display: inline-block;
+          margin: 0 10px 0 0;
+          font-size: 12px;
+          text-transform: uppercase;
+        }
+        .val{
+          display: inline-block;
+          color: theme-color('primary', 'yellow');
+        }
+      }
+    }
+
+    .headings-wrapper{
+      background: #525252;
+      margin: 1px 0;
+      display: flex;
+
+      .col-wrapper{
+        display: inline-flex;
+        width: 40%;
+        position: relative;
+        padding: 6px 10px;
+
+        &:first-child{ width: 20%; }
+      }
+
+      .col-title{
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+    }
+
+    .values-wrapper{
+      margin: 0 0 30px 0;
+      font-size: 14px;
+    
+      .value-wrapper{
+        background: #000;
+        border: 1px solid #424242;
+        border-bottom: none;
+        border-collapse: collapse;
+        color: #fff;
+        display: flex;
+
+        &:last-child {
+          border-bottom: 1px solid #424242 !important;
+        }
+
+        .col{
+          border-left: 1px solid #424242;
+          display: inline-flex;
+          width: 40%;
+          position: relative;
+          padding: 6px 10px;
+          min-height: 56px;
+
+          &:first-child{ width: 20%; border-left: none; }
+          
+          .col-label{
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 32px;
+            text-transform: capitalize;
+          }
+          .col-val-wrapper{
+            width: 100%;
+            position: relative;
+          }
+          .col-chart{
+            height: 26px;
+            margin-top: 2px;
+            position: relative;
+            
+            .bar{
+              display: block;
+              position: absolute;
+              top: 6px;
+              left: 0;
+              height: 14px;
+              background: theme-color('primary', 'green');
+              z-index: 99;
+            }
+
+            .target{
+              width: 0;
+              height: 26px;
+              background: #676767;
+              position: absolute;
+              top: 0px;
+            }
+          }
+          .col-val{
+            font-size: 11px;
+            font-weight: 600 !important;
+            display: block;
+
+            .number,
+            .change,
+            .target{
+              display: inline-block;
+              font-size: 11px;
+              margin: 0; padding: 0;
+              margin-left: 10px;
+            }
+
+            .number{ margin: 0; }
+            .change{ color: theme-color('primary', 'yellow'); }
+            .target{ color: #676767; }
+          }
+          &.revenue{
+            .col-chart{
+              .bar{
+                background: #fd5f00;
+              }
+            }
+          }
+          &.total_revenue{
+            .col-chart{
+              background: #00f9ff;
+              &:before{
+                background: #00f9ff;
+              }
+            }
+          }
+        }
+        
+
+        .col:first-child{
+          .col-val-wrapper{ 
+            border-left: none;
+          }
+        }
+      }
+    }
+  }
+
+
+  /*********************************
+  ==== Line Charts Widgets =====
+  ********************************/
+  .widgets-wrapper{
+    padding: 5px 0 35px 0;
+    min-height: 75vh;
+    position: relative;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .widget{
+      display: inline-block;
+      width: 32%;
+      height: 230px;
+      border: 1px solid var(--sellside-home-widget-border-color);
+      margin: .8% 0 0 1%;
+      position: relative;
+      // overflow: hidden;
+
+      &:last-child{ margin-right: 0; }
+
+      .widget-header{
+        position: absolute;
+        top: 0; left: 0;
+        padding: 0 15px 10px 15px;
+        
+        .overall{
+          display: inline-block;
+          vertical-align: top;
+          margin-top: -2px;
+          
+          .val{
+            font-size: 1.8rem;
+            line-height: 1;
+            margin: 0 0 4px 0;
+            vertical-align: top;
+            position: relative;
+
+            &.has-symbol{
+              padding-left: 13px;
+            }
+
+            .symbol{
+              position: absolute;
+              top: 0;
+              left: 0;
+              font-size: 1.1rem;
+
+              &.dollar,
+              &.cent{
+                display: inline-block;
+                vertical-align: top;
+              }
+
+              &.dollar{ top: 2px; }
+              &.cent{ top: -2px; font-size: 1.4rem; }
+            }
+          }
+        }
+      }
+
+      .title-wrapper{
+        margin: 0 0 10px 0;
+
+        .title{
+          display: inline-block;
+          width: auto;
+          // font-size: 1.25rem;
+          font-size: .725rem;
+          font-weight: 400;
+          line-height: 1.2;
+          margin: 0;
+          // padding: .23vw .38vw .13vw .38vw;
+          padding: 4px 6px 2px 6px;
+          text-transform: capitalize;
+
+          background: var(--yellow-color);
+          color: var(--bg-color);
+          text-transform: uppercase;
+          vertical-align: top;
+        }
+
+        &.webanalytics{
+          .title{
+            background: theme-color('primary', 'orange');
+          }
+        }
+      }
+
+      .total-wrapper{
+        .comparison{
+          display: inline-block;
+          width: auto;
+          font-size: 1.1rem;
+          line-height: 1.2;
+          color: #f3f3f3;
+          margin:  0 15px 0 0;
+          vertical-align: top;
+          position: relative;
+
+          span{
+            display: inline-block;
+            position: relative;
+            padding: 0 0 0 16px;
+            color: #00FF7F;
+            cursor: pointer;
+
+            &:before{
+              content: "";
+              width: 0;
+              height: 0;
+              position: absolute;
+              top: 5px; left: 0;
+              border-left: 6px solid transparent;
+              border-right: 6px solid transparent;
+            }
+
+            &.up{
+              color: theme-color('primary','green');
+              &:before{
+                border-bottom: 10px solid theme-color('primary','green');
+              }
+            }
+            &.down{
+              color: red;
+              &:before{
+                top: 6px; left: 0;
+                border-top: 10px solid red;
+              }
+            }
+          }
+
+          .period-comparison-details{
+            display: none;
+            position: absolute;
+            top: -15px; left: 115%;
+            width: 210px;
+            background: #efefef;
+            border: 1px solid #c3c3c3;
+            border-radius: 2px;
+            font-size: .775rem;
+            z-index: 99;
+            color: #000;
+
+            .info{
+              border-bottom: 1px solid #c3c3c3;
+              padding: 5px 10px;
+
+              .label{ 
+                padding: 0; 
+                color: #000;
+                font-weight: 400;
+              }
+
+              &:last-child{ border: none; }
+            }
+          }
+
+          span:hover ~ .period-comparison-details{
+            display: block;
+          }
+        }
+      }
+
+      .chart{
+        background: var(--bg-color);
+        color: var(--font-color);
+        position: absolute;
+        width: 100%;
+        bottom: 10px; left: 0; right: 0;
+        
+        svg{ overflow: visible !important; }
+      }
+      .axis {
+        font: .74rem sans-serif; //10px
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: theme-color('stroke', 'base');
+        stroke-opacity: 0.7;
+        shape-rendering: crispEdges;
+      }
+      .line {
+        fill: none;
+        stroke-width: 2px;
+      }
+      .overlay {
+        fill: none;
+        pointer-events: all;
+      }
+      .hover-line {
+        stroke: theme-color('stroke', 'base');
+        stroke-width: 1px;
+        stroke-dasharray: 3,3;
+        stroke-opacity: 0.7;
+        shape-rendering: crispEdges;
+        -webkit-shape-rendering: crispEdges;
+        -moz-shape-rendering: crispEdges;
+      }
+
+
+      /* Chart's Tooltip */
+      .tooltip{
+        display: none;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        width: 180px;
+        height: auto;
+        padding: 0;
+        z-index: 999;
+        word-wrap: break-word;
+        background: rgba(255,255,255, .9);
+        color: #000;
+
+        .tooltip-table{
+          width: 100%;
+          max-width: 100%;
+          font-size: .825rem;
+          line-height: 1;
+          border-collapse: collapse;
+
+          th, td{
+            padding: 6px 6px;
+            border: 1px solid rgba(0,0,0,.1);
+            border-collapse: collapse;
+          }
+          th{
+            font-size: .825rem;
+            font-weight: 400;
+            padding: 4px 6px;
+            word-break: break-all;
+            text-align: left;
+          }
+          td{
+            position: relative;
+            .block{
+              display: none;
+              position: absolute;
+              top: 8px; left: 6px;
+              width: 10px; height: 10px;
+              background: #ffffff;
+              margin: 0;
+            }
+            .text{ word-break: break-all; }
+          }
+        }
+      }
+      .hover-line {
+        stroke: #c3c3c3;
+        stroke-dasharray: 3,3; 
+        stroke-opacity: .7;
+        position: relative;
+      }
+      .hover-line-status{
+        z-index: 9999999;
+      }
+    }
+
+    &.indexing{
+      .widget{
+        width: 50%;
+      }
+    }
+
+
+    //Skeleton Loading
+    &.skeleton-wrapper{
+      margin-right: 0;
+
+      .skeleton{
+        width: 32%;
+        height: 230px;
+
+        .title-wrapper{
+          .title{ 
+            width: 68px; 
+            height: 19px; 
+            background: #222; 
+            position: relative;
+            overflow: hidden;
+          }
+        }
+        .total-wrapper{ 
+          width: 240px; height: 30px; background: #222; 
+          position: relative;
+          overflow: hidden;
+        }
+        .chart{
+          // width: 100%;
+          height: 150px;
+          
+          &:before{
+            display: block;
+            content: "";
+            position: absolute;
+            top: 10px; left: 15px;
+            bottom: 5px; right: 15px;
+            background: #222;
+          }
+        }
+      }
+
+      &.indexing{
+        .skeleton{
+          width: 50%;
+        }
+      }
+
+      @keyframes loading {
+        0% { transform: translateX(0); }
+        50%, 100% { transform: translateX(100%); }
+      }
+    }
+  }
+
+
+
+  /* Mobile ----------- */
+  @media only screen and (max-width: 768px) {
+    .widgets-wrapper{
+      .widget{ width: 98%; }
+    }
+  }
+
+  /* Tablet ----------- */
+  @media only screen and (min-width: 768px) {
+    .widgets-wrapper{
+      .widget{ width: 48.5%; }
+    }
+  }
+
+  /* Tablet ----------- */
+  @media only screen and (min-width: 966px) {
+    .widgets-wrapper{
+      .widget{ width: 32%; }
+    }
+  }
+  
+
+  /* Desktops and laptops ----------- */
+  @media only screen and (min-width: 1224px) {
+    .widgets-wrapper{
+      .widget{ width: 32%; }
+    }
+  }
+
+
+  /* Desktops and laptops ----------- Default Screen */
+  @media only screen and (min-width: 1440px) {
+    .widgets-wrapper{
+      .widget{ width: 32%; }
+    }
+  }
+
+
+  /* Large screens ----------- */
+  @media only screen and (min-width: 1680px) {
+    .widgets-wrapper{
+      .widget{ width: 23.75%; }
+    }
+  }
+
+    
+
+  /* Large screens ----------- */
+  @media only screen and (min-width: 1920px) {
+    .widgets-wrapper{
+      .widget{ width: 18.8%; }
+    }
+  }
+
+}

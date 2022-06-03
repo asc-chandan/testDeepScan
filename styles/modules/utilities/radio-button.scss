@@ -1,0 +1,94 @@
+// /**********************
+//   === Radio Buttons ===
+// ************************/
+// .radio-button{
+//   position: relative;
+//   margin: 0;
+//   padding: 0;
+
+//   input[type="radio"] {
+//     position: absolute;
+//     opacity: 0;
+//     margin: 0;
+//     padding: 0;
+//     width: 100%;
+//     height: 22px;
+//     z-index: 9;
+//   }
+//   label{
+//     display: inline-block;
+//     position: relative;
+//     padding-left: 28px;
+//     color: #fff;
+//     cursor: pointer;
+
+//     &:before{
+//       content: '';
+//       position: absolute;
+//       left: 0;
+//       top: 0;
+//       width: 16px;
+//       height: 16px;
+//       border: 2px solid #fff;
+//       @include border-radius(100%);
+//       background: none;
+//     }
+//     &:after{
+//       content: '';
+//       position: absolute;
+//       top: 5px;
+//       left: 5px;
+//       width: 10px;
+//       height: 10px;
+//       background: #fff;
+//       border-radius: 100%;
+//       -webkit-transition: all 0.2s ease;
+//       transition: all 0.2s ease;
+//     }
+//   }
+//   [type="radio"]:not(:checked) + label:after {
+//     opacity: 0;
+//     -webkit-transform: scale(0);
+//     transform: scale(0);
+//   }
+//   [type="radio"]:checked + label:after {
+//     opacity: 1;
+//     -webkit-transform: scale(1);
+//     transform: scale(1);
+//   }
+
+
+//   //Different Colors
+//   &.dark{ 
+//     label {
+//       color: #000;
+//       &:before, &:after {
+//         border-color: #000;
+//       }
+//     }
+//   }
+//   &.primary{ 
+//     label {
+//       &:before, &:after {
+//         border-color: theme-color('primary', 'base');
+//       }
+//       &:after{ background: theme-color('primary', 'base'); } 
+//     }
+//   }
+//   &.secondary{ 
+//     label {
+//       &:before, &:after {
+//         border-color: theme-color('primary', 'green');
+//       }
+//       &:after{ background: theme-color('primary', 'green'); } 
+//     }
+//   }
+//   &.has-error{ 
+//     label {
+//       &:before, &:after {
+//         border-color: theme-color('primary', 'red');
+//       }
+//       &:after{ background: theme-color('primary', 'red'); } 
+//     }
+//   }
+// }

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14">
+  <g id="icon-close" transform="translate(3 3)">
+    <path id="Path_14" data-name="Path 14" d="M14.05,9.193,12.907,8.05,11.05,9.907,9.193,8.05,8.05,9.193,9.907,11.05,8.05,12.907,9.193,14.05l1.857-1.857,1.857,1.857,1.143-1.143L12.193,11.05Z" transform="translate(-7.05 -7.05)" fill="#fff"/>
+    <g id="Rectangle_645" data-name="Rectangle 645" transform="translate(-3 -3)" fill="none" stroke="#fff" stroke-width="1.5">
+      <rect width="14" height="14" rx="2" stroke="none"/>
+      <rect x="0.75" y="0.75" width="12.5" height="12.5" rx="1.25" fill="none"/>
+    </g>
+  </g>
+</svg>

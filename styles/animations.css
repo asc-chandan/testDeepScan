@@ -1,0 +1,31 @@
+/* animation: [animation-name] [animation-duration] [animation-timing-function]
+[animation-delay] [animation-iteration-count] [animation-direction]
+[animation-fill-mode] [animation-play-state]; */
+
+/* Animation - Bounce In */
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* How to use
+div {
+  animation-duration: 2s;
+  animation-name: bounceIn;
+}
+
+//short hand syntax
+div{ animation: bounceIn 2s; }
+*/
+
+
+/* Animation - Bounce In */
