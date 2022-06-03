@@ -6993,13 +6993,12 @@ function drawHeatMapChart(args) {
   }
   defineXScale().then(() => {
     //Change x axis first and last tick position
-
     alignXAxisTicks(width, args.unique_key, initialConfig, xAxisTickValues, xDomains, parseDate, tickFontSize, xAxisTickStartPos);
   });
 
   /* Define and create yScale, yAxis, ticks */
   let y_steps = args.yAxisTicksCount !== undefined ? args.yAxisTicksCount : initialConfig.defaultYAxisTicksCount;
-  if (args.chartFormat.yaxis.tick !== '' && args.chartFormat.yaxis.tick > 0) {
+  if (yScaleLimits && args.chartFormat.yaxis.tick !== '' && args.chartFormat.yaxis.tick > 0) {
     y_steps = Math.floor(yScaleLimits['upperLimit'] / args.chartFormat.yaxis.tick) + 1;
   }
 
