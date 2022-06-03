@@ -178,8 +178,7 @@ class TrendMaster extends Component {
             client: obj.client,
         }, () => {
             this.handleLoadScripts();
-        })
-        console.log(obj)
+        });
     }
 
     onPageScroll(pageSize, pageNo, that) {

@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import { sitePages } from '../components/Navigation';
 import subjectObj from '../subjects/Subject1';
-import { getKeyByValue, getClients, getUser } from '../utils/Common';//Import Common Functions
+import subject2 from '../subjects/Subject2';
+import { getKeyByValue, getClients, getUser } from '../utils/Common';
 import '../styles/Home.scss';
 import ClickOutsideListener from '../components/SpeedSelect/components/ClickOutsideListener';
-// import * as Constants from '../components/Constants.js';
-
+import * as Constants from '../components/Constants.js';
 import '../styles/Dashboard.scss';
 
 class Home extends Component {
@@ -15,16 +15,15 @@ class Home extends Component {
     this.user = getUser();
     this.user_privileges = this.user.privileges;
     this.default_terminal_type = 'sellside';
-
     this.page_title = 'Home';
-
     let client_id = this.user.last_fetched_client;
 
     this.state = {
       isOpen: false,
       expandedOptionIDs: [], // store the IDs of options whose subOptions list is visible
       client: (client_id !== '' ? getKeyByValue(getClients(), client_id, 'id') : ''),
-      terminal_type: this.user.terminal_type.id !== 'sellside' ? this.user.terminal_type.id : this.default_terminal_type
+      terminal_type: this.user.terminal_type.id !== 'sellside' ? this.user.terminal_type.id : this.default_terminal_type,
+      terminal: this.user.terminal_type
     };
 
     this.handleToggleBtn = this.handleToggleBtn.bind(this);
@@ -35,13 +34,41 @@ class Home extends Component {
 
   componentDidMount() {
     this.handleLoadScripts()
+    subject2.subscribe(this.updateTerminalInfo.bind(this));
+  }
+
+  componentDidUpdate() {
+    if (this.state.terminal !== this.getTerminalType()) {
+      this.user = getUser();
+      this.user_privileges = this.user.privileges;
+    }
+  }
+
+  componentWillUnmount() {
+    subjectObj.unSubscribe(this.updateTerminalInfo.bind(this));
+  }
+
+  getTerminalType() {
+    let terminal_type;
+    let userStr = localStorage.getItem(Constants.SITE_PREFIX + 'user');
+    userStr = (userStr) ? JSON.parse(userStr) : {};
+    terminal_type = userStr['terminal_type'];
+    return terminal_type;
+  }
+
+  updateTerminalInfo(obj) {
+    let stateObj = {
+      terminal: obj.terminal,
+      terminal_type: obj.terminal.id !== undefined ? obj.terminal.id : this.default_terminal_type,
+    };
+    this.setState(stateObj);
   }
 
   //Load Scripts on Page/View Load
   handleLoadScripts() {
     subjectObj.notify({
-        page_title: this.page_title,
-        client: this.state.client
+      page_title: this.page_title,
+      client: this.state.client
     });
   }
 
@@ -66,10 +93,6 @@ class Home extends Component {
     if (this.user_privileges[this.state.terminal_type] !== undefined && sidePages && sidePages.length !== 0) {
       return (<>
         {sidePages.map((item, i) => {
-          // let nav_class = (item.sub_pages) ? 'nav-item has-submenu' : 'nav-item';
-          // let nav_icon_class = 'icon ';
-          // let parent_nav_url = item.url;
-
           // if item.privilege is string use inclues to check user privilege and else check array elements in array
           let hasNavAccess = false;
           if (typeof item.privilege === 'object') {
@@ -87,11 +110,10 @@ class Home extends Component {
           }
 
           //check if user has privilege to see the menu
-          // if (hasNavAccess) {
-            const hasSuboptions = item.sub_pages.length;
-            const isExpanded = this.state.expandedOptionIDs.includes(item.id);
-            let list = 
-            <div key={`main-item-${i}`} id={(item.title.replace(' ', '-')).toLowerCase()} className={'nav-item' + (hasSuboptions ? ' has-submenu' : '') + (isExpanded ? ' expanded' : '')}>
+          const hasSuboptions = item.sub_pages.length;
+          const isExpanded = this.state.expandedOptionIDs.includes(item.id);
+          let list = 
+          <div key={`main-item-${i}`} id={(item.title.replace(' ', '-')).toLowerCase()} className={'nav-item' + (hasSuboptions ? ' has-submenu' : '') + (isExpanded ? ' expanded' : '')}>
 
             <div className={'nav-item-container' + (hasNavAccess ? '': ' disabled')}>
               {hasSuboptions ?
@@ -106,14 +128,14 @@ class Home extends Component {
                 </Link>
               }
             </div>
-              {this.state.expandedOptionIDs.length > 0 && this.state.expandedOptionIDs[0] === item.id && hasSuboptions &&
+
+            {this.state.expandedOptionIDs.length > 0 && this.state.expandedOptionIDs[0] === item.id && hasSuboptions &&
               <ClickOutsideListener onOutsideClick={() => this.handleExpandableOptionClick(item.id)}>
                 <div className="nav-item-suboptions-panel">
                   <div className="nav-item-suboptions">
                     {item.sub_pages.map(subpage => {
                       return (
                         <Link key={subpage.id} className="nav-link-options" to={subpage.url} onClick={this.handleToggleBtn} >
-                          {/* <span className={'icon'}></span> */}
                           <span className="text">{subpage.title}</span>
                         </Link>
                       );
@@ -124,9 +146,6 @@ class Home extends Component {
               }
             </div>
             return (list);
-          // } else {
-          //   return '';
-          // }
         })
         }
       </>)

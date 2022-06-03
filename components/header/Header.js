@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import * as Constants from '../Constants.js';
 import subjectObj from '../../subjects/Subject1';
+import subject2 from '../../subjects/Subject2';
 import { IAMPages } from '../Navigation';
 import { getClients, getDefaultHomePageURL } from '../../utils/Common';
 import SpeedSelect from '../SpeedSelect/SpeedSelect';
 import APIService from '../../services/apiService';
 import ClickOutsideListner from '../ClickOutsideListner';
 import { sitePages } from '../../components/Navigation';
-import subject2 from '../../subjects/Subject2.js';
+
 import moment from 'moment';
 
 import '../../styles/Header.scss';
@@ -383,12 +384,18 @@ class Header extends Component {
       let userStr = localStorage.getItem(Constants.SITE_PREFIX + 'user');
       userStr = (userStr) ? JSON.parse(userStr) : {};
       userStr['terminal_type'] = event;
-      userStr['default_home_url'] = '/' + event.id;
+      // userStr['default_home_url'] = '/' + event.id;
+      userStr['default_home_url'] = '/';
       localStorage.setItem(Constants.SITE_PREFIX + 'user', JSON.stringify(userStr));
 
       this.setState({ selected_terminal: event }, () => {
         //if default home url contains selcted terminal id, use default_home_url as redirect url
-        let default_url = userStr.default_home_url.includes(event.id) ? userStr.default_home_url : '/' + event.id;
+        // let default_url = userStr.default_home_url.includes(event.id) ? userStr.default_home_url : '/' + event.id;
+        subject2.notify({
+          terminal: this.state.selected_terminal,
+        })
+
+        let default_url = '/';
         this.props.history.push(default_url);
       });
     }
@@ -404,7 +411,8 @@ class Header extends Component {
       user_info['terminal_type'] = event;
 
       //used in login component as well - optimized it 
-      let default_home_url = getDefaultHomePageURL(sitePages, terminal_type, user_info);
+      // let default_home_url = getDefaultHomePageURL(sitePages, terminal_type, user_info);
+      let default_home_url = '/';
 
       user_info.default_home_url = default_home_url;
       localStorage.setItem(Constants.SITE_PREFIX + 'user', JSON.stringify(user_info));
@@ -412,7 +420,12 @@ class Header extends Component {
         default_home_url: default_home_url
       }, () => {
         //if default home url contains selcted terminal id, use default_home_url as redirect url
-        let default_url = default_home_url.includes(terminal_type.id) ? user_info.default_home_url : '/' + terminal_type.id;
+        // let default_url = default_home_url.includes(terminal_type.id) ? user_info.default_home_url : '/' + terminal_type.id;
+        subject2.notify({
+          terminal: this.state.selected_terminal,
+        })
+
+        let default_url = '/';
         this.props.history.push(default_url);
       });
     }

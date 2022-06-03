@@ -39,7 +39,7 @@ const DataGrid = lazy(() => import('./views/SellSide/DataGrid/DataGrid').then(ha
 const SellSide = lazy(() => import('./views/SellSide/SellSideHome').then(handleModuleDownload));
 const ReportView = lazy(() => import('./views/SellSide/TrendMaster/ReportView').then(handleModuleDownload));
 // const AnalysisHome = lazy(() => import('./views/SellSide/DataGrid/AnalysisHome').then(handleModuleDownload));
-const AnalysisView = lazy(() => import('./views/SellSide/DataGrid/AnalysisView').then(handleModuleDownload));
+// const AnalysisView = lazy(() => import('./views/SellSide/DataGrid/AnalysisView').then(handleModuleDownload));
 const AccountsReceivable = lazy(() => import('./views/SellSide/Accounts/AccountsReceivable').then(handleModuleDownload));
 const AccountsPayable = lazy(() => import('./views/SellSide/Accounts/AccountsPayable').then(handleModuleDownload));
 const RevShare = lazy(() => import('./views/SellSide/Accounts/RevShare').then(handleModuleDownload));
@@ -162,11 +162,9 @@ class Main extends Component {
 
             <PrivateRoute exact path="/sellside/datatrend" redirectTo="/sellside/datatrend/d-home" component={TrendMaster} access="VIEW_ADVERTISER" />
             <PrivateRoute exact path="/sellside/datatrend/:tab" component={TrendMaster} access="VIEW_ADVERTISER" />
-
             <PrivateRoute exact  path="/sellside/datagrid" redirectTo="/sellside/datagrid/d-home"  component={DataGrid} access="ANALYSIS_HOME" />
             <PrivateRoute exact path="/sellside/datagrid/:tab" component={DataGrid} access="ANALYSIS_HOME" />
-            {/* <PrivateRoute path="/sellside/datagrid/analysis/:view_type" component={AnalysisView} access="ANALYSIS_HOME" /> */}
-           
+            
             <PrivateRoute path="/sellside/adseller_receivable" component={AccountsReceivable} access="ACCOUNTS_RECEIVABLE" />
             <PrivateRoute path="/sellside/adbuyer_payable" component={AccountsPayable} access="ACCOUNTS_RECEIVABLE" />
             <PrivateRoute path="/sellside/rev_share_settings" component={RevShare} access="REVENUE_SHARE" />
@@ -182,16 +180,18 @@ class Main extends Component {
             <PrivateRoute path="/buyside/campaign/log/:campaign_id" component={BuySideCampaignLog} access="BUYSIDE" />
             <PrivateRoute path="/buyside/campaign/publisher_data/:campaign_id" component={BuySideCampaignPublisherData} access="BUYSIDE" />
             <PrivateRoute path="/buyside/campaign/:campaign_id" component={BuySideCampaign} access="BUYSIDE" />
-            <PrivateRoute exact path="/buyside/datagrid" component={DataGrid} access="ANALYSIS_HOME" />
-            <PrivateRoute exact path="/buyside/datagrid/analysis/:view_type" component={AnalysisView} access="ANALYSIS_HOME" />
+
+            <PrivateRoute exact path="/buyside/datatrend" redirectTo="/buyside/datatrend/d-home" component={TrendMaster} access="VIEW_ADVERTISER" />
+            <PrivateRoute exact path="/buyside/datatrend/:tab" component={TrendMaster} access="VIEW_ADVERTISER" />
+            <PrivateRoute exact path="/buyside/datagrid" redirectTo="/buyside/datagrid/d-home" component={DataGrid} access="ANALYSIS_HOME" />
+            <PrivateRoute exact path="/buyside/datagrid/:tab" component={DataGrid} access="ANALYSIS_HOME" />
 
             {/* Klay Media Terminal */}
             <PrivateRoute exact path="/klay_media" component={SellSide} access="SIGHT_HOME" />
             <PrivateRoute path="/klay_media/datatrend/:view_type" component={ReportView} access="TREND_MASTER" />
             <PrivateRoute path="/klay_media/datatrend/:view_type/:period_comparison" component={ReportView} access="TREND_MASTER" />
             <PrivateRoute exact path="/klay_media/datagrid" component={DataGrid} access="KLAY_MEDIA" />
-            {/* <PrivateRoute exact path="/klay_media/datagrid/:tab" component={DataGrid} access="KLAY_MEDIA" /> */}
-            <PrivateRoute exact path="/klay_media/datagrid/analysis/:view_type" component={AnalysisView} access="KLAY_MEDIA" />
+            <PrivateRoute exact path="/klay_media/datagrid/:tab" component={DataGrid} access="KLAY_MEDIA" />
 
             <PrivateRoute path="/404" component={PageNotFound} access="UPDATE_PROFILE" />
             <Redirect to="/404" />

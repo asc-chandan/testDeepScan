@@ -175,11 +175,12 @@ class DataGridHomeTable extends Component {
               {totalLength < 9 && (<>
                 {dashbaordListToShow.map((d, i) => {
                   return (
-                  <tr key={i}>
-                    {columns.map((col, j) => (
-                      <td className='col'></td>
-                    ))}
-                  </tr>)})}
+                    <tr key={i}>
+                      {columns.map((col, j) => (
+                        <td key={i+'_'+j} className='col'></td>
+                      ))}
+                    </tr>
+                  )})}
               </>)}
 
               {/* {anaylsisList.length === 0 &&

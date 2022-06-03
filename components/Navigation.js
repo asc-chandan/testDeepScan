@@ -98,15 +98,6 @@ export const adminPages = [
  */
 export const sitePages = {
   'sellside': [
-    // {
-    //   'id': 1001,
-    //   'title': 'Terminal',
-    //   'url': '/sellside',
-    //   'show_in_menu': true,
-    //   'privilege': 'SIGHT_HOME',
-    //   'sub_pages': '',
-    //   'class': 'home'
-    // },
     {
       'id': 201,
       'title': 'Trend Master',
@@ -191,7 +182,7 @@ export const sitePages = {
     {
       'id': 1002,
       'title': 'Trend Master',
-      'url': '/sellside/datatrend/', // Trend Master has child - home, reportview
+      'url': '/buyside/datatrend/', // Trend Master has child - home, reportview
       'show_in_menu': true,
       'privilege': ['VIEW_ADVERTISER', 'VIEW_ADSERVER', 'VIEW_WEBANALYTICS', 'VIEW_PERFORMANCE'], //privilege_ids (which privileges has authrization to access this page)
       'class': "data-trend",
@@ -200,7 +191,7 @@ export const sitePages = {
     {
       'id': 1003,
       'title': 'Data Grid',
-      'url': '/sellside/datagrid',
+      'url': '/buyside/datagrid',
       'show_in_menu': true,
       'privilege': 'ANALYSIS_HOME', //privilege_ids (which privileges has authrization to access this page)
       'class': 'data-grid',
