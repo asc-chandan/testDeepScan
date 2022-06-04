@@ -3256,7 +3256,7 @@ class ReportView extends Component {
                     if (item.type === 'string') {
                       let isDisabledForAdserverDataset = ((item.display_title === 'Advertiser' || item.display_title === 'Monetization Channel' || item.display_title === 'Ad Type' || item.display_title === 'Integration Type') && this.state.newChartSettings.metric === 'fill_rate') ? true : false;
                       return (
-                        <div className="option radio">
+                        <div key={item.id} className="option radio">
                           <input id={`${this.getDashboardID()}-chart-segment-${item}`} type="radio" name={`${this.getDashboardID()}-chart-segment`} value={item.id} disabled={(this.state.newChartSettings.x_axis === item.id || isDisabledForAdserverDataset) ? true : false} checked={this.state.newChartSettings.segmentation === item.id} onClick={(e) => this.onNewConstructorSettingsChange('segmentation', e.target.value)} />
                           <label htmlFor={`${this.getDashboardID()}-chart-segment-${item}`}>{item.display_title}</label>
                         </div>
@@ -3274,7 +3274,7 @@ class ReportView extends Component {
                     if (item.type === 'string') {
                       let isDisabledForAdserverDataset = ((item.display_title === 'Advertiser' || item.display_title === 'Monetization Channel' || item.display_title === 'Ad Type' || item.display_title === 'Integration Type') && this.state.newChartSettings.metric === 'fill_rate') ? true : false;
                       return (
-                        <div className="option radio">
+                        <div key={item.id} className="option radio">
                           <input id={`${this.getDashboardID()}-chart-segment-${item}`} type="radio" name={`${this.getDashboardID()}-chart-segment`} value={item.id} disabled={(this.state.newChartSettings.x_axis === item.id || isDisabledForAdserverDataset) ? true : false} checked={this.state.newChartSettings.segmentation === item.id} onClick={(e) => this.onNewConstructorSettingsChange('segmentation', e.target.value)} />
                           <label htmlFor={`${this.getDashboardID()}-chart-segment-${item}`}>{item.display_title}</label>
                         </div>
@@ -3313,7 +3313,7 @@ class ReportView extends Component {
                       if (this.state.newChartSettings.chart_type === 'treemap') {
                         let isDisabledForAdserverDataset = ((item.display_title === 'Advertiser' || item.display_title === 'Monetization Channel'/* || item.display_title === 'Ad Type' || item.display_title === 'Integration Type'*/) && this.state.newChartSettings.metric === 'fill_rate') ? true : false;
                         return (
-                          <div className="option radio">
+                          <div key={item.id} className="option radio">
                             <input id={`${this.getDashboardID()}-chart-xaxis-${item.display_title}`} type="radio" name={`${this.getDashboardID()}-chart-xaxis`} value={item.id} disabled={(this.state.newChartSettings.segmentation === item.id || isDisabledForAdserverDataset) ? true : this.state.newChartSettings.metric === item.id ? true : false} checked={this.state.newChartSettings.x_axis === item.id} onChange={(e) => this.onNewConstructorSettingsChange('x_axis', e.target.value)} />
                             <label htmlFor={`${this.getDashboardID()}-chart-xaxis-${item.display_title}`}>{item.display_title}</label>
                           </div>
@@ -3332,7 +3332,7 @@ class ReportView extends Component {
                       if (this.state.newChartSettings.chart_type === 'scatter' || item.is_dimension === 1) {
                         let isDisabledForAdserverDataset = ((item.display_title === 'Advertiser' || item.display_title === 'Monetization Channel'/* || item.display_title === 'Ad Type' || item.display_title === 'Integration Type'*/) && this.state.newChartSettings.metric.includes('fill_rate')) ? true : false;
                         return (
-                          <div className="option radio">
+                          <div key={item.id} className="option radio">
                             <input id={`${this.getDashboardID()}-chart-xaxis-${item.display_title}`} type="radio" name={`${this.getDashboardID()}-chart-xaxis`} value={item.id} disabled={(this.state.newChartSettings.segmentation === item.id || isDisabledForAdserverDataset) ? true : false} checked={this.state.newChartSettings.x_axis === item.id} onChange={(e) => this.onNewConstructorSettingsChange('x_axis', e.target.value)} />
                             <label htmlFor={`${this.getDashboardID()}-chart-xaxis-${item.display_title}`}>{item.display_title}</label>
                           </div>
@@ -3351,7 +3351,7 @@ class ReportView extends Component {
                       if (item.is_dimension === 1) {
                         let isDisabledForAdserverDataset = ((item.display_title === 'Advertiser' || item.display_title === 'Monetization Channel'/* || item.display_title === 'Ad Type' || item.display_title === 'Integration Type'*/) && this.state.newChartSettings.metric.includes('fill_rate')) ? true : false;
                         return (
-                          <div className="option checkbox">
+                          <div key={item.id} className="option checkbox">
                             <input id={`${this.getDashboardID()}-chart-dimension-${item.display_title}}`} type="checkbox" value={item.id} disabled={(this.state.newChartSettings.segmentation === item.id || isDisabledForAdserverDataset) ? true : false} checked={this.state.newChartSettings.x_axis.includes(item.id)} onChange={(e) => this.onNewConstructorSettingsChange('dimension', e.target.value)} />
                             <label htmlFor={`${this.getDashboardID()}-chart-dimension-${item.display_title}}`}>{item.display_title}</label>
                           </div>
@@ -3371,7 +3371,7 @@ class ReportView extends Component {
                       if (item.is_dimension === 1 && item.display_title !== 'Date') {
                         let isDisabledForAdserverDataset = ((item.display_title === 'Advertiser' || item.display_title === 'Monetization Channel'/* || item.display_title === 'Ad Type' || item.display_title === 'Integration Type'*/) && this.state.newChartSettings.metric === 'fill_rate') ? true : false;
                         return (
-                          <div className="option radio">
+                          <div key={item.id} className="option radio">
                             <input id={`${this.getDashboardID()}-chart-segment-${item}`} type="radio" name={`${this.getDashboardID()}-chart-segment`} value={item.id} disabled={(this.state.newChartSettings.x_axis === item.id || isDisabledForAdserverDataset) ? true : false} checked={this.state.newChartSettings.segmentation === item.id} onChange={(e) => this.onNewConstructorSettingsChange('segmentation', e.target.value)} />
                             <label htmlFor={`${this.getDashboardID()}-chart-segment-${item}`}>{item.display_title}</label>
                           </div>

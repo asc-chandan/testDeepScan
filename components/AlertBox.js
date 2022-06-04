@@ -30,11 +30,11 @@ function AlertBox(props){
       <div className="btn-wrapper"><div className="btn-close" onClick={props.onAlertClose}></div></div>
       
       {props.autoHide && 
-        <div class="countdown-wrap">
-          <div class="countdown">
-            <div class="mask full"><div class="fill"></div></div>
-            <div class="mask half"><div class="fill"></div></div>
-            <div class="inside-count">{counter}</div>
+        <div className="countdown-wrap">
+          <div className="countdown">
+            <div className="mask full"><div className="fill"></div></div>
+            <div className="mask half"><div className="fill"></div></div>
+            <div className="inside-count">{counter}</div>
           </div>
         </div>
       }

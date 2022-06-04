@@ -557,7 +557,7 @@ class Header extends Component {
   //Back to user's original login
   handleBackToOriginalLogin() {
     let access_token = this.isLoginAsActive();
-    if (access_token === undefined && !access_token && access_token === '') return;
+    if (access_token === undefined || !access_token || access_token === '') return;
 
     //Update existing access token and user info with original one
     let user_details = getUserDetailsFromToken(access_token);

@@ -770,7 +770,7 @@ class AnalysisView extends Component {
         //set parsed analysis details and conditional formatting here and rest (rows, columns, values, filters_ dimensions etc) will get updated on next api call
         let defaultConditionalColorsRefs = [];
         let conditionalFormatting = [];
-        if (allAnalysisDetails['config'] && allAnalysisDetails['config'].conditional_formatting) { // For saved report, initialize according to the saved condtions
+        if (allAnalysisDetails && allAnalysisDetails['config'] && allAnalysisDetails['config'].conditional_formatting) { // For saved report, initialize according to the saved condtions
           defaultConditionalColorsRefs = allAnalysisDetails['config'].conditional_formatting.map(x => ({ 'bg': React.createRef(), 'color': React.createRef() }));
           conditionalFormatting = allAnalysisDetails['config'].conditional_formatting;
         }
@@ -5833,7 +5833,7 @@ class AnalysisView extends Component {
     return (
       <ClickOutsideListner onOutsideClick={() => this.setState({ isSelectionValueDropDownSelected: !this.state.isSelectionValueDropDownSelected })}>
         <div className='selected-values-container'>
-          {selectedDataColumns.map((keyVar) => <div className='tooltip-dropdown-item'><span key={keyVar}><i>{keyVar} :</i> {this.state.selectedData[keyVar]}</span></div>)}
+          {selectedDataColumns.map((keyVar) => <div key={keyVar} className='tooltip-dropdown-item'><span key={keyVar}><i>{keyVar} :</i> {this.state.selectedData[keyVar]}</span></div>)}
         </div>
       </ClickOutsideListner>
     );
