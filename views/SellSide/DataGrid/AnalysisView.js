@@ -1673,7 +1673,7 @@ class AnalysisView extends Component {
     let current_col_count = this.state.current_col_span;
     let prev_col_count = (current_col_count - this.state.max_columns_allowed);
 
-    if (current_col_count < this.state.max_columns_allowed) return false;
+    if (current_col_count < this.state.max_columns_allowed) return;
     if (prev_col_count < 0) { prev_col_count = 1; }
 
     this.setState({
@@ -3770,7 +3770,7 @@ class AnalysisView extends Component {
                         />
                       </div>
 
-                      {(item.condition !== undefined && item.condition.id !== 'empty') &&
+                      {(item && item.condition !== undefined && item.condition.id !== 'empty') &&
                         <div className="field-wrapper compare-val compare-val1">
                           <input type="text" id="txt-comparison-val1" name="txt-comparison-val1" className="form-control number" onChange={(e) => this.handleConditionalFormattingSelect(e, 'value1', i)} value={item.value1} placeholder={(item.condition.id === 'between') ? 'From' : 'Compare Value'} />
                           {(item.format_type !== undefined && item.format_type.id === 'period_comparison') &&
@@ -3779,7 +3779,7 @@ class AnalysisView extends Component {
                         </div>
                       }
 
-                      {item.condition.id === 'between' &&
+                      {item && item.condition.id === 'between' &&
                         <div className="field-wrapper  compare-val compare-val2">
                           <input type="text" id="txt-comparison-val2" name="txt-comparison-val2" className="form-control number" onChange={(e) => this.handleConditionalFormattingSelect(e, 'value2', i)} value={item.value2} placeholder="To" />
                           {item.format_type.id === 'period_comparison' &&
@@ -3799,25 +3799,18 @@ class AnalysisView extends Component {
                         {/* <input type="color" id={'txt-font-color' + i} name={'txt-font-color' + i} ref={this.state.conditionalColorsRefs[i]['bg']} className="form-control color-control" onChange={(e) => this.handleConditionalFormattingSelect(e, 'background', i)} value={item.background} /> */}
 
                         <div id={'txt-background-color' + i} className="color-control" style={{ backgroundColor: item.background }} onClick={(e) => this.handleToggleColorPicker(e, 'background', i)}></div>
-                        {item.display_background_picker &&
+                        {item && item.display_background_picker &&
                           <ClickOutsideListner onOutsideClick={(e) => this.handleToggleColorPicker(e, 'background', i)}>
                             <div className={'color-picker-wrapper'}>
                               <div className="color-picker">
                                 {Object.keys(COLOR_PICKER_LIST).map((colorKey) => {
-                                  return (<div className="color-col">
+                                  return (<div key={colorKey} className="color-col">
                                     {COLOR_PICKER_LIST[colorKey].map((color) => {
                                       return (<div className="color" style={{ backgroundColor: color }} onClick={(e) => this.handleColorPickerSelect('background', i, color)}></div>)
                                     })}
                                   </div>)
                                 })}
                               </div>
-
-                              {/* <CompactPicker
-                                disableAlpha={true}
-                                presetColors={this.state.colorPickerPresets['background']}
-                                color={item.background}
-                                onChangeComplete={(color) => this.handleColorPickerSelect('background', i, color)}
-                              /> */}
                             </div>
                           </ClickOutsideListner>
                         }
@@ -3828,7 +3821,7 @@ class AnalysisView extends Component {
                         {/* <input type="color" id={'txt-background-color' + i} name={'txt-background-color' + i} ref={this.state.conditionalColorsRefs[i]['color']} className="form-control color-control" onChange={(e) => this.handleConditionalFormattingSelect(e, 'color', i)} value={(item.color !== '' ? item.color : '#ffffff')} /> */}
 
                         <div id={'txt-font-color' + i} className="form-control color-control" style={{ backgroundColor: (item.color !== '' ? item.color : '#ffffff') }} onClick={(e) => this.handleToggleColorPicker(e, 'font', i)}></div>
-                        {item.display_fontcolor_picker &&
+                        {item && item.display_fontcolor_picker &&
                           <ClickOutsideListner onOutsideClick={(e) => this.handleToggleColorPicker(e, 'fontcolor', i)}>
                             <div className="color-picker-wrapper">
                               <div className="color-picker">
@@ -3840,13 +3833,6 @@ class AnalysisView extends Component {
                                   </div>)
                                 })}
                               </div>
-
-                              {/* <CompactPicker
-                                disableAlpha={true}
-                                presetColors={this.state.colorPickerPresets['color']}
-                                color={item.color}
-                                onChangeComplete={(color) => this.handleColorPickerSelect('color', i, color)}
-                              /> */}
                             </div>
                           </ClickOutsideListner>
                         }
@@ -4212,7 +4198,7 @@ class AnalysisView extends Component {
                       <div className="users-filter">
                         {usersFilters.map(user => {
                           const isSelected = this.state.insightSelectedUsersIDs.includes(user.id);
-                          return <UserAvatar user={user} isSelected={isSelected} onClick={this.handleInsightUserFilterSelect} />
+                          return <UserAvatar key={user.id} user={user} isSelected={isSelected} onClick={this.handleInsightUserFilterSelect} />
                         })}
                       </div>
                     </div>
@@ -4335,8 +4321,7 @@ class AnalysisView extends Component {
                               {noteReplies.map(noteReply => {
                                 const formattedCreatedDate = giveDateTimeInString(new Date(noteReply.created_time));
                                 return (
-                                  <div className="note-widget">
-                                    {/* <span className="unread-indicator"></span> */}
+                                  <div key={noteReply.id} className="note-widget">
                                     <div className="header">
                                       <UserAvatar user={noteReply.user} />
                                       <span className="name">{noteReply.user.first_name[0].toUpperCase() + noteReply.user.first_name.slice(1) + ' ' + (noteReply.user.last_name[0] ? noteReply.user.last_name[0].toUpperCase() + noteReply.user.last_name.slice(1) : '')}</span>
@@ -5954,7 +5939,7 @@ class AnalysisView extends Component {
         {this.state.analysisColumns.length > 0 && (<div id="hover-column-container" className={`hover-column-container hover-column-container-${this.props.analysisSavedSettings.id}`}>
           <div className={`hover-column-group hover-column-group-${this.props.analysisSavedSettings.id}`}>
             {/* { data-index={1} data-sort_key={[...columnsFromProp[1]]} onClick={this.handleSortingColumn}>} */}
-            {typeof this.state.analysisColumns[1] !== 'string' && this.state.analysisColumns[1].map((col, j) => <div className={`hover-column hover-column-${this.props.analysisSavedSettings.id}-${j}`}><span>{col}</span></div>)}
+            {typeof this.state.analysisColumns[1] !== 'string' && this.state.analysisColumns[1].map((col, j) => <div key={j} className={`hover-column hover-column-${this.props.analysisSavedSettings.id}-${j}`}><span>{col}</span></div>)}
           </div>
         </div>)}
 

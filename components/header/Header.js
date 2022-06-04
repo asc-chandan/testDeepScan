@@ -298,7 +298,7 @@ class Header extends Component {
 
   //Show/Hide Switch Apps Navigation
   handleSitesListToggle() {
-    if (this.user.organization_id > 1) return false;
+    if (this.user.organization_id > 1) return;
     this.setState({ toggleSitesNavigation: !this.state.toggleSitesNavigation });
   }
 
@@ -763,16 +763,16 @@ class Header extends Component {
                             <h2>Menubar Settings</h2>
                             <span>Auto hide</span>
                           </div>
-                          <div class="switch-toggle small">
-                            <div class="label">Controlbar 2</div>
-                            <div class="switch">
+                          <div className="switch-toggle small">
+                            <div className="label">Controlbar 2</div>
+                            <div className="switch">
                               <input type="checkbox" id="controlbar-2" />
                               <label for="controlbar-2">Toggle</label>
                             </div>
                           </div>
-                          <div class="switch-toggle sidebar small">
-                            <div class="label">Sidebar</div>
-                            <div class="switch">
+                          <div className="switch-toggle sidebar small">
+                            <div className="label">Sidebar</div>
+                            <div className="switch">
                               <input type="checkbox" id="sidebar" />
                               <label for="sidebar">Toggle</label>
                             </div>
