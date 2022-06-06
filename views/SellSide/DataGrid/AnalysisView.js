@@ -3826,7 +3826,7 @@ class AnalysisView extends Component {
                             <div className="color-picker-wrapper">
                               <div className="color-picker">
                                 {Object.keys(COLOR_PICKER_LIST).map((colorKey) => {
-                                  return (<div className="color-col">
+                                  return (<div key={colorKey} className="color-col">
                                     {COLOR_PICKER_LIST[colorKey].map((color) => {
                                       return (<div className="color" style={{ backgroundColor: color }} onClick={(e) => this.handleColorPickerSelect('color', i, color)}></div>)
                                     })}

@@ -853,7 +853,7 @@ $app_wrapper_padding: $header_height /*+ $sub_header_height*/;
   line-height: 1.4;
   color: theme-color("foreground", "light");
   text-transform: capitalize;
-  white-space: nowrap;
+  // white-space: nowrap;
   border: none;
   border-collapse: collapse;
 
@@ -900,18 +900,24 @@ $app_wrapper_padding: $header_height /*+ $sub_header_height*/;
   th {
     padding: 0 8px;
     border: none;
-    overflow: hidden;
+    height: 20px;
+    // min-width: 100px;
+    max-width: 0px;
+    // div {
     word-break: break-all;
-    border-collapse: collapse;
+    // border-collapse: collapse;
     vertical-align: middle;
-    font-weight: 400;
-    color: var(--font-color);
-    line-height: 20px;
-    max-width: 200px;
-    overflow: hidden !important;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: var(--transition);
+      font-weight: 400;
+      color: var(--font-color);
+      line-height: 20px;
+      // min-width: 100px;
+      // max-width: 200px;
+      overflow-x: scroll !important;
+      overflow-y: hidden !important;
+      // text-overflow: ellipsis;
+      white-space: nowrap;
+      // transition: var(--transition);
+    // }
 
     &.actions {
       span {
@@ -925,7 +931,7 @@ $app_wrapper_padding: $header_height /*+ $sub_header_height*/;
 
   th {
     position: relative;
-    padding-right: 30px;
+    // padding-right: 30px;
     background: transparent;
     border-top: none;
     border-bottom: none;
@@ -933,10 +939,13 @@ $app_wrapper_padding: $header_height /*+ $sub_header_height*/;
     position: sticky;
     top: 0; /* required */
     text-align: left;
-    text-transform: capitalize;
-    z-index: 8;
-    border: none;
-    color: #fff;
+    // div{
+      text-transform: capitalize;
+      z-index: 8;
+      border: none;
+      border-right: 1px solid #393e46;
+      color: #fff;
+    // }
 
     .bg {
       position: absolute;

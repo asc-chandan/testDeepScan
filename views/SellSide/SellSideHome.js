@@ -375,6 +375,7 @@ class SellSideHome extends Component {
     //Cancel Previous API Requests
     console.log('unmount - cancel previous view running apis');
     APIService.abortAPIRequests(this.controller);
+    window.removeEventListener('resize', this.resizeChartsGridLayout);
   }
 
 
@@ -613,7 +614,7 @@ class SellSideHome extends Component {
             chartConfig['showLegend'] = 0; // save in config and get it from API
             chartConfig['showGrid'] = 0; // save in config and get it from API
 
-            if (!chartConfig.chart_format_parameters || chartConfig.chart_format_parameters === '') { //if format is not saved add default
+            if (chartConfig && (!chartConfig.chart_format_parameters || chartConfig.chart_format_parameters === '')) { //if format is not saved add default
               chartConfig['format'] = getDefaultChartFormat();
             } else {
               chartConfig['format'] = JSON.parse(chartConfig['chart_format_parameters']);

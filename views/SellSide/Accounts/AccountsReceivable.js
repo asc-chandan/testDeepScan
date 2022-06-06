@@ -300,7 +300,7 @@ class AccountsReceivable extends Component {
               }
 
               {this.state.payment_status !== '' &&
-                <div class={'alert ' + (this.state.payment_status === 'Updated' ? 'success' : 'error')}>{this.state.payment_status}</div>
+                <div className={'alert ' + (this.state.payment_status === 'Updated' ? 'success' : 'error')}>{this.state.payment_status}</div>
               }
 
               {!this.state.inprocess && this.state.paymentSummaryData &&

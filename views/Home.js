@@ -146,8 +146,7 @@ class Home extends Component {
               }
             </div>
             return (list);
-        })
-        }
+        })}
       </>)
     }
   }

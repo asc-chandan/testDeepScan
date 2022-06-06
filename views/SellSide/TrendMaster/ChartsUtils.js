@@ -8705,7 +8705,7 @@ function drawTable(args) {
   d3.select(args.chartWrapper.current).classed('sticky-bottom-border', (args.data.length > 6 ? true : false));
 
   let tableWrapper = '';
-  if (args.data !== undefined && args.data.length > 0) {
+  if (args && args.data !== undefined && args.data.length > 0) {
     let tempHeaders = Object.keys(args.data[0]);
     let headers = [];
 

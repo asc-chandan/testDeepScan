@@ -227,7 +227,11 @@ const APIService = {
             })
             .catch((e) => {
                 if (e.message !== 'The user aborted a request.') {
-                    AlertSevice.showToast('error', e.message || 'Some Error Occured');
+                    if(e.message==='Failed to fetch'){
+                        AlertSevice.showToast('error', 'Request '+ e.message.toLowerCase() + ' due to network issue.');
+                    } else {
+                        AlertSevice.showToast('error', e.message || 'Some Error Occured');
+                    }
                 }
                 return {};
             });

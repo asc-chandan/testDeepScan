@@ -2846,10 +2846,9 @@ class ReportView extends Component {
                         ) : (
                           segmented_keys.length > 0 &&
                           segmented_keys.map((segment) => {
-                            return (<div className="segment"><span>{segment}</span> <span className="color-block" style={{ backgroundColor: colorFunc(segment) }}></span></div>)
+                            return (<div key={segment} className="segment"><span>{segment}</span> <span className="color-block" style={{ backgroundColor: colorFunc(segment) }}></span></div>)
                           })
-                        )
-                        }
+                        )}
                       </div>
                     </div>
                   }
@@ -3007,14 +3006,13 @@ class ReportView extends Component {
 
                       {isApplicable &&
                         <div className="dropdowns">
-                          {Object.keys(bandParams).map(param => {
+                          {Object.keys(bandParams).map((param, i) => {
                             const paramName = param[0].toUpperCase() + param.slice(1);
                             const paramRange = bandParams[param].split('-').map(x => +x);
                             return (
-                              <div className="fields-group">
+                              <div key={param+'-'+i} className="fields-group">
                                 <div key={param} className={`dd-with-label band-dd-${param}`}>
                                   <label className="dd-label">{paramName}</label>
-                                  {/* <input type="text" disabled className="dd-input" value={this.state.newChartBandSettings[bandIndex][param]} onChange={(e) => this.handleNewConstructorBandSettingChange(bandIndex, param, +e.target.value)} /> */}
                                   <div className="dd-input">{this.state.newChartBandSettings[bandIndex][param]}</div>
                                 </div>
 
@@ -3237,14 +3235,14 @@ class ReportView extends Component {
                   {filteredDimensionMetrics.map((item) => {
                     if (item.is_dimension === 0) {
                       let isDisabledForAdserverDataset = (item.display_title === 'Fill Rate' && ((this.state.newChartSettings.x_axis === 'advertiser' || this.state.newChartSettings.x_axis === 'monetization_channel'/* || this.state.newChartSettings.x_axis === 'ad_type' || this.state.newChartSettings.x_axis === 'integration_type'*/) || (this.state.newChartSettings.segmentation === 'advertiser' || this.state.newChartSettings.segmentation === 'monetization_channel'/* || this.state.newChartSettings.x_axis === 'ad_type' || this.state.newChartSettings.x_axis === 'integration_type'*/))) ? true : false;
-                      return (<div className="option radio">
+                      return (<div key={item.id} className="option radio">
                         <input id={`${this.getDashboardID()}-chart-filter-${item.display_title}}`} type="radio" value={item.id} disabled={isDisabledForAdserverDataset} checked={this.state.newChartSettings.metric.includes(item.id)} onChange={(e) => this.onNewConstructorSettingsChange('metric', e.target.value)} />
                         <label htmlFor={`${this.getDashboardID()}-chart-filter-${item.display_title}}`}>{item.display_title}</label>
                       </div>
                       )
                     }
-                  })
-                  }
+                  })}
+
                   {chartFormSearchInput && !filteredDimensionMetrics.length && <p className="no-match-msg">No Match Found</p>}
                 </div>
               }
@@ -3419,7 +3417,7 @@ class ReportView extends Component {
                     if (item.is_dimension === 0) {
                       let isDisabledForAdserverDataset = (item.display_title === 'Fill Rate' && ((this.state.newChartSettings.x_axis === 'advertiser' || this.state.newChartSettings.x_axis === 'monetization_channel'/* || this.state.newChartSettings.x_axis === 'ad_type' || this.state.newChartSettings.x_axis === 'integration_type'*/) || (this.state.newChartSettings.segmentation === 'advertiser' || this.state.newChartSettings.segmentation === 'monetization_channel'/* || this.state.newChartSettings.segmentation === 'ad_type' || this.state.newChartSettings.segmentation === 'integration_type'*/))) ? true : false;
                       return (
-                        <div className="option radio">
+                        <div key={item.id} className="option radio">
                           <input id={`${this.getDashboardID()}-chart-value-${item.display_title}}`} type="radio" name={`${this.getDashboardID()}-chart-value}`} value={item.id} disabled={this.state.newChartSettings.x_axis === item.id || isDisabledForAdserverDataset ? true : false} checked={this.state.newChartSettings.metric === item.id} onChange={(e) => this.onNewConstructorSettingsChange('metric', e.target.value)} />
                           <label htmlFor={`${this.getDashboardID()}-chart-value-${item.display_title}}`}>{item.display_title}</label>
                         </div>
@@ -3437,7 +3435,7 @@ class ReportView extends Component {
                   {filteredDimensionMetrics.map((item) => {
                     if (item.is_dimension === 0) {
                       let isDisabledForAdserverDataset = (item.display_title === 'Fill Rate' && ((this.state.newChartSettings.x_axis.includes('advertiser') || this.state.newChartSettings.x_axis.includes('monetization_channel')/* || this.state.newChartSettings.x_axis.includes('ad_type') || this.state.newChartSettings.x_axis.includes('integration_type')*/) || (this.state.newChartSettings.segmentation.includes('advertiser') || this.state.newChartSettings.segmentation.includes('monetization_channel')/* || this.state.newChartSettings.segmentation.includes('ad_type') || this.state.newChartSettings.segmentation.includes('integration_type')*/))) ? true : false;
-                      return (<div className="option checkbox">
+                      return (<div key={item.id} className="option checkbox">
                         <input id={`${this.getDashboardID()}-chart-filter-${item.display_title}}`} type="checkbox" value={item.id} disabled={isDisabledForAdserverDataset} checked={this.state.newChartSettings.metric.includes(item.id)} onChange={(e) => this.onNewConstructorSettingsChange('value', e.target.value)} />
                         <label htmlFor={`${this.getDashboardID()}-chart-filter-${item.display_title}}`}>{item.display_title}</label>
                       </div>
@@ -3464,7 +3462,7 @@ class ReportView extends Component {
                   {filteredDimensionMetrics.map((item) => {
                     if (item.is_dimension === 0) {
                       let isDisabledForAdserverDataset = (item.display_title === 'Fill Rate' && ((this.state.newChartSettings.x_axis === 'advertiser' || this.state.newChartSettings.x_axis === 'monetization_channel'/* || this.state.newChartSettings.x_axis === 'ad_type' || this.state.newChartSettings.x_axis === 'integration_type'*/) || (this.state.newChartSettings.segmentation === 'advertiser' || this.state.newChartSettings.segmentation === 'monetization_channel'/* || this.state.newChartSettings.segmentation === 'ad_type' || this.state.newChartSettings.segmentation === 'integration_type'*/))) ? true : false;
-                      return (<div className="option checkbox">
+                      return (<div key={item.id} className="option checkbox">
                         <input id={`${this.getDashboardID()}-chart-filter-${item.display_title}}`} type="checkbox" value={item.id} disabled={isDisabledForAdserverDataset} checked={this.state.newChartSettings.metric.includes(item.id)} onChange={(e) => this.onNewConstructorSettingsChange('value', e.target.value)} />
                         <label htmlFor={`${this.getDashboardID()}-chart-filter-${item.display_title}}`}>{item.display_title}</label>
                       </div>
@@ -4237,8 +4235,8 @@ class ReportView extends Component {
                     <div className="previleges">
                       <div className="label">Authorization : </div>
                       <ul>
-                        {shareInfo.privileges.split(',').map(p =>
-                          <li><span className="item">{p[0] + p.slice(1).toLowerCase()}</span></li>
+                        {shareInfo.privileges.split(',').map((p, i) =>
+                          <li key={i}><span className="item">{p[0] + p.slice(1).toLowerCase()}</span></li>
                         )}
                       </ul>
                     </div>
