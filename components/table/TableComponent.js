@@ -17,7 +17,6 @@ const TableComponent = ({
   const scrollRef = useRef();
 
   useEffect(() => {
-    console.log('here')
     let screenSize = document.body.offsetWidth - 300;
     setMinWidthForTable(screenSize);
 
@@ -52,7 +51,7 @@ const TableComponent = ({
     }, 500);
     // console.log(document.getElementsByClassName("col-head")[1].offsetWidth)
 
-  }, inprocess);
+  }, [inprocess]);
 
   const handleScroll = () => {
     if (dataList !== null && paginationInfo.totalResultsCount !== dataList.length && !inprocess) {
@@ -144,10 +143,10 @@ const TableComponent = ({
       {/* <div className="asc-custom-table-wrapper"> */}
       <table id="asc-custom-table" className="asc-custom-table">
         <thead>
-          <tr>
+          <tr key="row0">
             {dataArray[0].map((col, i) => {
               return (
-                <th style={{ "width": columnsWidthInPer.length !== 0 ? columnsWidthInPer[i].toString() + "%" : "150px", "min-width": columnsMinWidth.length !== 0 ? columnsMinWidth[i].toString() + 'px' : "100px" }} key={col.colKey} id={`col-head-${i}`} className={`col-head col ${col.nameForClass}`} onClick={() => {/*onColumnSort(col.colKey)*/}}>
+                <th style={{ "width": columnsWidthInPer.length !== 0 ? columnsWidthInPer[i].toString() + "%" : "150px", "minWidth": columnsMinWidth.length !== 0 ? columnsMinWidth[i].toString() + 'px' : "100px" }} key={`${col.colKey}${i}`} id={`col-head-${i}`} className={`col-head col ${col.nameForClass}`} onClick={() => {/*onColumnSort(col.colKey)*/}}>
                   {col.content}
                   <div className="col-resize-handle" title="Drag to resize"
                     onMouseDown={(e) => handleMouseDown(e, i)}
@@ -166,9 +165,9 @@ const TableComponent = ({
             if (i === 0) {
               return <></>
             } else {
-              return (<tr key={i} data-num={i} valign="top">
+              return (<tr key={`row${i}`} data-num={i} valign="top">
                 {row.map((col, j) => {
-                  return (<td className={col.nameForClass}>
+                  return (<td key={`row${i}-col${j}`} className={col.nameForClass}>
                     {col.content}
                   </td>)
                 })}
@@ -178,9 +177,9 @@ const TableComponent = ({
           })}
           {totalLength < 9 && (<>
             {dashbaordListToShow.map((d, i) => (
-              <tr key={i} data-num={i} valign="top">
+              <tr key={`row${i}`} data-num={i} valign="top">
                 {columns.map((col, j) => (
-                  <td key={col.accessor} className='col'></td>
+                  <td key={`row${i}-${col.accessor}${j}`} className='col'></td>
                 ))}
                 {extraColumnWidth !== 0 && <td></td>}
               </tr>))}

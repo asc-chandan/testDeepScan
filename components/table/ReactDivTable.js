@@ -1520,7 +1520,7 @@ class ReactDivTable extends Component {
           </div>
 
           <div className="tbl-body">
-            {this.props.data && totalRecordsLen !== 0 &&
+            {this.props &&  this.props.data && totalRecordsLen !== 0 &&
               this.recursiveTable(this.props.data, 0, null, null, 0)
             }
 

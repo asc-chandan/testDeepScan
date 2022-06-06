@@ -154,6 +154,53 @@ $min-width: 880px;
     display: flex;
     background-color: #111111;
     padding: 10px;
+    // justify-content: space-between;
+
+    .download-button-wrapper,
+    .delete-button-wrapper {
+        display: inline-block;
+        margin: 0 15px;
+        position: relative;
+        width: 14px;
+        height: 14px;
+        display: flex;
+
+        .showloading2 {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 12px;
+            height: 12px;
+        }
+    }
+
+    .download-options-wrapper {
+        display: block;
+        position: fixed;
+        width: 115px;
+        background: #fff;
+        z-index: 999;
+        margin-top: 16px;
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            li {
+                background: none;
+                padding: 4px 10px;
+                border-bottom: 1px solid #efefef;
+                color: #000;
+                // font-size: 0.825rem;
+                cursor: pointer;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+            }
+        }
+    }
     button {
         background-color: transparent;
         border: none;

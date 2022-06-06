@@ -2772,9 +2772,11 @@ class AnalysisView extends Component {
 
   handleFilterPanelMainTabChange(tab) {
     // Changing the left position of hover header column on opening of panel
-    if (!document.getElementsByClassName(`hover-column-container-${this.props.analysisSavedSettings.id}`)[0].parentNode.classList.contains('panel-open')) {
-      let left = parseInt(document.getElementsByClassName(`hover-column-container-${this.props.analysisSavedSettings.id}`)[0].style.left.split('p')[0]) + 365;
-      document.getElementsByClassName(`hover-column-container-${this.props.analysisSavedSettings.id}`)[0].style.left = left.toString()+'px';
+    if (document.getElementsByClassName(`hover-column-container-${this.props.analysisSavedSettings.id}`).length !== 0) {
+      if (!document.getElementsByClassName(`hover-column-container-${this.props.analysisSavedSettings.id}`)[0].parentNode.classList.contains('panel-open')) {
+        let left = parseInt(document.getElementsByClassName(`hover-column-container-${this.props.analysisSavedSettings.id}`)[0].style.left.split('p')[0]) + 365;
+        document.getElementsByClassName(`hover-column-container-${this.props.analysisSavedSettings.id}`)[0].style.left = left.toString()+'px';
+      }
     }
     this.setState({
       filter_panel_main_tab: tab,

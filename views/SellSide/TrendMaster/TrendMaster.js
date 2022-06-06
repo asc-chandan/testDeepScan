@@ -242,7 +242,7 @@ class TrendMaster extends Component {
                     // Check if current tab in url is in Edit mode and if that is allowed to be opened in Edit mode or not
                     if (editModeTabId) {
                         // Check if current dashboardId in url(if any) is allowed to be opened in Edit mode or not
-                        const canBeOpenedInEditMode = (editModeTabId === null || editModeTabId.includes('new')) ? true : response.data.find(d => editModeTabId === String(d.id)).privileges.includes('EDIT');
+                        const canBeOpenedInEditMode = editModeTabId.includes('new') ? true : response.data.find(d => editModeTabId === String(d.id)).privileges.includes('EDIT');
                         if (!canBeOpenedInEditMode) {
                             // Restricted Route , hence redirect to View mode
                             this.openTab(editModeTabId, false);
@@ -1769,8 +1769,8 @@ const ShareDashbaord = ({ dashboardData, userId, onShareCancel }) => {
                                                         <div className="previleges">
                                                             <div className="label">Authorization : </div>
                                                             <ul>
-                                                                {shareInfo.privileges.split(',').map(p =>
-                                                                    <li><span className="item">{p[0] + p.slice(1).toLowerCase()}</span></li>
+                                                                {shareInfo.privileges.split(',').map((p,i) =>
+                                                                    <li key={i}><span className="item">{p[0] + p.slice(1).toLowerCase()}</span></li>
                                                                 )}
                                                             </ul>
                                                         </div>
@@ -1783,8 +1783,8 @@ const ShareDashbaord = ({ dashboardData, userId, onShareCancel }) => {
                                                                 <span className="full-dash-msg"> Full Dashboard</span>
                                                                 :
                                                                 <ul>
-                                                                    {shareInfo.dashboard_config.split(',').map(p =>
-                                                                        <li><span className="item">{p}</span></li>
+                                                                    {shareInfo.dashboard_config.split(',').map((p, i) =>
+                                                                        <li key={i}><span className="item">{p}</span></li>
                                                                     )}
                                                                 </ul>
                                                             }
@@ -1870,6 +1870,7 @@ const ShareDashbaord = ({ dashboardData, userId, onShareCancel }) => {
                                                     </div>
                                                 );
                                             })}
+                                            
                                             {!sharedUsers.length &&
                                                 <div>Not shared with anyone yet</div>
                                             }

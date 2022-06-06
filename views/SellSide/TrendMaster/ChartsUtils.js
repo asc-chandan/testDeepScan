@@ -5254,6 +5254,7 @@ function drawScatterChart2(args) {
   /* Define and create yScale, yAxis, ticks */
   var yScale;
   var yAxis;
+  let xAxisSliderGroup;
   async function defineYScale() {
     //Set y axis scale
     // console.log(yScaleLimits , yStartPoint , yEndPoint , 'scatter')
@@ -5302,7 +5303,7 @@ function drawScatterChart2(args) {
   let xTickSliderHeight = initialConfig.xTickSliderHeight;
   let xTickSliderTextPosTop = isFitToWidthMode ? Math.round(4 * currentCanvasWidth / args.screen) : 4;
 
-  let xAxisSliderGroup = chart.append('g').attr('class', 'xaxis-slider-group').attr('transform', `translate(0,0)`).style('display', 'none');
+  xAxisSliderGroup = chart.append('g').attr('class', 'xaxis-slider-group').attr('transform', `translate(0,0)`).style('display', 'none');
   if (initialConfig.showXAxisTicks) {
     xAxisSliderGroup.append('rect')
       .attr("x", 0)

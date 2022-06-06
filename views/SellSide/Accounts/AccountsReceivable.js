@@ -217,7 +217,7 @@ class AccountsReceivable extends Component {
 
     APIService.apiRequest(Constants.API_BASE_URL + '/updatePaymentSummary', statusPayLoad, false, 'POST', this.controller)
       .then(response => {
-        if (response.status === 1) {
+        if (response && response.status === 1) {
           this.setState({ payment_status: response.message });
         } else {
           this.setState({ payment_status: response.message });

@@ -505,7 +505,7 @@ class ReportView extends Component {
         that.ascHAnchor.current.style.left = that.multiChartsScrollableWrapper.current.scrollLeft + 'px';
       });
     } else {
-      this.multiChartsScrollableWrapper.current.removeEventListener("scroll", () => { });
+      this.multiChartsScrollableWrapper.current.removeEventListener("scroll", ()=>{});
     }
   }
 
@@ -805,6 +805,8 @@ class ReportView extends Component {
     // console.log('unmount - cancel previous view running apis');
     APIService.abortAPIRequests(this.controller);
     subject2.unSubscribe(this.handleClientChange.bind(this));
+    window.removeEventListener('resize', this.onWindowResize);
+    this.multiChartsScrollableWrapper.current.removeEventListener("scroll", ()=>{});
   }
 
   loadScriptsIfTabBecomesActive() {

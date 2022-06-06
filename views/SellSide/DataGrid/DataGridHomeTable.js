@@ -106,19 +106,6 @@ class DataGridHomeTable extends Component {
               // <div className="action-buttons-wrapper">
               <div className="recent-action">
 
-                {canShare && <button className={'btn-share'+ (disableButtons ? ' disable' : '')} onClick={() => { }} title="Share"></button>}
-
-                <button className={'btn-download' + (disableButtons ? ' disabled' : '')} onClick={() => this.setState({ openeDownloadOptionsRowId: row.id })} title="Download"></button>
-
-                {/* <div className="download-button-wrapper">
-                  {downloadingAnalysisId !== row.id &&
-                    <button className={'btn-download'+ (disableButtons ? ' disable' : '')} onClick={() => this.setState({ openeDownloadOptionsRowId: row.id })} title="Download"></button>
-                  }
-                  {downloadingAnalysisId === row.id &&
-                    <Loader2 />
-                  }
-                </div> */}
-
                 {(this.state.openeDownloadOptionsRowId === row.id && downloadingAnalysisId !== row.id) &&
                   <ClickOutsideListner onOutsideClick={() => this.setState({ openeDownloadOptionsRowId: null })} className="outside-listener">
                     <div className="download-options-wrapper">
@@ -129,10 +116,24 @@ class DataGridHomeTable extends Component {
                     </div>
                   </ClickOutsideListner>
                 }
+
+                {canShare && <button className={'btn-share' + (disableButtons ? ' disable' : '')} onClick={() => { }} title="Share"></button>}
+
+                {/* <button className={'btn-download' + (disableButtons ? ' disabled' : '')} onClick={() => this.setState({ openeDownloadOptionsRowId: row.id })} title="Download"></button> */}
+
+                <div className="download-button-wrapper">
+                  {downloadingAnalysisId !== row.id &&
+                    <button className={'btn-download' + (disableButtons ? ' disable' : '')} onClick={() => this.setState({ openeDownloadOptionsRowId: row.id })} title="Download"></button>
+                  }
+                  {downloadingAnalysisId === row.id &&
+                    <Loader2 />
+                  }
+                </div>
+                
                 <button className={'btn-schedule'+ (disableButtons ? ' disable' : '')} onClick={() => { }} title="Schedule"></button>
                 {canEdit && <button className={'xs btn-edit'+ (disableButtons ? ' disable' : '')} onClick={() => onAnalysisEdit(row.id)} title="Schedule"></button>}
-                {canDelete && (!deletingAnalysisId || (deletingAnalysisId && row.id !== deletingAnalysisId)) && <button className={'btn-delete' + (disableButtons ? ' disabled' : '')} onClick={() => onAnalysisDelete(row.id)}></button>}
-                {/* {canDelete &&
+                {/* {canDelete && (!deletingAnalysisId || (deletingAnalysisId && row.id !== deletingAnalysisId)) && <button className={'btn-delete' + (disableButtons ? ' disabled' : '')} onClick={() => onAnalysisDelete(row.id)}></button>} */}
+                {canDelete &&
                   <div className="delete-button-wrapper">
                     {deletingAnalysisId !== row.id &&
                       <button className={'btn-delete'+ (disableButtons ? ' disable' : '')} onClick={() => onAnalysisDelete(row.id)} title="Delete"></button>
@@ -141,7 +142,7 @@ class DataGridHomeTable extends Component {
                       <Loader2 />
                     }
                   </div>
-                } */}
+                }
                 <>
                   {bookmarkingAnalysisId !== row.id &&
                     <button  className={'btn-bookmark'+(row.is_bookmark === 1?' bookmarked':'') +(disableButtons ? ' disable' : '')} onClick={() => onAnalysisBookmark(row.id)} title="Bookmark"></button>
