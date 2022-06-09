@@ -3866,7 +3866,9 @@ class AnalysisView extends Component {
         allFilters.forEach((item)=>{
           if(item!=='period'){
             let matchingFilter = this.state.all_items.filter((e) => e.title===item);
-            selectedVisibleFilters.push(matchingFilter[0]);
+            if (matchingFilter.length !== 0) {
+              selectedVisibleFilters.push(matchingFilter[0]);
+            }
           }
         });
       }

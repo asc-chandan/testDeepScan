@@ -13,10 +13,9 @@ import RangePicker from '../../components/ReactCalendar/RangePicker';
 import '../../styles/Global.scss';
 import '../../styles/BuySide.scss';
 
-import { getKeyByValue, getClients, formatDate, getUser } from '../../utils/Common';
+import { getKeyByValue, getClients, getUser } from '../../utils/Common';
 import APIService from '../../services/apiService';
 import BuySideReactTable from './BuySideReactTable';
-import HideSubHeader from '../../components/HideSubHeader';
 
 
 class BuySide extends Component {
@@ -67,7 +66,7 @@ class BuySide extends Component {
   }
 
   //Reload the page if client id/name change from url
-  componentDidUpdate(prev_props){
+  componentDidUpdate(){
     this.user = getUser();
     
     if(this.user.last_fetched_client!==this.state.client.id){
@@ -175,7 +174,7 @@ class BuySide extends Component {
     
     if(this.state.selected_property.length > 0){
       let site_ids = [];
-      this.state.selected_property.forEach((item, i) => {
+      this.state.selected_property.forEach((item) => {
         site_ids.push(item.id);
       });
       apiPayload += '&site_id='+site_ids;

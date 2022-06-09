@@ -8,6 +8,7 @@ import '../styles/Home.scss';
 import ClickOutsideListener from '../components/SpeedSelect/components/ClickOutsideListener';
 import * as Constants from '../components/Constants.js';
 import '../styles/Dashboard.scss';
+import TerminalChangeSubject from '../subjects/TerminalChangeSubject';
 
 class Home extends Component {
   constructor(props) {
@@ -34,7 +35,12 @@ class Home extends Component {
 
   componentDidMount() {
     this.handleLoadScripts()
-    subject2.subscribe(this.updateTerminalInfo.bind(this));
+
+    // subscribing the subject2 to get the notification about the client change from header.
+    subject2.subscribe(this.handleUpdateClient.bind(this));
+
+    // subscribing the TerminalChangeSubject to get the notification about the terminal change from header.
+    TerminalChangeSubject.subscribe(this.updateTerminalInfo.bind(this));
   }
 
   componentDidUpdate() {
@@ -45,7 +51,9 @@ class Home extends Component {
   }
 
   componentWillUnmount() {
-    subjectObj.unSubscribe(this.updateTerminalInfo.bind(this));
+    //unsubscribing the subjects on component un mount.
+    subject2.unSubscribe(this.handleUpdateClient.bind(this));
+    TerminalChangeSubject.unSubscribe(this.updateTerminalInfo.bind(this));
   }
 
   getTerminalType() {
@@ -54,6 +62,14 @@ class Home extends Component {
     userStr = (userStr) ? JSON.parse(userStr) : {};
     terminal_type = userStr['terminal_type'];
     return terminal_type;
+  }
+
+  handleUpdateClient(obj) {
+    this.setState({
+      client: obj.client,
+    }, () => {
+      this.handleLoadScripts();
+    });
   }
 
   updateTerminalInfo(obj) {

@@ -13,7 +13,6 @@ import { getKeyByValue, getClients, getUser, exportCSVFile } from '../../../util
 //Import Services
 import APIService from '../../../services/apiService';
 import LoaderbyData from '../../../components/LoaderbyData/LoaderbyData.js';
-import HideSubHeader from '../../../components/HideSubHeader';
 
 
 class AccountsReceivable extends Component {
@@ -197,7 +196,7 @@ class AccountsReceivable extends Component {
       let months = arg[month_index]['val'];
       let monthIds = [];
       if (months.length > 0) {
-        months.forEach((item, i) => {
+        months.forEach((item) => {
           monthIds.push(item.id);
         });
         paymentSummaryPayLoad['month'] = monthIds;
@@ -285,8 +284,6 @@ class AccountsReceivable extends Component {
               <button className="btn-with-icon btn-download" onClick={this.handleDownloadView} title="Download View">Download</button>
             </div>
           </div>
-
-          {/* <HideSubHeader />*/}
         </div>
 
 

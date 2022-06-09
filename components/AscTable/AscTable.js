@@ -8,7 +8,7 @@ function AscTable(props) {
   const [data, setData] = useState(props.data);
   const [filteredData, setFilteredData] = useState(props.data);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSizes, setPageSizes] = useState([10,25,50,100,500]);
+  const [pageSizes] = useState([10,25,50,100,500]);
   const [pageSizeSelected, setPageSizeSelected] = useState(props.pageSize!==undefined ? props.pageSize : 50);
   const [totalRecords, setTotalRecords] = useState(props.data.length);
   const [totalPages, setTotalPages] = useState(Math.ceil(totalRecords/pageSizeSelected));
@@ -204,7 +204,7 @@ function AscTable(props) {
                   }
                   
                   return (
-                    <td onClick={(e)=> handleColEdit(e,i,j)}>
+                    <td key={i+'-'+j} onClick={(e)=> handleColEdit(e,i,j)}>
                       {(col.name==='action' && item['status']==='not active') &&
                         <button className="btn outline xs btn-add">{props.actionAddButtonName}</button>
                       }
@@ -232,9 +232,6 @@ function AscTable(props) {
                             <DatePicker picker="date"
                               placeholder="Pick a Date"
                               align="left"
-                              // date={currentDate}
-                              // onChange={handleDateChange}
-                              // disableFn={(dObj) => isDateSmaller(dObj, new Date(2021, -1, 31))}
                             />
                           }
                         </span>

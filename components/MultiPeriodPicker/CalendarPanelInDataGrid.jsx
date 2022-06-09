@@ -331,21 +331,21 @@ const CalendarPanelInDataGrid = ({ periods, periodBGColors = DEFAULT_PERIOD_BGCO
         });
     };
 
-    const handlePrevMonthClick = (e) => {
+    const handlePrevMonthClick = () => {
         const prevStartMonth = startMonth === 0 ? 11 : startMonth - 1;
         const prevStartYear = startMonth === 0 ? startYear - 1 : startYear;
         setStartMonth(prevStartMonth);
         setStartYear(prevStartYear);
     };
-    const handleNextMonthClick = (e) => {
+    const handleNextMonthClick = () => {
         const nextStartMonth = (startMonth + 1) % 12;
         const nextStartYear = startMonth === 11 ? startYear + 1 : startYear;
         setStartMonth(nextStartMonth);
         setStartYear(nextStartYear);
     };
 
-    const handlePrevYearClick = (e) => setStartYear(startYear - 1);
-    const handleNextYearClick = (e) => setStartYear(startYear + 1);
+    const handlePrevYearClick = () => setStartYear(startYear - 1);
+    const handleNextYearClick = () => setStartYear(startYear + 1);
     const handlePrevDecadeClick = () => setStartYear(startYear - 10);
     const handleNextDecadeClick = () => setStartYear(startYear + 10);
 
@@ -808,7 +808,7 @@ const CalendarPanelInDataGrid = ({ periods, periodBGColors = DEFAULT_PERIOD_BGCO
                 <div className="widget-content">
                     {periodComparisonGroupByOptions.map(item => (
                         <div key={item.id} className="option" >
-                            <input type="checkbox" checked={periodComparisonGroupBy.id === item.id} onChange={(e) => onPeriodComparisonGroupByChange(item)} />
+                            <input type="checkbox" checked={periodComparisonGroupBy.id === item.id} onChange={() => onPeriodComparisonGroupByChange(item)} />
                             <span className="label">{item.display_title}</span>
                         </div>
                     ))}

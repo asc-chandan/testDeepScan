@@ -7,12 +7,11 @@ import Loader from '../../components/Loader';
 import '../../styles/Global.scss';
 import '../../styles/BuySide.scss';
 
-import { getKeyByValue, getClients, formatDate, getUser } from '../../utils/Common';
+import { getKeyByValue, getClients, getUser } from '../../utils/Common';
 import { isDateGreater } from '../../components/ReactCalendar/components/utils';
 import RangePicker from '../../components/ReactCalendar/RangePicker';
 import APIService from '../../services/apiService';
 import BuySideReactTable from './BuySideReactTable';
-import HideSubHeader from '../../components/HideSubHeader';
 
 class BuySideCampaignPublisherData extends Component {
   constructor(props) {
@@ -48,7 +47,7 @@ class BuySideCampaignPublisherData extends Component {
   }
 
   //Reload the page if client id/name change from url
-  componentDidUpdate(prev_props){
+  componentDidUpdate(){
     this.user = getUser();
 
     if(this.user.last_fetched_client!==this.state.client.id){
@@ -91,7 +90,6 @@ class BuySideCampaignPublisherData extends Component {
           }
           if(defaultFormat==='this_month'){
             formattedStartDate = moment(formattedEndDate).startOf('month').toDate();
-            formattedEndDate = formattedEndDate;
           }
 
           let formattedDateRange = [formattedStartDate, formattedEndDate];
@@ -222,18 +220,16 @@ class BuySideCampaignPublisherData extends Component {
               <div className="summary-wrapper">
                 {Object.keys(this.state.campaignSummary).length > 0 &&
                   <div className="inner-wrapper">
-                    {
-                    Object.keys(this.state.campaignSummary).map((item, i) => {
+                    {Object.keys(this.state.campaignSummary).map((item) => {
                       if(item=='campaign_id' || item=='campaign_name') return;
                       let label = item.replace(/_/g, ' ');
                       return (
-                        <div className={'info '+item}>
+                        <div key={item} className={'info '+item}>
                           <div className="number">{this.state.campaignSummary[item]}</div>
                           <div className="label">{label}</div>
                         </div>
                       )
-                    })
-                    }
+                    })}
                   </div>
                 }
               </div>

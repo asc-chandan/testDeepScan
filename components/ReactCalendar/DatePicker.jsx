@@ -39,7 +39,7 @@ const DatePicker = ({ picker, showInline, placeholder, align, allowClear, date, 
         handleDateChange('', null);
     };
 
-    const handleOutsideClick = (e) => {
+    const handleOutsideClick = () => {
         // console.log('outside clicked');
         setInputFocused(false);
     }
@@ -171,21 +171,21 @@ const DatePickerPanel = ({ picker, date, onChange, disableFn }) => {
         });
     };
 
-    const handlePrevMonthClick = (e) => {
+    const handlePrevMonthClick = () => {
         const prevMonth = month === 0 ? 11 : month - 1;
         const prevYear = month === 0 ? year - 1 : year;
         setMonth(prevMonth);
         setYear(prevYear);
     };
-    const handleNextMonthClick = (e) => {
+    const handleNextMonthClick = () => {
         const nextMonth = (month + 1) % 12;
         const nextYear = month === 11 ? year + 1 : year;
         setMonth(nextMonth);
         setYear(nextYear);
     };
 
-    const handlePrevYearClick = (e) => setYear(year - 1);
-    const handleNextYearClick = (e) => setYear(year + 1);
+    const handlePrevYearClick = () => setYear(year - 1);
+    const handleNextYearClick = () => setYear(year + 1);
     const handlePrevDecadeClick = () => setYear(year - 10);
     const handleNextDecadeClick = () => setYear(year + 10);
 
@@ -209,7 +209,7 @@ const DatePickerPanel = ({ picker, date, onChange, disableFn }) => {
                     onPrevYearBtn={handlePrevYearClick}
                     onNextYearBtn={handleNextYearClick}
                     disable={picker === 'month' ? disableFn : () => false}
-                    selectMonth={(month, y) => date ? month === date.getMonth() : false}
+                    selectMonth={(month) => date ? month === date.getMonth() : false}
                 />
             }
             {panel === 'year' &&
@@ -219,7 +219,6 @@ const DatePickerPanel = ({ picker, date, onChange, disableFn }) => {
                     onNextDecadeBtn={handleNextDecadeClick}
                     disable={picker === 'year' ? disableFn : () => false}
                     selectYear={(y) => date ? y === date.getFullYear() : false}
-
                 />
             }
             {panel === 'quarter' &&

@@ -37,7 +37,7 @@ class ShareTrendMasterDashboard extends Component {
         this.handleLoadScripts();
     }
 
-    componentDidUpdate(prev_props) {
+    componentDidUpdate() {
     }
 
     componentWillUnmount() {
@@ -65,8 +65,7 @@ class ShareTrendMasterDashboard extends Component {
     //     });
     // }
 
-    handlePanelToggle(tabID, panelType) {
-        console.log('tabID', tabID);
+    handlePanelToggle() {
         this.setState({
             showConsolePanel: !this.state.showConsolePanel
         });

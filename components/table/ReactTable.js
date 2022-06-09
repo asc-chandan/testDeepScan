@@ -4,7 +4,7 @@ import * as Constants from '../Constants.js';
 import ClickOutsideListner from '../ClickOutsideListner';
 import Loader2 from '../Loader2';
 
-function Table({ columns, data, client, props }) {
+function Table({ columns, data, props }) {
   const {
     getTableProps,
     getTableBodyProps,
@@ -46,10 +46,10 @@ function Table({ columns, data, client, props }) {
   return (
     <table {...getTableProps()} className="custom-table">
       <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
+        {headerGroups.map((headerGroup, i) => (
+          <tr key={i} {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps()}><span className="bg"></span>{column.render('Header')}</th>
+              <th key={column} {...column.getHeaderProps()}><span className="bg"></span>{column.render('Header')}</th>
             ))}
           </tr>
         ))}
@@ -59,18 +59,18 @@ function Table({ columns, data, client, props }) {
         {rows.map((row, i) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell, j) => {
+            <tr key={i} {...row.getRowProps()}>
+              {row.cells.map((cell) => {
                 let view_type = row.cells[1]['value'];
                 const reportUrl = '/' + props.terminal_type + '/datagrid/analysis/' + view_type;
                 if (cell.column.id == 'name') {
-                  return (<td {...cell.getCellProps()}>
+                  return (<td key={cell.column.id} {...cell.getCellProps()}>
                     <button className="btn-link icon-folder"
                       onClick={() => handleViewLoad(reportUrl, cell.row.original)} title="View">{cell.row.original.name}</button>
                   </td>)
                 } else {
                   return (
-                    <td {...cell.getCellProps()}>
+                    <td key={cell.column.id} {...cell.getCellProps()}>
                       {cell.render('Cell')}
 
                       {/* Used for Analysis View Home Page Only */}

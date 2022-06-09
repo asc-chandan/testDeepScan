@@ -11,14 +11,12 @@ import { isDateGreater } from '../../../components/ReactCalendar/components/util
 import RangePicker from '../../../components/ReactCalendar/RangePicker';
 import SpeedSelect from '../../../components/SpeedSelect/SpeedSelect';
 
-
 //Import Common Functions
 import { getKeyByValue, getClients, getUser, exportCSVFile } from '../../../utils/Common';
 
 //Import Services
 import APIService from '../../../services/apiService';
 import LoaderbyData from '../../../components/LoaderbyData/LoaderbyData';
-import HideSubHeader from '../../../components/HideSubHeader';
 
 
 class AccountsPayable extends Component {
@@ -230,8 +228,7 @@ class AccountsPayable extends Component {
   }
 
   //On Select Change
-  onOptionSelect(event, id) {
-    // console.log(event.target.checked);
+  onOptionSelect(event) {
     this.setState({ group_by: event.target.checked ? 'month' : 'date' });
 
     setTimeout(() => {

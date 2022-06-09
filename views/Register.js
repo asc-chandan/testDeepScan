@@ -6,13 +6,9 @@ import SHA512 from 'crypto-js/sha512';
 import Base64 from 'crypto-js/enc-base64';
 import { setUserSession, getUserDetailsFromToken } from '../utils/Common';
 
-// import { isValidEmail } from '../../utils';
-
 
 export default class Register extends React.Component {
-
     constructor(props) {
-
         super(props);
         this.state = {
             // variables related to from signup
@@ -141,15 +137,11 @@ export default class Register extends React.Component {
     }
 
     onFacebookSignupBtn() {
-
         if (this.facebookSdkLoadedSubscription) { this.facebookSdkLoadedSubscription.unsubscribe(); }
 
         this.facebookSdkLoadedSubscription = socialLoginApi.facebookSdkLoaded.subscribe((sdkLoaded) => {
-
             if (!sdkLoaded) { return; }
-
-
-            const getUserProfile = (token, userId) => {
+            const getUserProfile = (token) => {
                 window.FB.api(`/me/`, { "fields": "id,name,email,gender,location,birthday,picture.width(100).height(100)" }, (userProfileResponse) => {
                     // console.log('game- fb profile response', userProfileResponse);
 
@@ -277,8 +269,4 @@ export default class Register extends React.Component {
             </div>
         );
     }
-};
-
-
-
-
+}

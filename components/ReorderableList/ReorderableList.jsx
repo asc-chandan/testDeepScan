@@ -119,10 +119,9 @@ function ReorderableList(props) {
                 const itemAboveWhichIndicatorToBeShownCord = sortableListElement.querySelector(`[data-rlist-draggable-index="${itemAboveWhichIndicatorToBeShownIndex}"]`).getBoundingClientRect();
                 dragIndicator.style.top = Number(itemAboveWhichIndicatorToBeShownCord.top) + 'px';
             }
-
         }
 
-        function handleMouseUp(eInner) {
+        function handleMouseUp() {
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
 
@@ -132,7 +131,6 @@ function ReorderableList(props) {
             draggingItemCopy.remove();
             dragIndicator.remove();
 
-
             // console.log('local', currentDropIndex);
             const initIndex = initialIndex;
             const finalIndex = initialIndex >= itemAboveWhichIndicatorToBeShownIndex ? itemAboveWhichIndicatorToBeShownIndex : itemAboveWhichIndicatorToBeShownIndex - 1;
@@ -141,9 +139,7 @@ function ReorderableList(props) {
             if (initIndex !== finalIndex) {
                 onReorder(initIndex, finalIndex);
             }
-
         }
-
     };
 
     const listProps = {

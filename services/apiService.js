@@ -1,9 +1,8 @@
 import AuthHeader from '../utils/AuthHeader';
 import * as Constants from '../components/Constants';
-import { removeUserSession, getLocalStorageVal, getUserDetailsFromToken, setUserSession, getUser, getToken, getDefaultHomePageURL } from '../utils/Common';
+import { removeUserSession, getUserDetailsFromToken, setUserSession, getUser, getToken, getDefaultHomePageURL } from '../utils/Common';
 import AlertSevice from './alertService';
 import { sitePages } from '../components/Navigation';
-// import { milliseconds } from 'date-fns';
 
 const errorMessages = {
     '400': 'Bad Request',
@@ -152,7 +151,7 @@ const APIService = {
                                 }
 
                             }).catch(e => {
-                                AlertSevice.warning('User password/session expired, Please login again.');
+                                AlertSevice.warning('User password/session expired, Please login again.', e.msg);
                                 removeUserSession();
                                 window.location.reload();
                             });
@@ -166,7 +165,7 @@ const APIService = {
                         //then wait for api callback response
                         //return the response to apiservive caller
                         resetTokenInProcess = getResetTokenProcessStatus();
-                        return new Promise((resolve, reject) => {
+                        return new Promise((resolve) => {
                             let interval = setInterval(()=>{
                                 resetTokenInProcess = getResetTokenProcessStatus();
                                 if(resetTokenInProcess===0){
@@ -174,7 +173,7 @@ const APIService = {
                                     resolve(1);
                                 }
                             },50);
-                        }).then((val)=>{
+                        }).then(()=>{
                             return this.apiRequest(API_URL, data, showProgress, req_method, controller, authHeader);
                         });
                     }

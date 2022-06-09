@@ -4,11 +4,11 @@ import * as Constants from '../Constants.js';
 import subjectObj from '../../subjects/Subject1';
 import subject2 from '../../subjects/Subject2';
 import { IAMPages } from '../Navigation';
-import { getClients, getDefaultHomePageURL } from '../../utils/Common';
+import { getClients } from '../../utils/Common';
 import SpeedSelect from '../SpeedSelect/SpeedSelect';
 import APIService from '../../services/apiService';
 import ClickOutsideListner from '../ClickOutsideListner';
-import { sitePages } from '../../components/Navigation';
+import TerminalChangeSubject from '../../subjects/TerminalChangeSubject.js';
 
 import moment from 'moment';
 
@@ -169,7 +169,7 @@ class Header extends Component {
         }
       })
       .catch(err => {
-        console.log('Error:Couldn\'t fetch user preferences');
+        console.log('Error:Couldn\'t fetch user preferences', err.msg);
       });
   }
 
@@ -313,12 +313,12 @@ class Header extends Component {
   }
 
   //On Switch Tab
-  onSwitchToNewTab(event, id) {
+  onSwitchToNewTab(event) {
     this.setState({ switchToNewTab: event.target.checked });
   }
 
   //Switch to beta version of site
-  handleSwitchToNextVersion(e) {
+  handleSwitchToNextVersion() {
     this.setState({
       switchToNextVersion: !this.state.switchToNextVersion
     }, () => {
@@ -391,7 +391,7 @@ class Header extends Component {
       this.setState({ selected_terminal: event }, () => {
         //if default home url contains selcted terminal id, use default_home_url as redirect url
         // let default_url = userStr.default_home_url.includes(event.id) ? userStr.default_home_url : '/' + event.id;
-        subject2.notify({
+        TerminalChangeSubject.notify({
           terminal: this.state.selected_terminal,
         })
 
@@ -421,7 +421,7 @@ class Header extends Component {
       }, () => {
         //if default home url contains selcted terminal id, use default_home_url as redirect url
         // let default_url = default_home_url.includes(terminal_type.id) ? user_info.default_home_url : '/' + terminal_type.id;
-        subject2.notify({
+        TerminalChangeSubject.notify({
           terminal: this.state.selected_terminal,
         })
 
@@ -460,8 +460,10 @@ class Header extends Component {
 
     APIService.apiRequest(Constants.API_BASE_URL + '/user_preference', payload, false, requestType, null)
       .then(response => {
+        console.log('user_preference_saved', response);
       })
       .catch(err => {
+        console.log('user_preference_saved', err.msg);
       });
   }
 
@@ -486,7 +488,7 @@ class Header extends Component {
           }
         })
         .catch(err => {
-          console.log('Error2: Client didn\'t save');
+          console.log('Error2: Client didn\'t save', err.msg);
         });
     }, 0);
   }
@@ -579,7 +581,7 @@ class Header extends Component {
     this.props.history.push('/sellside/api/data_status');
   }
 
-  handleSightVersionChange(e) {
+  handleSightVersionChange() {
     this.setState({ toggleInProcess: true, toggleForSightVersion: !this.state.toggleForSightVersion }, () => {
       APIService.apiRequest(Constants.API_BASE_URL + '/user_sight_version', { "version": "sight0" }, false, 'PUT')
       .then((response) => {
@@ -589,7 +591,7 @@ class Header extends Component {
       })
       .catch(err => {
         this.setState({ toggleInProcess: false, toggleForSightVersion: !this.state.toggleForSightVersion })
-        console.log('Error: Couldn\'t set version');
+        console.log('Error: Couldn\'t set version', err.msg);
       });
     })
   }
@@ -767,14 +769,14 @@ class Header extends Component {
                             <div className="label">Controlbar 2</div>
                             <div className="switch">
                               <input type="checkbox" id="controlbar-2" />
-                              <label for="controlbar-2">Toggle</label>
+                              <label htmlFor="controlbar-2">Toggle</label>
                             </div>
                           </div>
                           <div className="switch-toggle sidebar small">
                             <div className="label">Sidebar</div>
                             <div className="switch">
                               <input type="checkbox" id="sidebar" />
-                              <label for="sidebar">Toggle</label>
+                              <label htmlFor="sidebar">Toggle</label>
                             </div>
                           </div>
                         </div>

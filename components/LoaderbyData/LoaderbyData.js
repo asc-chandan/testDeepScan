@@ -5,7 +5,7 @@ import logoBydataText from '../../images/bydata.svg';
 import logoBydataIcon from '../../images/logo-icon.svg';
 import logoOrbit from '../../images/logo-icon.gif';
 
-export default function LoaderbyData({ progressPercent }) {
+export default function LoaderbyData() {
     return (
         <div className="bydata-loader-wrapper">
             <div className="bydata-loader">
@@ -21,4 +21,4 @@ export default function LoaderbyData({ progressPercent }) {
             </div>
         </div>
     );
-};
+}

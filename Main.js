@@ -124,7 +124,7 @@ class Main extends Component {
         }
       })
       .catch(err => {
-        console.log('Error:Couldn\'t fetch user preferences');
+        console.log('Error:Couldn\'t fetch user preferences', err.msg);
       });
   }
 

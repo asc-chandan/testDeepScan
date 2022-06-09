@@ -151,7 +151,7 @@ export const convertDatePeriodPreselectsToRange = (preselect, customSettings = n
     case 'This Month': return giveDateInMMDDYYY(new Date(today.getFullYear(), today.getMonth(), 1)) + ' - ' + giveDateInMMDDYYY(today);
     case 'Last Year': return giveDateInMMDDYYY(new Date(today.getFullYear() - 1, 0, 1)) + ' - ' + giveDateInMMDDYYY(new Date(today.getFullYear() - 1, 11, 31));
     case 'This Year': return giveDateInMMDDYYY(new Date(today.getFullYear(), 0, 1)) + ' - ' + giveDateInMMDDYYY(today);
-    case 'Custom':
+    case 'Custom': {
       const daysInputStart = customSettings.start_date;
       const daysInputStartPreselect = customSettings.start_date_preselect;
       const daysInputEnd = customSettings.end_date;
@@ -186,6 +186,7 @@ export const convertDatePeriodPreselectsToRange = (preselect, customSettings = n
         ed = today;
       }
       return giveDateInMMDDYYY(sd) + ' - ' + giveDateInMMDDYYY(ed);
+    }
     default: return preselect;
   }
 }
@@ -262,7 +263,7 @@ export const getLastFetchedClient = (user_info) => {
       last_fetched_client = user_info.clients[clientIndex];
     } else {
       last_fetched_client = user_info.clients[0];
-    };
+    }
   }
   return last_fetched_client;
 }
@@ -334,7 +335,7 @@ export const getKeyByValue = (array, value, key = 'name') => {
   }
 }
 
-export const findKeyValueRecursively = (arr, value, valueToFind) => {
+export const findKeyValueRecursively = (arr, value) => {
   arr.filter(function (item) { return item.id === value })
     .map(function (item) { return item.valueToFind })
 }
@@ -465,52 +466,6 @@ export const displayTextWidth = (text, font) => {
   let metrics = context.measureText(text);
   return Math.ceil(metrics.width);
 };
-
-
-// Helper function to get an element's exact position
-function getPosition(el) {
-  var xPos = 0;
-  var yPos = 0;
-
-  while (el) {
-    if (el.tagName == "BODY") {
-      // deal with browser quirks with body/window/document and page scroll
-      var xScroll = el.scrollLeft || document.documentElement.scrollLeft;
-      var yScroll = el.scrollTop || document.documentElement.scrollTop;
-
-      xPos += (el.offsetLeft - xScroll + el.clientLeft);
-      yPos += (el.offsetTop - yScroll + el.clientTop);
-    } else {
-      // for all other non-BODY elements
-      xPos += (el.offsetLeft - el.scrollLeft + el.clientLeft);
-      yPos += (el.offsetTop - el.scrollTop + el.clientTop);
-    }
-
-    el = el.offsetParent;
-  }
-  return {
-    x: xPos,
-    y: yPos
-  };
-}
-
-
-function scrollTo(element, to, duration) {
-  var start = element.scrollTop,
-    change = to - start,
-    currentTime = 0,
-    increment = 20;
-
-  var animateScroll = function () {
-    currentTime += increment;
-    var val = Math.easeInOutQuad(currentTime, start, change, duration);
-    element.scrollTop = val;
-    if (currentTime < duration) {
-      setTimeout(animateScroll, increment);
-    }
-  };
-  animateScroll();
-}
 
 //t = current time
 //b = start value

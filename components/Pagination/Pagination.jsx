@@ -35,7 +35,7 @@ export default class Pagination extends React.Component {
     }
 
     //On Select Change
-    onOptionSelect(event, id){
+    onOptionSelect(event){
         this.setState({pageSizeSelected: event});
 
         //Get Parent Method Call
@@ -75,7 +75,7 @@ export default class Pagination extends React.Component {
                         <SpeedSelect
                             options={this.state.pageSizes} // required
                             selectedOption={(this.state.pageSizeSelected) ? this.state.pageSizeSelected : ''} // required
-                            onSelect={(e) => this.onOptionSelect(e, 'pagination')} 
+                            onSelect={(e) => this.onOptionSelect(e)} 
                             displayKey='name'
                             uniqueKey='id'
                             selectLabel='Pages' 
@@ -83,6 +83,7 @@ export default class Pagination extends React.Component {
                         />
                     }
                 </div>
+                
                 <div className="pagination">
                     <input type="text" name="page-no" id="page-no" className="input-field" value={this.state.currentPage} onChange={(e) => this.handlePageChange(e, 'input')} />
                     <div className="total-pages"> / {this.state.totalPages}</div>

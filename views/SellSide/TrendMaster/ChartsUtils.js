@@ -7991,7 +7991,6 @@ function drawWaterFallChart(args) {
     let totalPositiveValues = 0, totalNegativeValues = 0, totalPositiveObjects = [], totalNegaticeObjects = [];
 
     for (var i = 0; i < dataNest.length; i += 1) {
-      let internalCumulative = 0;
       dataForChart[i] = { ...dataForChart[i], start: cumulative };
       dataForChart[i] = { ...dataForChart[i], key: dataNest[i].key };
 
@@ -8007,12 +8006,8 @@ function drawWaterFallChart(args) {
           pos.push(d);
         }
       });
-      if ((cumulative - totalPos) < min) {
-        min = cumulative-totalPos;
-      }
-      if (cumulative > max) {
-        max = cumulative
-      }
+
+      // console.log(cumulative)
 
       totalPositiveObjects = [ ...totalPositiveObjects, pos ];
       totalNegaticeObjects = [ ...totalNegaticeObjects, neg ];
@@ -8026,6 +8021,14 @@ function drawWaterFallChart(args) {
       dataForChart[i] = { ...dataForChart[i], totalNegative: totalNeg }
       dataForChart[i] = { ...dataForChart[i], positiveValues: pos }
       dataForChart[i] = { ...dataForChart[i], negativeValues: neg }
+
+
+      if ((cumulative - totalPositiveValues) < min) {
+        min = cumulative-totalPositiveValues;
+      }
+      if (cumulative > max) {
+        max = cumulative
+      }
     }
 
     dataForChart[dataForChart.length] = {
@@ -8244,7 +8247,9 @@ function drawWaterFallChart(args) {
 
   if (isSegmented) {
     // console.log('here')
+    let heightArray = [];
     for (let i = 0; i < dataForChart.length; i += 1) {
+      heightArray = [];
       let previousPoint = dataForChart[i].start;
       let point = dataForChart[i].start;
       if (i === dataForChart.length-1) {
@@ -8256,7 +8261,7 @@ function drawWaterFallChart(args) {
 
         continue;
       }
-      if (dataForChart.totalNegative !== 0){
+      if (dataForChart[i].totalNegative !== 0){
         // chart.append("rect")
         //   .attr("transform", (d, j) => `translate(${xScale(dataForChart[i].key)}, ${yScale(Math.max((point + dataForChart[i].totalNegative), point))})`)
         //   .attr("height", (d, j) => Math.abs(yScale(point) - yScale((point + dataForChart[i].totalNegative))))
@@ -8274,9 +8279,10 @@ function drawWaterFallChart(args) {
               // let yPoint = point;
               previousPoint = point;
               point += d[args.yaxiskey];
+              heightArray.push(Math.abs(yScale(previousPoint) - yScale(point)));
               return `translate(${xScale(d[args.xaxiskey])}, ${yScale(Math.max(previousPoint, point))})`;
             })
-            .attr("height", (d, j) => Math.abs(yScale(previousPoint) - yScale(point)))
+            .attr("height", (d, j) => heightArray[j])
             .attr("width", (dataForChart[i].totalPositive !== 0 ? (xScale.bandwidth())/2 : xScale.bandwidth()))
             .style("fill", (d, j) => {
               let colorValue = hashToRgb(color(d[chartSegmentation]));
@@ -8285,9 +8291,10 @@ function drawWaterFallChart(args) {
             })
               // .style("fill-opacity", "50%")
             // .on("mousemove", () => handleSegmentChartMouseMove());
+        heightArray = []
       }
 
-      if (dataForChart.totalPositive !== 0){
+      if (dataForChart[i].totalPositive !== 0){
         // chart.append("rect")
         //   .attr("transform", (d, j) => `translate(${xScale(dataForChart[i].key) + (dataForChart[i].totalNegative !== 0 ? (xScale.bandwidth())/2 : 0)}, ${yScale(Math.max((point + dataForChart[i].totalPositive), point))})`)
         //   .attr("height", (d, j) => Math.abs(yScale(point) - yScale((point + dataForChart[i].totalPositive))))
@@ -8304,12 +8311,16 @@ function drawWaterFallChart(args) {
               // let yPoint = point;
               previousPoint = point;
               point += d[args.yaxiskey];
+              heightArray.push(Math.abs(yScale(previousPoint) - yScale(point)));
               return `translate(${xScale(d[args.xaxiskey]) + (dataForChart[i].totalNegative !== 0 ? (xScale.bandwidth())/2 : 0)}, ${yScale(Math.max(previousPoint, point))})`;
             })
-            .attr("height", (d, j) => Math.abs(yScale(previousPoint) - yScale(point)))
+            .attr("height", (d, j) => {
+              return heightArray[j];
+            })
             .attr("width", (dataForChart[i].totalNegative !== 0 ? (xScale.bandwidth())/2 : xScale.bandwidth()))
             .style("fill", (d, j) => color(d[chartSegmentation]))
             // .style("fill-opacity", "50%")
+        heightArray = []
       }
     }
   } else {

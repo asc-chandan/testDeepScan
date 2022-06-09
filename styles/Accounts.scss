@@ -115,3 +115,39 @@ $total_header_height: $header_height + $sub_header_height;
   }
 }
 
+
+.revshare-view{
+  .asc-picker-container{
+    width: 100% !important;
+    display: block !important;
+
+    .asc-picker-header{
+      border: none;
+      .asc-picker-header-prev-btn{
+        left: 5px;
+        background: none !important; 
+        -webkit-mask: none !important;
+        mask: none !important;
+
+        .asc-picker-header-prev-icon{ 
+          background: none !important; 
+          -webkit-mask: none !important;
+          mask: none !important;
+        }
+      }
+      .asc-picker-header-next-btn{
+        right: 5px;
+        background: none !important; 
+        -webkit-mask: none !important;
+        mask: none !important;
+
+        .asc-picker-header-next-icon{ 
+          background: none !important;
+          -webkit-mask: none !important;
+          mask: none !important;
+        }
+      }
+    }
+  }
+}
+

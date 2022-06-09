@@ -95,7 +95,7 @@ class AccountsReceivableDimensions extends Component {
 
 
   //Get Dimension using API
-  getAllDimensions(evt) {
+  getAllDimensions() {
     //Input Validations and Send Fetch Request
     this.setState({ error: '', inprocess: true });
 

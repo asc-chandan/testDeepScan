@@ -131,7 +131,7 @@ class DataGridHomeTable extends Component {
                 </div>
                 
                 <button className={'btn-schedule'+ (disableButtons ? ' disable' : '')} onClick={() => { }} title="Schedule"></button>
-                {canEdit && <button className={'xs btn-edit'+ (disableButtons ? ' disable' : '')} onClick={() => onAnalysisEdit(row.id)} title="Schedule"></button>}
+                {canEdit && <button className={'xs btn-edit'+ (disableButtons ? ' disable' : '')} onClick={() => onAnalysisEdit(row.id)} title="Edit"></button>}
                 {/* {canDelete && (!deletingAnalysisId || (deletingAnalysisId && row.id !== deletingAnalysisId)) && <button className={'btn-delete' + (disableButtons ? ' disabled' : '')} onClick={() => onAnalysisDelete(row.id)}></button>} */}
                 {canDelete &&
                   <div className="delete-button-wrapper">

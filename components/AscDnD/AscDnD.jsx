@@ -7,7 +7,7 @@ const DndDataContext = React.createContext();
 
 function DndContext({ onDragEnd, ...props }) {
 
-    const [contextId, setContextId] = useState(DndContext.DndContextCounter);
+    const [contextId] = useState(DndContext.DndContextCounter);
     const droppableDisableFns = useRef({});
 
     useEffect(() => {
@@ -49,7 +49,7 @@ function DndContext({ onDragEnd, ...props }) {
         const draggingItemCopyStylesPassedByUser = JSON.parse(draggingItemElement.dataset['dndDraggableCloneStyles']);
         const stylesToIgnore = ['top', 'left', 'right', 'bottom', 'height', 'width', 'transform'];
         for (let style in draggingItemCopyStylesPassedByUser) {
-            if (draggingItemCopyStylesPassedByUser.hasOwnProperty(style) && !stylesToIgnore.includes(style)) {
+            if (Object.prototype.hasOwnProperty.call(draggingItemCopyStylesPassedByUser, style) && !stylesToIgnore.includes(style)) {
                 draggingItemCopyStyles += `${style}:${draggingItemCopyStylesPassedByUser[style]};`;
             }
         }
@@ -110,7 +110,7 @@ function DndContext({ onDragEnd, ...props }) {
                 const droppableId = overlappingDroppable.ref.dataset['dndDroppableId'];
                 // if dropDisableFunction is available, enable the drop,
                 // else call that function by passing the draggableId, this function should return true/false
-                const isDropDisabled = !!droppableDisableFns.current[droppableId] ? !droppableDisableFns.current[droppableId](draggingItemElement.dataset['dndDraggableId']) : false;
+                const isDropDisabled = !!droppableDisableFns.current[droppableId]===true ? !droppableDisableFns.current[droppableId](draggingItemElement.dataset['dndDraggableId']) : false;
                 if (isDropDisabled) {
                     overlappingDroppable = null;
                     document.body.style.cursor = 'not-allowed';
@@ -124,7 +124,7 @@ function DndContext({ onDragEnd, ...props }) {
             }
         }
 
-        function handleMouseUp(eInner) {
+        function handleMouseUp() {
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
 

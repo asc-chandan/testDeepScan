@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import * as Constants from '../components/Constants.js';
 import '../styles/Global.scss';
-
-// import { getUser } from '../utils/Common'; //Import Common Functions
 import APIService from '../services/apiService'; //Import Services
 import AscTable from '../components/AscTable/AscTable';
 
-function CreateOrganization(props) {
+function CreateOrganization() {
   const [error, setError] = useState('');
   const [inprocess, setInprocess] = useState(false);
-  // const [user, setUser] = useState(getUser());
   const [orgData, setOrgData] = useState([]);
   const page_title = "Add/Edit Organization";
 

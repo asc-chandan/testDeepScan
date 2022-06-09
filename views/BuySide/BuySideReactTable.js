@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from "react-router-dom";
 import {useTable,useSortBy} from 'react-table';
 
-import * as Constants from '../../components/Constants.js';
-import APIService from '../../services/apiService';
-
-function Table({columns, data, client, props}) {
+function Table({columns, data}) {
   const {
     getTableProps, 
     getTableBodyProps, 
@@ -22,11 +19,11 @@ function Table({columns, data, client, props}) {
   return (
     <table {...getTableProps()} className="custom-table">
       <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column,i) => {
+        {headerGroups.map((headerGroup, i) => (
+          <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column,j) => {
               return (
-                <th key={i} {...column.getHeaderProps(column.getSortByToggleProps())}>
+                <th key={j} {...column.getHeaderProps(column.getSortByToggleProps())}>
                   <span className="bg"></span>{column.render('Header')}
                   <span className="sorting-wrapper">
                     {column.isSorted
@@ -47,15 +44,15 @@ function Table({columns, data, client, props}) {
           prepareRow(row);
           
           return (
-            <tr {...row.getRowProps()}>
+            <tr key={i} {...row.getRowProps()}>
               {row.cells.map(cell => {
                 if(cell.column.id !==undefined && cell.column.id=='campaign_name'){
-                  return (<td {...cell.getCellProps()}>
+                  return (<td key={cell.column.id} {...cell.getCellProps()}>
                     <Link to={'/buyside/campaign/'+(cell.row.original.campaign_id)} style={{'color': '#fff', 'textDecoration': 'underline'}}>{cell.row.original.campaign_name}</Link>
                   </td>)
                 } else {
                   return (
-                    <td {...cell.getCellProps()}>
+                    <td key={cell.column.id} {...cell.getCellProps()}>
                       { cell.render('Cell') }
                     </td>
                   )

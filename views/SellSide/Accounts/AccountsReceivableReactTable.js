@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {useTable} from 'react-table';
 
-function Table({columns, data, client, onPaymentStatusUpdate}) {
+function Table({columns, data, onPaymentStatusUpdate}) {
   const {
     getTableProps, 
     getTableBodyProps, 
@@ -10,13 +10,11 @@ function Table({columns, data, client, onPaymentStatusUpdate}) {
     prepareRow
   } = useTable({columns, data});
 
-
-
   //Get Payment Status on Initial Load
   const initialPaymentStatus = (records) => {
     var payments_results = JSON.parse(JSON.stringify(records));
     var initial_payment_status = [];
-    payments_results.forEach((item, i)=>{
+    payments_results.forEach((item)=>{
       if(item.advertiser==='Total')  {
         initial_payment_status.push(null);
       } else {
@@ -72,8 +70,8 @@ function Table({columns, data, client, onPaymentStatusUpdate}) {
   return (
     <table {...getTableProps()} className="custom-table">
       <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
+        {headerGroups.map((headerGroup, i) => (
+          <tr key={i} {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map(column => {
               return (column.id==='payment_flag') ? <th key={column.id} {...column.getHeaderProps()}><span className="bg"></span><input type="checkbox" name="selectall-list" onChange={handleSelectAll} checked={isAllChecked} /> {column.render('Header')}</th> : <th key={column.id} {...column.getHeaderProps()}><span className="bg"></span>{column.render('Header')}</th>
             })}
@@ -85,11 +83,11 @@ function Table({columns, data, client, onPaymentStatusUpdate}) {
         {rows.map((row, i) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()}>
+            <tr key={i} {...row.getRowProps()}>
               {row.cells.map(cell => {
                 if(row.values.advertiser==='Total'){
                   return (
-                    <td className="highlighted" {...cell.getCellProps()}>
+                    <td key={cell.column.id} className="highlighted" {...cell.getCellProps()}>
                       {(cell.column.id==='advertiser' || cell.column.id==='amount' || cell.column.id==='currency') &&
                         cell.render('Cell')
                       }
@@ -97,7 +95,7 @@ function Table({columns, data, client, onPaymentStatusUpdate}) {
                   )
                 } else {
                   return (
-                    <td {...cell.getCellProps()}>
+                    <td key={cell.column.id} {...cell.getCellProps()}>
                       {/* Used for Analysis View Home Page Only */}
                       {cell.column.id==='is_settled' &&
                         <input type="checkbox" className="payment-received" checked={checked[i]} data-id={cell.row.original.id} onChange={(e) => handleChange(e, i)} />

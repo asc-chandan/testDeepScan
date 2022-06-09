@@ -3,8 +3,7 @@ import * as Constants from '../components/Constants';
 import APIService from '../services/apiService';
 import SHA512 from 'crypto-js/sha512';
 import Base64 from 'crypto-js/enc-base64';
-import { getToken, setUserSession, getUserDetailsFromToken, getDefaultHomePageURL } from '../utils/Common';
-import { sitePages } from '../components/Navigation';
+import { setUserSession, getUserDetailsFromToken } from '../utils/Common';
 
 class ResetPassword extends React.Component {
     constructor() {
@@ -264,7 +263,7 @@ class ResetPassword extends React.Component {
         this.setState({
             email: evt.target.value,
         });
-    };
+    }
 
     handlePassChange(evt) {
         this.props.dismissError();

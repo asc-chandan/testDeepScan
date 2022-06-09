@@ -7,13 +7,10 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 
 
 const DatePanel = ({ year, month, onDateClick, onMonthBtn, onYearBtn, onPrevMonthBtn, onNextMonthBtn, disable = () => false, selectDate = () => false, rangeStartDate, rangeEndDate, rangeHoverDate, onDateHover = () => { } }) => {
-
-
     const firstDay = (new Date(year, month)).getDay(); // btwn 0-6
     const daysInMonth = 32 - new Date(year, month, 32).getDate();
 
     const getMonthData = () => {
-
         let data = [[], [], [], [], [], []]; // data will be a 2-D array
         let weekCounter = 0, cellInWeekCounter = 1, dateCounter = 1;
 
@@ -109,9 +106,7 @@ const DatePanel = ({ year, month, onDateClick, onMonthBtn, onYearBtn, onPrevMont
     const data = getMonthData();
     // console.log('Month data', month, data);
     return (
-
         <div className="asc-picker-date-panel">
-
             <PanelHeader panel="date" year={year} month={month}
                 onPrevBtn={onPrevMonthBtn} onNextBtn={onNextMonthBtn} onMonthBtn={onMonthBtn} onYearBtn={onYearBtn} />
             <div className="asc-picker-body">
@@ -160,9 +155,7 @@ const DatePanel = ({ year, month, onDateClick, onMonthBtn, onYearBtn, onPrevMont
 };
 
 
-const MonthPanel = ({ year, month, onMonthClick, onYearBtn, onPrevYearBtn, onNextYearBtn, disable = () => false, selectMonth = () => false, rangeStartDate, rangeEndDate, rangeHoverDate, onDateHover = () => { } }) => {
-
-
+const MonthPanel = ({ year, onMonthClick, onYearBtn, onPrevYearBtn, onNextYearBtn, disable = () => false, selectMonth = () => false, rangeStartDate, rangeEndDate, rangeHoverDate, onDateHover = () => { } }) => {
     const getData = () => {
         let data = [[], [], [], []];
         let monthCounter = 0, quarterCounter = 0;
@@ -232,8 +225,6 @@ const MonthPanel = ({ year, month, onMonthClick, onYearBtn, onPrevYearBtn, onNex
 };
 
 const YearPanel = ({ year, onYearClick, onPrevDecadeBtn, onNextDecadeBtn, disable = () => false, selectYear = () => false, rangeStartDate, rangeEndDate, rangeHoverDate, onDateHover = () => { } }) => {
-
-
     const startYear = Math.floor(year / 10) * 10 - 1;
     const getData = () => {
         let data = [[], [], [], []];
@@ -302,8 +293,7 @@ const YearPanel = ({ year, onYearClick, onPrevDecadeBtn, onNextDecadeBtn, disabl
 
 };
 
-const QuarterPanel = ({ year, month, onQuarterClick, onYearBtn, onPrevYearBtn, onNextYearBtn, disable = () => false, selectQuarter = () => false, rangeStartDate, rangeEndDate, rangeHoverDate, onDateHover = () => { } }) => {
-
+const QuarterPanel = ({ year, onQuarterClick, onYearBtn, onPrevYearBtn, onNextYearBtn, disable = () => false, selectQuarter = () => false, rangeStartDate, rangeEndDate, rangeHoverDate, onDateHover = () => { } }) => {
     const data = [1, 2, 3, 4].map(q => {
         const dObj = new Date(year, 3 * (q - 1), 1);
         return {
@@ -354,9 +344,7 @@ const QuarterPanel = ({ year, month, onQuarterClick, onYearBtn, onPrevYearBtn, o
 
 };
 
-
 const PanelHeader = ({ panel, month, year, onPrevBtn, onNextBtn, onMonthBtn, onYearBtn }) => {
-
     const decade = panel === 'year' ? year + '-' + (year + 9) : '';
     return (
         <div className="asc-picker-header">

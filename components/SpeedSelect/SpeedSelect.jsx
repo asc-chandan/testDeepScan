@@ -44,7 +44,7 @@ export default class SpeedSelect extends React.Component {
             }
         }
         // validate selectedOptions type in case of multiple
-        if (props.hasOwnProperty('multiple') && !Array.isArray(props.selectedOption)) {
+        if (Object.prototype.hasOwnProperty.call(props, 'multiple') && !Array.isArray(props.selectedOption)) {
             throw Error('selectedOption prop must be an \'Array\' in case multiple prop is present');
         }
     }
@@ -57,12 +57,12 @@ export default class SpeedSelect extends React.Component {
             keyboardSelectedIndex: null, // stores the index of currently selected item using keyup and keydown keys
             // keyboardEnterPressedOnItem: false, // used to trigger the selection of the keyboard selected item
             checkedOptions: props.selectedOption, // used only in case of multiple select
-            isMultiple: props.hasOwnProperty('multiple')
+            isMultiple: Object.prototype.hasOwnProperty.call(props, 'multiple')
         };
     }
 
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps) {
         if (prevProps.options !== this.props.options) {
             this.validateProps(this.props);
             this.setState(this.giveState(this.props));
@@ -251,7 +251,7 @@ export default class SpeedSelect extends React.Component {
         });
     }
 
-    handleDropdownOutsideClick(e) {
+    handleDropdownOutsideClick() {
         this.closeDropdown();
     }
 
@@ -408,9 +408,7 @@ const selectBoxLabelClickHandler = (e) => {
     e.nativeEvent.stopImmediatePropagation();
 }
 
-const SelectBoxLabel = ({ selectedOption, optionsCopy, displayKey, selectLabel, showResetBtn, onSelectedOptionRemove, isMultiple, showSelectionsInChipForm, selectionWrapperMaxHeight, hideOkCancelBtns, isOptionObject, isOpen, handleSearch, inputSearch, inputRef }) => {
-
-
+const SelectBoxLabel = ({ selectedOption, optionsCopy, displayKey, selectLabel, showResetBtn, onSelectedOptionRemove, isMultiple, showSelectionsInChipForm, selectionWrapperMaxHeight, hideOkCancelBtns, isOptionObject}) => {
     showSelectionsInChipForm = showSelectionsInChipForm || false;
     selectionWrapperMaxHeight = selectionWrapperMaxHeight ? selectionWrapperMaxHeight + 'px' : 'auto';
 
@@ -616,7 +614,7 @@ const SingleDropDown = ({ optionsCopy, selectedOption, disabledOptions = [], dis
                 {newOptionToCreate && !optionsCopy.length && inputSearch.trim() !== '' &&
                     <li className={'create-option'} onClick={(e) => onOptionClick(e, newOptionToCreate, 'single')}>
                         <label>
-                            <span>Create '{inputSearch.trim()}'</span>
+                            <span>Create &lsquo;{inputSearch.trim()}&rsquo;</span>
                         </label>
                     </li>
                 }

@@ -4,8 +4,7 @@ import APIService from '../services/apiService';
 import socialLoginApi from '../services/socialLogin';
 import SHA512 from 'crypto-js/sha512';
 import Base64 from 'crypto-js/enc-base64';
-import { getToken, setUserSession, getUserDetailsFromToken, getDefaultHomePageURL } from '../utils/Common';
-import { sitePages } from '../components/Navigation';
+import { setUserSession, getUserDetailsFromToken } from '../utils/Common';
 import ResetPassword from './ResetPassword';
 
 class Login extends Component {
@@ -139,7 +138,7 @@ class Login extends Component {
     this.setState({
       username: evt.target.value,
     });
-  };
+  }
 
   handlePassChange(evt) {
     this.dismissError();
@@ -185,7 +184,6 @@ class Login extends Component {
         };
 
         this.onSocialLogin(payload);
-
       }
 
       const authInstance = window.gapi.auth2.getAuthInstance();
@@ -199,7 +197,7 @@ class Login extends Component {
             getUserProfileAndSendToServer(user);
 
           }).catch(err => {
-            // console.log('game- google signin error', err);
+            console.log('game - google signin error', err.msg);
           });
       }
     });

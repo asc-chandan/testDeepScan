@@ -11,7 +11,6 @@ import '../../../styles/RevShare.scss';
 import RevShareReactTable from './RevShareReactTable';
 import { getKeyByValue, getClients, getUser } from '../../../utils/Common';
 import APIService from '../../../services/apiService';
-import HideSubHeader from '../../../components/HideSubHeader';
 
 class RevShare extends Component {
   constructor(props) {
@@ -358,7 +357,7 @@ class RevShare extends Component {
     ];
 
     return (
-      <div className="app-wrapper accounts-view">
+      <div className="app-wrapper accounts-view revshare-view">
         <div id="app-sub-header">
           {/* <h2 className="page-title">{this.page_title}</h2> */}
 
@@ -404,8 +403,6 @@ class RevShare extends Component {
               <button className="btn outline xs btn-add-new" onClick={this.handleAddNewRow}>Add New</button>
             </div>
           }
-
-          {/* <HideSubHeader />*/}
         </div>
         
         <div className="container">

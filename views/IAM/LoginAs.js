@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import * as Constants from '../../components/Constants.js';
-import subjectObj from '../../subjects/Subject1';
 import Loader from '../../components/Loader';
 import { sitePages } from '../../components/Navigation';
-
 import '../../styles/LoginAs.scss';
 
-import { getKeyByValue, getClients, getUser, setLoginAsUserSession, getUserDetailsFromToken } from '../../utils/Common'; //Import Common Functions
+import { getUser, setLoginAsUserSession, getUserDetailsFromToken } from '../../utils/Common'; //Import Common Functions
 import APIService from '../../services/apiService'; //Import Services
-
 import LoginAsReactTable from './LoginAsReactTable';
 import LoginAsFilters from './LoginAsFilters';
 
@@ -91,7 +88,7 @@ class Console extends Component {
     let filteredUsers = [];
     
     if(args){
-      this.state.usersList.forEach((item, i) => {
+      this.state.usersList.forEach((item) => {
         const index = args.findIndex(ele => ele.id === item.organization_id);
         if(index > -1){
           filteredUsers.push(item);

@@ -17,12 +17,8 @@ import APIService from '../../services/apiService'; //Import Services
 import subjectObj from '../../subjects/Subject1';
 import LoaderbyData from '../../components/LoaderbyData/LoaderbyData';
 import ClickOutsideListener from '../../components/ClickOutsideListner';
-
 import { isDateGreater } from '../../components/ReactCalendar/components/utils';
 import RangePicker from '../../components/ReactCalendar/RangePicker';
-
-import alertService from '../../services/alertService.js';
-// import { DefaultColorsList, ColorPalettes } from '../../components/ColorPalettes';
 
 const CHART_DIMENSIONS = {
   defaultWidth: 450,
@@ -180,171 +176,171 @@ class SellSideHome extends Component {
 
   //On chart widget drag and drop
   onChartWidgetDragStart(e, id) {
-    if (e.button === 0) {
-      //to handle initial drag and drop
-      if (this.state.initialPlotterDrag) {
-        this.setState({ initialPlotterDrag: false });
+    if (e.button !== 0) return;
+
+    //to handle initial drag and drop
+    if (this.state.initialPlotterDrag) {
+      this.setState({ initialPlotterDrag: false });
+      return;
+    }
+
+    const element = document.getElementById('chart-' + id);
+    document.addEventListener('mousemove', chartMove);
+    document.addEventListener('mouseup', chartDrop);
+    element.classList.add('mousedown');
+
+    const widgetCordinates = element.getBoundingClientRect();
+    const distBwChartLeftEdgeAndMouseX = e.pageX - widgetCordinates.left;
+    const distBwChartTopEdgeAndMouseY = e.pageY - widgetCordinates.top;
+
+    // get maximum zindex of tempChartGridLayout
+    let updatedTempGridLayouts = [...this.state.tempChartsGridLayout];
+    let updatedZIndex = this.state.chartWidgetLastDraggedZIndex.zindex;
+    let chartLayoutIndex = updatedTempGridLayouts.findIndex((e) => e.id === id);
+    if (this.state.chartWidgetLastDraggedZIndex.id !== id) {
+      let maxZIndex = Math.max.apply(Math, updatedTempGridLayouts.map((chart) => chart.zindex));
+      updatedZIndex = maxZIndex + 1;
+    }
+
+    const colChartWrapperDiv = document.querySelector(`#col-charts-wrapper`);
+    const multiChartsScrollableContainer = this.multiChartsScrollableWrapper.current;
+    const multiChartsContainer = multiChartsScrollableContainer.querySelector('#multicharts-wrapper');
+    const multiChartsContainerUsableWidth = multiChartsContainer.getBoundingClientRect().width - Number(window.getComputedStyle(multiChartsContainer).getPropertyValue('padding-right').replace('px', ''));
+    let that = this;
+    let mouseMoved = false; // to detect wheather mouse was moved/dragged before releasing the mouse. This will help ignoring the calculation and hence preventing bugs in 'mouseUp' event
+
+    function chartMove(e) {
+      let multiChartsContainerCord = multiChartsContainer.getBoundingClientRect();
+
+      // compute mouse X and Y cordinates relative to chart container
+      const mouseXRelative = e.pageX - multiChartsContainerCord.left;
+      const mouseYRelative = e.pageY - multiChartsContainerCord.top;
+
+      const canNotBeMovedFurtherLeft = (mouseXRelative - distBwChartLeftEdgeAndMouseX) < 0;
+      const canNotBeMovedFurtherRight = (mouseXRelative - distBwChartLeftEdgeAndMouseX + widgetCordinates.width) > multiChartsContainerUsableWidth;
+      const canNotBeMovedFurtherTop = mouseYRelative - distBwChartTopEdgeAndMouseY < 0;
+
+      if (!canNotBeMovedFurtherLeft && !canNotBeMovedFurtherRight) {
+        element.style.left = (mouseXRelative - distBwChartLeftEdgeAndMouseX) + 'px';
+        if (canNotBeMovedFurtherTop) {
+          element.style.top = 0 + 'px';
+        }
+      }
+      if (!canNotBeMovedFurtherTop) {
+        element.style.top = (mouseYRelative - distBwChartTopEdgeAndMouseY) + 'px';
+        if (canNotBeMovedFurtherLeft) {
+          element.style.left = 0 + 'px';
+        }
+        if (canNotBeMovedFurtherRight) {
+          element.style.left = (multiChartsContainerUsableWidth - widgetCordinates.width) + 'px';
+        }
+      }
+      if ((!canNotBeMovedFurtherLeft && !canNotBeMovedFurtherRight) || !canNotBeMovedFurtherTop) {
+        mouseMoved = true;
+        element.style.zIndex = updatedZIndex;
+        document.body.style.userSelect = 'none'; // disable user select to avoid selection while dragging  
+        // that.multiChartsWrapper.current.style.height = multiChartsWrapperScrollHeight + 'px';
+      }
+
+
+      /**SCROLL LOGIC STARTS */
+      const scrollThreshold = 50;
+      const bottomThresholdExcess = element.getBoundingClientRect().bottom - (window.innerHeight - scrollThreshold);
+      // console.log('near',bottomThreshold);
+      const topScrollExcess = (65 + scrollThreshold) - element.getBoundingClientRect().top;
+      const leftScrollExcess = scrollThreshold - element.getBoundingClientRect().left;
+      const rightScrollExcess = element.getBoundingClientRect().right - (window.innerWidth - 355 - scrollThreshold);
+
+      const verticalScrollNeeded = bottomThresholdExcess > 0 || topScrollExcess > 0;
+      const hotizontalScrollNeeded = leftScrollExcess > 0 || rightScrollExcess > 0;
+      if (verticalScrollNeeded || hotizontalScrollNeeded) {
+
+        // console.log('scroll- start');
+        // window.scrollSpeed = bottomThresholdExcess > 0  ? bottomThresholdExcess/5 : topScrollExcess/5;
+        window.scrollYSpeed = bottomThresholdExcess > 0 ? 20 : -20;
+        window.scrollXSpeed = rightScrollExcess > 0 ? 10 : -10;
+        // console.log('scroll- amount',window.scrollYSpeed);
+
+        if (!window.isScrolling) {
+          const scroll = () => {
+            const currentYScroll = colChartWrapperDiv.scrollTop;
+            const currentXScroll = multiChartsScrollableContainer.scrollLeft;
+            let scrollYCompleted, scrollXCompleted;
+
+            if (verticalScrollNeeded) {
+              colChartWrapperDiv.scrollTop = currentYScroll + window.scrollYSpeed;
+              scrollYCompleted = bottomThresholdExcess > 0 ? colChartWrapperDiv.scrollTop <= currentYScroll : colChartWrapperDiv.scrollTop === 0;
+            }
+            if (hotizontalScrollNeeded) {
+              multiChartsScrollableContainer.scrollLeft = currentXScroll + window.scrollXSpeed;
+              scrollXCompleted = rightScrollExcess > 0 ? multiChartsScrollableContainer.scrollLeft <= currentXScroll : that.multiChartsScrollableWrapper.current.scrollLeft === 0;
+            }
+
+            let requestScrollInNextFrame = false;
+            if (window.isScrolling && verticalScrollNeeded && !scrollYCompleted) {
+              // console.log('scroll- scrolling window ', window.scrollYSpeed);
+              element.style.top = Number(element.style.top.replace('px', '')) + window.scrollYSpeed + 'px';
+              requestScrollInNextFrame = true;
+            }
+            if (window.isScrolling && hotizontalScrollNeeded && !scrollXCompleted) {
+              element.style.left = Number(element.style.left.replace('px', '')) + window.scrollXSpeed + 'px';
+              requestScrollInNextFrame = true;
+            }
+            if (window.isScrolling && requestScrollInNextFrame) {
+              window.requestAnimationFrame(scroll);
+              return;
+            }
+            // console.log('scroll- scrolling stopped ');
+            window.isScrolling = false;
+          };
+
+          window.isScrolling = true;
+          window.requestAnimationFrame(scroll);
+        }
+
+
+      } else {
+        window.isScrolling = false;
+      }
+      /**SCROLL LOGIC ENDS */
+    }
+
+    function chartDrop(e) {
+      window.isScrolling = false;
+      // that.multiChartsWrapper.current.style.height ='';
+      e.stopPropagation();
+      document.removeEventListener('mousemove', chartMove);
+      document.removeEventListener('mouseup', chartDrop);
+      element.classList.remove('mousedown');
+      document.body.style.userSelect = 'auto';  // revert userSelect property
+
+      // Do nothing if there was no mouse movement, it will be the case when chart is just clicked
+      if (!mouseMoved) {
+        that.handleChartSelection(chartLayoutIndex, id);
         return;
       }
 
-      const element = document.getElementById('chart-' + id);
-      document.addEventListener('mousemove', chartMove);
-      document.addEventListener('mouseup', chartDrop);
-      element.classList.add('mousedown');
+      let gridMappedTop = Math.round(Number(element.style.top.replace('px', '')) / that.state.gridRowHeight);
+      let gridMappedLeft = Math.round(Number(element.style.left.replace('px', '')) / that.state.gridColWidth);
+      let posTop = (gridMappedTop * that.state.gridRowHeight);
+      let posLeft = (gridMappedLeft * that.state.gridColWidth);
 
-      const widgetCordinates = element.getBoundingClientRect();
-      const distBwChartLeftEdgeAndMouseX = e.pageX - widgetCordinates.left;
-      const distBwChartTopEdgeAndMouseY = e.pageY - widgetCordinates.top;
+      if (isNaN(posTop)) return;
 
-      // get maximum zindex of tempChartGridLayout
-      let updatedTempGridLayouts = [...this.state.tempChartsGridLayout];
-      let updatedZIndex = this.state.chartWidgetLastDraggedZIndex.zindex;
-      let chartLayoutIndex = updatedTempGridLayouts.findIndex((e) => e.id === id);
-      if (this.state.chartWidgetLastDraggedZIndex.id !== id) {
-        let maxZIndex = Math.max.apply(Math, updatedTempGridLayouts.map((chart) => chart.zindex));
-        updatedZIndex = maxZIndex + 1;
-      }
+      element.style.top = posTop + 'px';
+      element.style.left = posLeft + 'px';
 
-      const colChartWrapperDiv = document.querySelector(`#col-charts-wrapper`);
-      const multiChartsScrollableContainer = this.multiChartsScrollableWrapper.current;
-      const multiChartsContainer = multiChartsScrollableContainer.querySelector('#multicharts-wrapper');
-      const multiChartsContainerUsableWidth = multiChartsContainer.getBoundingClientRect().width - Number(window.getComputedStyle(multiChartsContainer).getPropertyValue('padding-right').replace('px', ''));
-      let that = this;
-      let mouseMoved = false; // to detect wheather mouse was moved/dragged before releasing the mouse. This will help ignoring the calculation and hence preventing bugs in 'mouseUp' event
+      that.adjustHeightOfMultiChartWrapper();
 
-      function chartMove(e) {
-        let multiChartsContainerCord = multiChartsContainer.getBoundingClientRect();
+      // let updatedTempChartsGridLayout = [...that.state.tempChartsGridLayout];
+      updatedTempGridLayouts[chartLayoutIndex]['x'] = posLeft;
+      updatedTempGridLayouts[chartLayoutIndex]['y'] = posTop;
+      updatedTempGridLayouts[chartLayoutIndex]['zindex'] = updatedZIndex;
 
-        // compute mouse X and Y cordinates relative to chart container
-        const mouseXRelative = e.pageX - multiChartsContainerCord.left;
-        const mouseYRelative = e.pageY - multiChartsContainerCord.top;
-
-        const canNotBeMovedFurtherLeft = (mouseXRelative - distBwChartLeftEdgeAndMouseX) < 0;
-        const canNotBeMovedFurtherRight = (mouseXRelative - distBwChartLeftEdgeAndMouseX + widgetCordinates.width) > multiChartsContainerUsableWidth;
-        const canNotBeMovedFurtherTop = mouseYRelative - distBwChartTopEdgeAndMouseY < 0;
-
-        if (!canNotBeMovedFurtherLeft && !canNotBeMovedFurtherRight) {
-          element.style.left = (mouseXRelative - distBwChartLeftEdgeAndMouseX) + 'px';
-          if (canNotBeMovedFurtherTop) {
-            element.style.top = 0 + 'px';
-          }
-        }
-        if (!canNotBeMovedFurtherTop) {
-          element.style.top = (mouseYRelative - distBwChartTopEdgeAndMouseY) + 'px';
-          if (canNotBeMovedFurtherLeft) {
-            element.style.left = 0 + 'px';
-          }
-          if (canNotBeMovedFurtherRight) {
-            element.style.left = (multiChartsContainerUsableWidth - widgetCordinates.width) + 'px';
-          }
-        }
-        if ((!canNotBeMovedFurtherLeft && !canNotBeMovedFurtherRight) || !canNotBeMovedFurtherTop) {
-          mouseMoved = true;
-          element.style.zIndex = updatedZIndex;
-          document.body.style.userSelect = 'none'; // disable user select to avoid selection while dragging  
-          // that.multiChartsWrapper.current.style.height = multiChartsWrapperScrollHeight + 'px';
-        }
-
-
-        /**SCROLL LOGIC STARTS */
-        const scrollThreshold = 50;
-        const bottomThresholdExcess = element.getBoundingClientRect().bottom - (window.innerHeight - scrollThreshold);
-        // console.log('near',bottomThreshold);
-        const topScrollExcess = (65 + scrollThreshold) - element.getBoundingClientRect().top;
-        const leftScrollExcess = scrollThreshold - element.getBoundingClientRect().left;
-        const rightScrollExcess = element.getBoundingClientRect().right - (window.innerWidth - 355 - scrollThreshold);
-
-        const verticalScrollNeeded = bottomThresholdExcess > 0 || topScrollExcess > 0;
-        const hotizontalScrollNeeded = leftScrollExcess > 0 || rightScrollExcess > 0;
-        if (verticalScrollNeeded || hotizontalScrollNeeded) {
-
-          // console.log('scroll- start');
-          // window.scrollSpeed = bottomThresholdExcess > 0  ? bottomThresholdExcess/5 : topScrollExcess/5;
-          window.scrollYSpeed = bottomThresholdExcess > 0 ? 20 : -20;
-          window.scrollXSpeed = rightScrollExcess > 0 ? 10 : -10;
-          // console.log('scroll- amount',window.scrollYSpeed);
-
-          if (!window.isScrolling) {
-            const scroll = () => {
-              const currentYScroll = colChartWrapperDiv.scrollTop;
-              const currentXScroll = multiChartsScrollableContainer.scrollLeft;
-              let scrollYCompleted, scrollXCompleted;
-
-              if (verticalScrollNeeded) {
-                colChartWrapperDiv.scrollTop = currentYScroll + window.scrollYSpeed;
-                scrollYCompleted = bottomThresholdExcess > 0 ? colChartWrapperDiv.scrollTop <= currentYScroll : colChartWrapperDiv.scrollTop === 0;
-              }
-              if (hotizontalScrollNeeded) {
-                multiChartsScrollableContainer.scrollLeft = currentXScroll + window.scrollXSpeed;
-                scrollXCompleted = rightScrollExcess > 0 ? multiChartsScrollableContainer.scrollLeft <= currentXScroll : that.multiChartsScrollableWrapper.current.scrollLeft === 0;
-              }
-
-              let requestScrollInNextFrame = false;
-              if (window.isScrolling && verticalScrollNeeded && !scrollYCompleted) {
-                // console.log('scroll- scrolling window ', window.scrollYSpeed);
-                element.style.top = Number(element.style.top.replace('px', '')) + window.scrollYSpeed + 'px';
-                requestScrollInNextFrame = true;
-              }
-              if (window.isScrolling && hotizontalScrollNeeded && !scrollXCompleted) {
-                element.style.left = Number(element.style.left.replace('px', '')) + window.scrollXSpeed + 'px';
-                requestScrollInNextFrame = true;
-              }
-              if (window.isScrolling && requestScrollInNextFrame) {
-                window.requestAnimationFrame(scroll);
-                return;
-              }
-              // console.log('scroll- scrolling stopped ');
-              window.isScrolling = false;
-            };
-
-            window.isScrolling = true;
-            window.requestAnimationFrame(scroll);
-          }
-
-
-        } else {
-          window.isScrolling = false;
-        }
-        /**SCROLL LOGIC ENDS */
-      }
-
-      function chartDrop(e) {
-        window.isScrolling = false;
-        // that.multiChartsWrapper.current.style.height ='';
-        e.stopPropagation();
-        document.removeEventListener('mousemove', chartMove);
-        document.removeEventListener('mouseup', chartDrop);
-        element.classList.remove('mousedown');
-        document.body.style.userSelect = 'auto';  // revert userSelect property
-
-        // Do nothing if there was no mouse movement, it will be the case when chart is just clicked
-        if (!mouseMoved) {
-          that.handleChartSelection(chartLayoutIndex, id);
-          return;
-        }
-
-        let gridMappedTop = Math.round(Number(element.style.top.replace('px', '')) / that.state.gridRowHeight);
-        let gridMappedLeft = Math.round(Number(element.style.left.replace('px', '')) / that.state.gridColWidth);
-        let posTop = (gridMappedTop * that.state.gridRowHeight);
-        let posLeft = (gridMappedLeft * that.state.gridColWidth);
-
-        if (isNaN(posTop)) return;
-
-        element.style.top = posTop + 'px';
-        element.style.left = posLeft + 'px';
-
-        that.adjustHeightOfMultiChartWrapper();
-
-        // let updatedTempChartsGridLayout = [...that.state.tempChartsGridLayout];
-        updatedTempGridLayouts[chartLayoutIndex]['x'] = posLeft;
-        updatedTempGridLayouts[chartLayoutIndex]['y'] = posTop;
-        updatedTempGridLayouts[chartLayoutIndex]['zindex'] = updatedZIndex;
-
-        that.setState({
-          chartWidgetLastDraggedZIndex: { zindex: updatedZIndex, id: id },
-          tempChartsGridLayout: updatedTempGridLayouts
-        });
-      }
+      that.setState({
+        chartWidgetLastDraggedZIndex: { zindex: updatedZIndex, id: id },
+        tempChartsGridLayout: updatedTempGridLayouts
+      });
     }
   }
 
@@ -354,7 +350,7 @@ class SellSideHome extends Component {
   }
 
   //Reload the page if client id/name change from url
-  componentDidUpdate(prev_props, prevState){
+  componentDidUpdate(){
     this.user = getUser();
     
     if((this.user.terminal_type.id!==this.state.terminal_type) || 
@@ -545,7 +541,7 @@ class SellSideHome extends Component {
   getDimensionsStr(view_types) {
     let dimensions_list_combined = new Set();
     view_types.forEach(vt => {
-      this.state.allDataSourcesDimensionsMetrics[vt].forEach((item, i) => {
+      this.state.allDataSourcesDimensionsMetrics[vt].forEach((item) => {
         if (item.is_dimension === 1 && item.type === 'string') {
           dimensions_list_combined.add(item.title)
         }
@@ -684,7 +680,7 @@ class SellSideHome extends Component {
     return chartCordinates;
   }
 
-  getDefaultChartGridLayout(chart, index) {
+  getDefaultChartGridLayout(chart) {
     let default_chart_width = chart.segmentation !== '' ? (parseInt(CHART_DIMENSIONS.defaultWidth) + parseInt(CHART_DIMENSIONS.defaultSegmentWidth)) : CHART_DIMENSIONS.defaultWidth;
 
     // add y placement details
@@ -852,7 +848,7 @@ class SellSideHome extends Component {
     let cDataClient = { formattedData: [], formattedNetData: {}, segmentationData: '' };
 
     //define x and y axis
-    let colx = chartConfig.x_axis ? chartConfig.x_axis : 'date';
+    // let colx = chartConfig.x_axis ? chartConfig.x_axis : 'date';
     cDataClient['formattedData'] = chartData.data;
     cDataClient['segmentationData'] = chartConfig.segmentation;
 
@@ -1303,7 +1299,7 @@ class SellSideHome extends Component {
             <div className="score-variation down"><span className="icon"></span>21%</div>
 
             {this.state.showMoreButtonsDropDownToggle[chartIndex] &&
-              <ClickOutsideListener onOutsideClick={(e) => this.handleMoreButtonsDropDownToggle(chartIndex)}>
+              <ClickOutsideListener onOutsideClick={() => this.handleMoreButtonsDropDownToggle(chartIndex)}>
                 <div className="more-buttons-wrapper">
                   <ul>
                     <li><button className="btn-copy" title="Copy" disabled={this.state.chartOrDashboardSaveInProcess} onClick={() => this.handleChartCopyBtn(unique_key)}>Copy</button></li>
@@ -1349,13 +1345,9 @@ class SellSideHome extends Component {
 
 
   render(){
-    let grid_rows = parseInt((window.innerHeight - 60)/10);
-
     return (
       <div className="app-wrapper trend-view-wrapper sellside-home">
         <div id="app-sub-header">
-          {/* <h2 className="page-title">Terminal</h2> */}
-
           <div className="date-period-wrapper">
             {this.state.client && 
               <RangePicker picker="date"

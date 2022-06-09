@@ -128,7 +128,7 @@ export default function DashboardTabs({ tabs, activeTabId, onOpen, onEdit, onPub
 
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="droppable" direction="horizontal">
-                    {(provided, snapshot) => {
+                    {(provided) => {
                         return (
                             <div className="sub-header-tabs-droppable" ref={provided.innerRef} {...provided.droppableProps} >
                                 <div className={'sub-header-tabs' + (showSlideBtns ? ' h-scroll' : '')} ref={tabContainerRef} onWheel={handleMouseWheel}  >
@@ -142,7 +142,7 @@ export default function DashboardTabs({ tabs, activeTabId, onOpen, onEdit, onPub
                                         // console.log('rendering tab : ', tab.id);
                                         return (
                                             <Draggable key={tab.id + '_' + index} draggableId={tab.id + '_' + index} index={index}>
-                                                {(provided, snapshot) => (
+                                                {(provided) => (
                                                     <div className={'tab' + (isSelected ? ' selected' : '')}
                                                         id={`tab-${tab.id}`}
                                                         ref={provided.innerRef}

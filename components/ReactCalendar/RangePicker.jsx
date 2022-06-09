@@ -24,7 +24,7 @@ const RangePicker = ({ picker, showInline, placeholder, align, allowClear, range
         setRangeInState((range && range[0] && range[1]) ? range : null);
     }, [range]);
 
-    const handlePickerClick = (e) => {
+    const handlePickerClick = () => {
         setTimeout(() => {
             setInputFocused(true);
         });
@@ -39,7 +39,7 @@ const RangePicker = ({ picker, showInline, placeholder, align, allowClear, range
         notifyRangeSelection(null)
     };
 
-    const handleOutsideClick = (e) => {
+    const handleOutsideClick = () => {
         // console.log('outside clicked');
         // If ok Cancel btn is visible, user might have changed the 'rangeInState' before clicking outside
         // Hence, reset the Range 
@@ -239,21 +239,21 @@ const RangePickerPanel = ({ picker, range, dateForLastDaysCalculation, onChange,
         });
     };
 
-    const handlePrevMonthClick = (e) => {
+    const handlePrevMonthClick = () => {
         const prevStartMonth = startMonth === 0 ? 11 : startMonth - 1;
         const prevStartYear = startMonth === 0 ? startYear - 1 : startYear;
         setStartMonth(prevStartMonth);
         setStartYear(prevStartYear);
     };
-    const handleNextMonthClick = (e) => {
+    const handleNextMonthClick = () => {
         const nextStartMonth = (startMonth + 1) % 12;
         const nextStartYear = startMonth === 11 ? startYear + 1 : startYear;
         setStartMonth(nextStartMonth);
         setStartYear(nextStartYear);
     };
 
-    const handlePrevYearClick = (e) => setStartYear(startYear - 1);
-    const handleNextYearClick = (e) => setStartYear(startYear + 1);
+    const handlePrevYearClick = () => setStartYear(startYear - 1);
+    const handleNextYearClick = () => setStartYear(startYear + 1);
     const handlePrevDecadeClick = () => setStartYear(startYear - 10);
     const handleNextDecadeClick = () => setStartYear(startYear + 10);
 

@@ -26,7 +26,7 @@ const LoginRegister = ({ location ,history}) => {
         <div className="login-page">
             <div className="site-logo">
                 {/* <div className="name">Sight</div> */}
-                <a href="https://ascendeum.com" target="_blank" className="logo">byData</a>
+                <a href="https://ascendeum.com" target="_blank" rel="noreferrer" className="logo">byData</a>
                 <div className="tagline">Customized data visualization for decision makers</div>
             </div>
 

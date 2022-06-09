@@ -24,19 +24,13 @@ export default function TrendMasterHomeTable({
     setVisibleDescriptionDashboardIds(updatedList);
   };
 
-  // //return  null when no records are available
-  // if (!inprocess && (!dashboardList || (dashboardList && !dashboardList.length))) {
-  //   return null;
-  // }
   if (dashboardList === null) {
     return null;
   }
 
   if (inprocess && !dashboardList) {
     return (
-      <div className="home-table">
-        <LoaderbyData />;
-      </div>
+      <div className="home-table"><LoaderbyData /></div>
     )
   } else {
     let dashbaordListToShow = [];
@@ -51,7 +45,7 @@ export default function TrendMasterHomeTable({
     let dataRow = [];
     let data = {};
     let content;
-    columns.map((col, i) => {
+    columns.map((col) => {
       const sortClassname = sortedColumnInfo && sortedColumnInfo.name === col.accessor ? sortedColumnInfo.isAscending ? 'sort_asc' : 'sort_desc' : '';
       content = <>
         <span className="text">{col.display_name}</span>
@@ -69,14 +63,12 @@ export default function TrendMasterHomeTable({
     dataArray.push(dataRow);
     dataRow = [];
 
-    
-
-    dashboardList.map((item, i) => {
+    dashboardList.map((item) => {
       const canEdit = item.privileges.includes('EDIT');
       const canDelete = item.privileges.includes('DELETE');
       const canShare = item.privileges.includes('SHARE');
 
-      columns.map((col, j) => {
+      columns.map((col) => {
         if (col.accessor === 'dashboard_name') {
           const showDescription = visibleDescriptionDashboardIds.includes(item.id);
           content = <>
@@ -98,8 +90,8 @@ export default function TrendMasterHomeTable({
             {(!copyingDashboardId || (copyingDashboardId && item.id !== copyingDashboardId)) && <button className={'btn-copy' + (disableButtons ? ' disabled' : '')} onClick={() => onRowCopyClick(item.id)}></button>}
             {canEdit && <button className={'btn-edit' + (disableButtons ? ' disabled' : '')} onClick={() => onRowEditClick(item.id)}></button>}
             {canDelete && (!deletingDashboardId || (deletingDashboardId && item.id !== deletingDashboardId)) && <button className={'btn-delete' + (disableButtons ? ' disabled' : '')} onClick={() => onRowDeleteClick(item.id)}></button>}
-            {deletingDashboardId && item.id === deletingDashboardId && <span className="loading"></span>}
-            {copyingDashboardId && item.id === copyingDashboardId && <span className="loading"></span>}
+            {((deletingDashboardId && item.id === deletingDashboardId) || (copyingDashboardId && item.id === copyingDashboardId)) && <span className="loading"></span>}
+            
             {bookmarkingDashboardId !== item.id &&
               <button className={'btn-bookmark' + (item.is_bookmark ? ' bookmarked' : '') + (disableButtons ? ' disable' : '')} onClick={() => onRowBookmarkClick(item.id)}></button>
             }

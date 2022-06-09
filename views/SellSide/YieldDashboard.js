@@ -13,8 +13,6 @@ import APIService from '../../services/apiService';
 import SpeedSelect from '../../components/SpeedSelect/SpeedSelect';
 import { isDateGreater } from '../../components/ReactCalendar/components/utils';
 import RangePicker from '../../components/ReactCalendar/RangePicker';
-import HideSubHeader from '../../components/HideSubHeader';
-
 
 class YieldDashboard extends Component {
   constructor(props) {
@@ -61,7 +59,7 @@ class YieldDashboard extends Component {
   }
 
   //Reload the page if client id/name change from url
-  componentDidUpdate(prev_props){
+  componentDidUpdate(){
     this.user = getUser();
     if(this.user.last_fetched_client!==this.state.client.id){
       //Update State Values
@@ -144,7 +142,7 @@ class YieldDashboard extends Component {
 
 
   //On Select Change
-  onOptionSelect(event, id){
+  onOptionSelect(event){
     this.setState({
       selected_adtype: event
     }, ()=>{
@@ -158,7 +156,7 @@ class YieldDashboard extends Component {
    * Analysis Saved View Functios
    */
 
-  getYieldDashboardData(args=null){
+  getYieldDashboardData(){
     //Input Validations
     this.setState({ error: '', inprocess: true });
 
@@ -183,7 +181,7 @@ class YieldDashboard extends Component {
           if(!this.state.adtypeList){
             let adtypeList = [];
             let adtypes = JSON.parse(response.ad_type);
-            adtypes.forEach((item, i) => {
+            adtypes.forEach((item) => {
               adtypeList.push(item.name);
             });
             stateObj['adtypeList'] = adtypeList;
@@ -227,12 +225,12 @@ class YieldDashboard extends Component {
       return(
         <div className="yield-main-wrapper">No Records Found.</div>
       )
-    };
+    }
 
     return (
       <div className="yield-main-wrapper">
         {
-          Object.keys(this.state.yieldDashboardData).map((key, index) => {
+          Object.keys(this.state.yieldDashboardData).map((key) => {
             let data = JSON.parse(this.state.yieldDashboardData[key]);
             let data_len = Object.keys(data).length;
             let max_cpm = 0;
@@ -248,7 +246,7 @@ class YieldDashboard extends Component {
                 'total_records_count': data_len
               };
 
-              Object.keys(data).forEach((level1key,index) => {
+              Object.keys(data).forEach((level1key) => {
                 let total_impressions = data[level1key]['total_impressions'];
                 let total_cpm = this.roundFloat(data[level1key]['cpm']); //round number
                 let total_revenue = this.roundFloat(data[level1key]['total_revenue']); //round number
@@ -284,7 +282,7 @@ class YieldDashboard extends Component {
               
                   <div className="values-wrapper">
                     {
-                      Object.keys(data).map((level1key,index) => {
+                      Object.keys(data).map((level1key) => {
                         let total_impressions = data[level1key]['total_impressions'];
                         let total_cpm = this.roundFloat(data[level1key]['cpm']); //round number
                         let total_revenue = this.roundFloat(data[level1key]['total_revenue']); //round number
@@ -298,7 +296,7 @@ class YieldDashboard extends Component {
                         let class_name = level1key.replace(' ', '_');
                         
                         return (
-                          <div className={'value-wrapper '+(class_name)}>
+                          <div key={class_name} className={'value-wrapper '+(class_name)}>
                             <div className="col-wrapper">
                               <div className="col">
                                 <div className="col-val-wrapper"><div className="col-label">{level1key}</div></div>
@@ -343,14 +341,14 @@ class YieldDashboard extends Component {
 
                         <div className="col">
                           <div className="col-val-wrapper cpm">
-                            <div className="col-val"><span className="number">$'{this.roundFloat(grand_totals['total_cpm']/grand_totals['total_records_count'])}</span></div>
+                            <div className="col-val"><span className="number">${this.roundFloat(grand_totals['total_cpm']/grand_totals['total_records_count'])}</span></div>
                             <div className="col-chart" style={{width: total_cpm_width_percentage+'%'}}></div>
                           </div>
                         </div>
 
                         <div className="col">
                           <div className="col-val-wrapper total_revenue">
-                            <div className="col-val"><span className="number">$'{numberWithCommas(this.roundFloat(grand_totals['total_revenue']))}</span><span className="change">100%</span></div>
+                            <div className="col-val"><span className="number">${numberWithCommas(this.roundFloat(grand_totals['total_revenue']))}</span><span className="change">100%</span></div>
                             <div className="col-chart" style={{width: total_revenue_width_percentage+'%'}}></div>
                           </div>
                         </div>
@@ -397,7 +395,7 @@ class YieldDashboard extends Component {
                 <SpeedSelect
                   options={this.state.adtypeList}
                   selectedOption={(this.state.selected_adtype) ? this.state.selected_adtype : ''}
-                  onSelect={(e) => this.onOptionSelect(e, 'ad_type')}
+                  onSelect={(e) => this.onOptionSelect(e)}
                   displayKey='value'
                   uniqueKey='ad_type'
                   selectLabel='ad_type'

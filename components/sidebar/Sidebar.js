@@ -35,10 +35,9 @@ class Sidebar extends Component {
     subjectObj.subscribe(this.updateSidebarClientInfo.bind(this));
   }
 
-  componentDidUpdate(prev_props) {
+  componentDidUpdate() {
     this.user = getUser();
     if (this.state.terminal_type !== this.user.terminal_type.id) {
-      // console.log('prev terminal: '+this.state.terminal_type+'-- new terminal:'+this.user.terminal_type.id);
       this.setState({
         isOpen: false,
         client: {},

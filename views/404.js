@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getUser, getClients } from '../utils/Common';
+import { getUser } from '../utils/Common';
 
 import '../styles/Global.scss';
 import Header from '../components/header/Header';
@@ -27,13 +27,7 @@ class PageNotFound extends Component {
     }
     
     if (this.state.counter === 0) {
-      let base_url = '/'+this.user.terminal_type.id;
-      let default_url = this.user.terminal_type.id==='sellside' ? base_url+'/datatrend' : '';
-
-      // this.props.history.push(this.user.default_home_url!=='' ? this.user.default_home_url : '/'); //redirect to home
-      // this.props.history.push(this.user.default_home_url!=='' ? this.user.default_home_url : default_url); //redirect to home
       this.props.history.push('/'); //redirect to home
-
       return;
     }
   }

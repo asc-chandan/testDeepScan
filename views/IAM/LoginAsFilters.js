@@ -1,11 +1,5 @@
 import React, { Component } from 'react';
-import * as Constants from '../../components/Constants.js';
 import SpeedSelect from '../../components/SpeedSelect/SpeedSelect';
-
-import { getClients, getUser } from '../../utils/Common'; //Import Common Functions
-
-//Import Services
-import APIService from '../../services/apiService';
 
 class LoginAsFilters extends Component {
   constructor(props) {
@@ -23,13 +17,12 @@ class LoginAsFilters extends Component {
   componentDidMount(){
   }
 
-  componentDidUpdate(prev_props){
+  componentDidUpdate(){
   }
 
 
   //On Select Change
-  onOptionSelect(event, id){
-    var item_type = id;
+  onOptionSelect(event){
     var item_val = event;
     
     this.setState({
@@ -50,7 +43,7 @@ class LoginAsFilters extends Component {
               <SpeedSelect
                 options={this.props.organizations}
                 selectedOption={this.state.selected_org}
-                onSelect={(e) => this.onOptionSelect(e, 'org')}
+                onSelect={(e) => this.onOptionSelect(e)}
                 displayKey='name'
                 uniqueKey='id'
                 selectLabel='Organization'

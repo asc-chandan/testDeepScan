@@ -7,7 +7,7 @@ import { getUser } from '../utils/Common'; //Import Common Functions
 import APIService from '../services/apiService'; //Import Services
 import AscTable from '../components/AscTable/AscTable';
 
-function CreateUser(props) {
+function CreateUser() {
   const [error, setError] = useState('');
   const [inprocess, setInprocess] = useState(false);
   const user = useState(getUser());

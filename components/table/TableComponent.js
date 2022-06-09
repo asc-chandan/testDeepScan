@@ -3,7 +3,7 @@ import '../../styles/Table.scss'
 import { calculateTextWidth } from '../../views/SellSide/TrendMaster/ChartsUtils';
 
 const TableComponent = ({
-  inprocess, columns, dataArray, dataList, paginationInfo, scrollAPICall, that, dashbaordListToShow, onColumnSort
+  inprocess, columns, dataArray, dataList, paginationInfo, scrollAPICall, that, dashbaordListToShow
 }) => {
   const [hoverLinePosition, setHoverLinePosition] = useState({ left: 0 })
   const [isMouseDown, setIsMouseDown] = useState(false);
@@ -27,7 +27,7 @@ const TableComponent = ({
       colHeadersMinWidth.push(calculateTextWidth(col.display_name, '11px Poppins, "Open Sans", sans-serif, helvetica') + 20);
     });
     let colWidthsInPercentage = [];
-    colHeadersValue.map((col) => colWidthsInPercentage.push(100 / colHeadersValue.length));
+    colHeadersValue.map(() => colWidthsInPercentage.push(100 / colHeadersValue.length));
 
     setColumnsMinWidth(colHeadersMinWidth);
     setColumnsWidthInPer(colWidthsInPercentage);

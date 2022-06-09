@@ -109,7 +109,7 @@ class ReactDivTable extends Component {
   /**
    * On componentn mount
    */
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.selectedChildren = {};
   }
 
@@ -225,7 +225,7 @@ class ReactDivTable extends Component {
     context.font = font;
     let metrics = context.measureText(text);
     return Math.ceil(metrics.width);
-  };
+  }
 
   setRequiredWidth(widthRecieved, colIndex, start, end, isResizeDefault) {
     let tabs = document.getElementsByClassName(`tbl-row-${this.props.analysisId}`);
@@ -396,7 +396,7 @@ class ReactDivTable extends Component {
     let toggleObjKeys = Object.keys(toggleObj);
 
     //Collapse Rows
-    toggleObjKeys.forEach((item, i) => {
+    toggleObjKeys.forEach((item) => {
       if (excludeIndexes && excludeIndexes.includes(item)) {
         // console.log(item+'---'+excludeIndexes.includes(item)); //do nothing
       } else {
@@ -442,7 +442,7 @@ class ReactDivTable extends Component {
   /* Handle Row Toggle 
   * Row Toggle to get sub level data on first click append data under main analysis data clicked index
   * From next click it will show data directly from variable instead of making api request */
-  handleRowToggle(event, index) {
+  handleRowToggle(event) {
     event.stopPropagation();
     // let level_details = event.currentTarget.dataset.level_details; //Pick the clicked row column key
     let level_details = JSON.parse(event.currentTarget.dataset.level_details); //Pick the clicked row column key
@@ -661,7 +661,7 @@ class ReactDivTable extends Component {
                     const paddingLeftText = 18 * (nesting_level > 0 ? 1 : (canClick ? 1 : 0)) + 12 * (canClick ? nesting_level : Math.max(nesting_level - 1, 0));
                     const leftToggleBtn = 8 + 12 * nesting_level;
 
-                    this.props.conditionalFormatting.forEach((format, k) => {
+                    this.props.conditionalFormatting.forEach((format) => {
                       if (format && format.cell_value !== undefined && format.cell_value.length > 0) {
                         let hasCondition = format.cell_value.some(e => col_key.includes(e.name.toLowerCase()));
                         let conditional_formatting_col_value = '';
@@ -774,7 +774,7 @@ class ReactDivTable extends Component {
                     const paddingLeftText = 18 * (nesting_level > 0 ? 1 : (canClick ? 1 : 0)) + 12 * (canClick ? nesting_level : Math.max(nesting_level - 1, 0));
                     const leftToggleBtn = 8 + 12 * nesting_level;
 
-                    this.props.conditionalFormatting.forEach((format, k) => {
+                    this.props.conditionalFormatting.forEach((format) => {
                       if (format && format.cell_value !== undefined && format.cell_value.length > 0) {
                         let hasCondition = format.cell_value.some(e => col_key.includes(e.name.toLowerCase()));
                         // if (this.props.terminal_type === 'klay_media') {
@@ -1220,7 +1220,7 @@ class ReactDivTable extends Component {
       let numOfCols = Math.abs(columnEndPoint - columnStartingPoint) + 1;
 
       selectedData.map((row, i) => {
-        row.map((data, j) => {
+        row.map((data) => {
           let rowData = '';
           if (data.includes(',')) {
             let dataSpilt = data.split(',')
@@ -1502,7 +1502,7 @@ class ReactDivTable extends Component {
                                 </div>
 
                                 {this.props.selected_columns.map((col) => {
-                                  return(<div className={'sub-column no-bg'}>
+                                  return(<div key={col} className={'sub-column no-bg'}>
                                     <div className="cell-text"></div>
                                   </div>)
                                 })}

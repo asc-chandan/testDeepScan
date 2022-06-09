@@ -18,7 +18,7 @@ import { MultiPeriodPickerPanel } from '../../../components/MultiPeriodPicker/Mu
 import { givePrevNthDate, giveDaysCountInRange } from '../../../components/MultiPeriodPicker/components/utils';
 import APIService from '../../../services/apiService';
 import {
-  getKeyByValue, getClients, getUser, giveDotSeparatedDateRange, convertDatePeriodPreselectsToRange, giveDateInMMDDYYY, generateHashedPassword
+  getKeyByValue, getClients, getUser, giveDotSeparatedDateRange, convertDatePeriodPreselectsToRange, giveDateInMMDDYYY
 } from '../../../utils/Common';
 
 import {
@@ -612,7 +612,7 @@ class ReportView extends Component {
   }
 
   escapePastingChat = () => {
-    const { filteredChartsSettings, tempCopyedChat } = this.state
+    const { filteredChartsSettings } = this.state
     const i = filteredChartsSettings.findIndex(chart => chart.id === "new_chart_constructor");
 
     if(!filteredChartsSettings || i === -1)
@@ -632,11 +632,10 @@ class ReportView extends Component {
     this.handleChartDeleteBtn(e, selectedChartIds[0]);
   }
 
-  copyAChartOnControlPlusC = (e) => {
+  copyAChartOnControlPlusC = () => {
     const id = this.state.selectedChartIds[0];
-    const chart = this.state.filteredChartsSettings.find(chart => chart.id === id)
-
-    if(id) this.setState({tempCopyedChat: {...chart}})
+    const chart = this.state.filteredChartsSettings.find(chart => chart.id === id);
+    if(id) this.setState({tempCopyedChat: {...chart}});
   }
   
   pastChartOnControlPlusC() {
@@ -687,9 +686,14 @@ class ReportView extends Component {
         break;
 
       default:
-          return;
+        return;
     }
-    this.setState({tempChartsGridLayout});
+
+    this.setState({tempChartsGridLayout}, ()=>{
+      if (this.isDashboardInEditMode()) {
+        this.handleDashboardChartLayoutSave(); //save the layout
+      }
+    });
   }
 
   //Reload the page if client id/name change from url
@@ -1044,6 +1048,11 @@ class ReportView extends Component {
         if (this.state.sharedUsers === null && !this.state.loadingSharedUsers) {
           this.getSharedUsersList();
         }
+      }
+
+      //hide the new dahsboard create chart msg
+      if(tab==='dashboard_settings' && this.props.showDashboardCreatedMsg && this.state.filteredChartsSettings.length > 0){
+        this.props.hideDashboardCreatedMsg();
       }
     };
 
@@ -1447,12 +1456,12 @@ class ReportView extends Component {
               //dashboard grid layout exist or not check
               let chart_grid_layout_index = savedDashboardOtherSettings.chart_grid_layout.findIndex((e) => e.id === chart.id);
               if (!savedDashboardOtherSettings || !savedDashboardOtherSettings.chart_grid_layout) {
-                updateChartsGridLayout.push(this.getDefaultChartGridLayout(chart, i)); //use saved config here
+                updateChartsGridLayout.push(this.getDefaultChartGridLayout(chart)); //use saved config here
               }
 
               //if chart is under list but chart grid layout does not exist
               if (chart_grid_layout_index === -1) {
-                updateChartsGridLayout.splice(i, 0, this.getDefaultChartGridLayout(chart, i));
+                updateChartsGridLayout.splice(i, 0, this.getDefaultChartGridLayout(chart));
               }
             });
 
@@ -1534,7 +1543,7 @@ class ReportView extends Component {
   }
 
 
-  getDefaultChartGridLayout(chart, index) {
+  getDefaultChartGridLayout(chart) {
     let showLegend = chart.showLegend !== undefined ? chart.showLegend : 0;
     let default_chart_width = (chart.segmentation !== '' && showLegend) ? (parseInt(this.state.chart_dimensions.defaultWidth) + parseInt(this.state.chart_dimensions.defaultSegmentWidth)) : this.state.chart_dimensions.defaultWidth;
 
@@ -1752,7 +1761,7 @@ class ReportView extends Component {
         !isNewDashboard && !this.state.insightNotes && this.getDashboardInsightNotes();
         !isNewDashboard && !this.state.sharedUsers && this.getSharedUsersList();
       }).catch(e => {
-        console.log('Some error occured in fetching one of the dimensions');
+        console.log('Some error occured in fetching one of the dimensions', e);
       });
   }
 
@@ -1783,6 +1792,7 @@ class ReportView extends Component {
       })
       .catch(err => {
         this.setState({ loadingNotes: false });
+        console.log('error insights', err);
       });
   }
 
@@ -1811,6 +1821,7 @@ class ReportView extends Component {
           this.setState({
             insightNotesRepliesLoadings: { ...this.state.insightNotesRepliesLoadings, [parentNoteId]: false }
           });
+          console.log('error', err);
           reject();
         });
     });
@@ -1877,7 +1888,7 @@ class ReportView extends Component {
 
 
   //on Minimize Console Panel
-  handleMinimizeConsolePanel(e, val) {
+  handleMinimizeConsolePanel(e) {
     // change custom scroll left to 0
 
     //minimize the console panel
@@ -1925,7 +1936,7 @@ class ReportView extends Component {
 
           {(!this.state.preferenceAutoHideConsolePanel && this.showConsoleMinimizedButton()) &&
             <div className="panel-close-options">
-              <button className={"btn-panel-minimize" + (!this.props.dashboardData.showConsolePanel ? " panel-closed" : "")} title="Minimize Panel" onClick={(e) => this.handleMinimizeConsolePanel(e, true)}></button>
+              <button className={"btn-panel-minimize" + (!this.props.dashboardData.showConsolePanel ? " panel-closed" : "")} title="Minimize Panel" onClick={(e) => this.handleMinimizeConsolePanel(e)}></button>
             </div>
           }
         </div>
@@ -1977,14 +1988,14 @@ class ReportView extends Component {
     let changeCount = (constructorChangeCount + constructorBandChangeCount + constructorFormatChangeCount);
 
     let consolePanelTitle = '';
-    if(this.state.showWidgetInfo){ consolePanelTitle = 'Widget Information' };
-    if(this.state.showWidgetLegendDetails){ consolePanelTitle = 'Chart Legend' };
-    if(selectedTab === 'dashboard_settings'){ consolePanelTitle = 'Settings' };
-    if(selectedTab === 'constructor'){ consolePanelTitle = 'Constructor' };
-    if(selectedTab === 'index' || selectedTab === 'search'){ consolePanelTitle = 'Index' };
-    if(selectedTab === 'insight') { consolePanelTitle = 'Insight' };
-    if(selectedTab === 'share') { consolePanelTitle = 'Share' };
-    if(selectedTab === 'controls') { consolePanelTitle = 'controls' };
+    if(this.state.showWidgetInfo){ consolePanelTitle = 'Widget Information' }
+    if(this.state.showWidgetLegendDetails){ consolePanelTitle = 'Chart Legend' }
+    if(selectedTab === 'dashboard_settings'){ consolePanelTitle = 'Settings' }
+    if(selectedTab === 'constructor'){ consolePanelTitle = 'Constructor' }
+    if(selectedTab === 'index' || selectedTab === 'search'){ consolePanelTitle = 'Index' }
+    if(selectedTab === 'insight') { consolePanelTitle = 'Insight' }
+    if(selectedTab === 'share') { consolePanelTitle = 'Share' }
+    if(selectedTab === 'controls') { consolePanelTitle = 'controls' }
 
     return (
       <div className="console-content-wrapper">
@@ -1993,7 +2004,6 @@ class ReportView extends Component {
 
           <div className="tabs-content-wrapper">
             <div className="tab-content">
-              
               {selectedTab!=='' && this.getConsolePanelTabMainContent(selectedTab)}
               {this.state.showWidgetInfo && this.getWidgetInfo()}
               {this.state.showWidgetLegendDetails && this.getWidgetLegendDetails()}
@@ -2071,7 +2081,7 @@ class ReportView extends Component {
     const handleFullscreenBtnClick = () => {
       const ele = document.getElementById('trendmaster');
       const fullScreenFunc = ele.requestFullscreen || ele.webkitRequestFullscreen || ele.msRequestFullscreen;
-      fullScreenFunc.call(ele).catch(err => console.log('Some error occured while opening full-screen mode'));
+      fullScreenFunc.call(ele).catch(err => console.log('Some error occured while opening full-screen mode', err));
     }
 
     return (
@@ -2080,20 +2090,20 @@ class ReportView extends Component {
           {this.isDashboardInEditMode() ?
             <>
               <li className={selectedTab === 'index' ? activeClass : ''}>
-                <button onClick={(e) => this.handleConsolePanelTabChange('index')} className="btn btn-medium">Index</button>
+                <button onClick={() => this.handleConsolePanelTabChange('index')} className="btn btn-medium">Index</button>
               </li>
               <li className={(selectedTab === 'constructor' ? activeClass : '')}>
-                <button onClick={(e) => this.handleConsolePanelTabChange('constructor')} className="btn btn-medium">Constructor</button>
+                <button onClick={() => this.handleConsolePanelTabChange('constructor')} className="btn btn-medium">Constructor</button>
               </li>
-              {hasInsightTabAccess && <li className={(selectedTab === 'insight' ? activeClass : '')}><button className="btn btn-insight" onClick={(e) => this.handleConsolePanelTabChange('insight')}>Insight</button></li>}
-              {hasShareTabAccess && <li className={(selectedTab === 'share' ? activeClass : '')}><button className="btn btn-share" onClick={(e) => this.handleConsolePanelTabChange('share')}>Share</button></li>}
+              {hasInsightTabAccess && <li className={(selectedTab === 'insight' ? activeClass : '')}><button className="btn btn-insight" onClick={() => this.handleConsolePanelTabChange('insight')}>Insight</button></li>}
+              {hasShareTabAccess && <li className={(selectedTab === 'share' ? activeClass : '')}><button className="btn btn-share" onClick={() => this.handleConsolePanelTabChange('share')}>Share</button></li>}
             </>
             :
             <>
-              <li className={(selectedTab === 'search' ? activeClass : '')}><button onClick={(e) => this.handleConsolePanelTabChange('search')} className="btn btn-medium">Index</button></li>
-              {hasControlTabAccess && <li className={selectedTab === 'controls' ? activeClass : ''} ><button onClick={(e) => this.handleConsolePanelTabChange('controls')} className="btn btn-medium">Controls</button></li>}
-              {hasInsightTabAccess && <li className={(selectedTab === 'insight' ? activeClass : '')}><button className="btn btn-insight" onClick={(e) => this.handleConsolePanelTabChange('insight')}>Insight</button></li>}
-              {hasShareTabAccess && <li className={(selectedTab === 'share' ? activeClass : '')}><button className="btn btn-share" onClick={(e) => this.handleConsolePanelTabChange('share')}>Share</button></li>}
+              <li className={(selectedTab === 'search' ? activeClass : '')}><button onClick={() => this.handleConsolePanelTabChange('search')} className="btn btn-medium">Index</button></li>
+              {hasControlTabAccess && <li className={selectedTab === 'controls' ? activeClass : ''} ><button onClick={() => this.handleConsolePanelTabChange('controls')} className="btn btn-medium">Controls</button></li>}
+              {hasInsightTabAccess && <li className={(selectedTab === 'insight' ? activeClass : '')}><button className="btn btn-insight" onClick={() => this.handleConsolePanelTabChange('insight')}>Insight</button></li>}
+              {hasShareTabAccess && <li className={(selectedTab === 'share' ? activeClass : '')}><button className="btn btn-share" onClick={() => this.handleConsolePanelTabChange('share')}>Share</button></li>}
             </>
           }
         </ul>
@@ -2101,7 +2111,7 @@ class ReportView extends Component {
         <div className="chart-tabs-right">
           <ul className="chart-tabs-icon">
             {this.isDashboardInEditMode() &&
-              <li className={'chart-tab-setting'}><button className={'btn-settings'} onClick={(e) => this.handleConsolePanelTabChange('dashboard_settings')} /*onClick={() => this.setState({ showNewDashboardForm: true })}*/ ></button></li>
+              <li className={'chart-tab-setting'}><button className={'btn-settings'} onClick={() => this.handleConsolePanelTabChange('dashboard_settings')} /*onClick={() => this.setState({ showNewDashboardForm: true })}*/ ></button></li>
             }
             <li><button className="btn-fullscreen" onClick={handleFullscreenBtnClick}></button></li>
           </ul>
@@ -2221,7 +2231,7 @@ class ReportView extends Component {
   }
 
   //remove edit mode of title
-  handleRemoveTitleEditMode(e) {
+  handleRemoveTitleEditMode() {
     if (this.state.newChartSettings.name.length > 1) {
       this.setState({ editableChartTitle: false });
     }
@@ -2244,11 +2254,11 @@ class ReportView extends Component {
           inEditMode ?
             <div className={'constructor title ' + (mode_class)}>
               <div className="label">Name :</div>
-              <input type="text" name="chart-title" value={this.state.newChartSettings.name} className="field-control" onChange={(e) => this.onNewConstructorSettingsChange('name', e.target.value)} onBlur={(e) => this.handleRemoveTitleEditMode(e)} />
+              <input type="text" name="chart-title" value={this.state.newChartSettings.name} className="field-control" onChange={(e) => this.onNewConstructorSettingsChange('name', e.target.value)} onBlur={() => this.handleRemoveTitleEditMode()} />
             </div>
             :
             <>
-              <div className={'constructor title ' + (mode_class)} onClick={(e) => this.setState({ editableChartTitle: true })}>
+              <div className={'constructor title ' + (mode_class)} onClick={() => this.setState({ editableChartTitle: true })}>
                 <div className="label">Name :</div>
                 <div className="val">{this.state.newChartSettings.name}</div>
               </div>
@@ -2264,31 +2274,24 @@ class ReportView extends Component {
     switch (id) {
       case 'constructor':
         return this.giveConsoleContentHtmlForConstructorTab();
-        break;
 
       case 'controls':
         return this.giveConsoleContentHtmlForControlsTab();
-        break;
 
       case 'index':
         return (<div id="dashboard-settings" className="dashboaord-tab-content">{this.giveChartsListContent()}</div>);
-        break;
-
+        
       case 'search':
         return (<div id="search-settings" className="dashboaord-tab-content">{this.giveChartsListContent()}</div>);
-        break;
-
+        
       case 'insight':
         return this.giveConsoleContentHtmlForInsightsTab();
-        break;
-
+        
       case 'share':
         return this.giveConsoleContentHtmlForShareTab();
-        break;
-
+        
       case 'dashboard_settings':
         return this.giveConsoleContentHtmlForDashboardSettings();
-        break;
 
       default:
         return (<div id="no-access" className="dashboaord-tab-content">Control panel disabled for View Mode</div>);
@@ -2423,11 +2426,9 @@ class ReportView extends Component {
     )
   }
 
-
   giveConsoleContentHtmlForDashboardSettings() {
     return this.getDashboardFormContent();
   }
-
 
   giveConsoleContentHtmlForConstructorTab() {
     let isRequiredInfoFilled = (this.state.newChartSettingsLastExecuted.chart_type !== '' && this.state.newChartSettingsLastExecuted.view_type !== '' && this.state.newChartSettingsLastExecuted.x_axis !== '' && this.state.newChartSettingsLastExecuted.metric !== '') ? true : false;
@@ -2475,10 +2476,10 @@ class ReportView extends Component {
       const settings = this.state.newChartSettings;
 
       switch (tab) {
-        case 'chart': return settings.chart_type !== ''; break;
-        case 'dataset': return settings.view_type !== ''; break;
-        case 'segment': return settings.segmentation !== ''; break;
-        case 'measurement': return settings.metric !== ''; break;
+        case 'chart': return settings.chart_type !== '';
+        case 'dataset': return settings.view_type !== '';
+        case 'segment': return settings.segmentation !== '';
+        case 'measurement': return settings.metric !== '';
         case 'measurements': {
           if (!settings.metric.includes(',')) {
             return false
@@ -2490,12 +2491,11 @@ class ReportView extends Component {
               return true;
             }
           }
-          break;
         }
         case 'x_axis':
         case 'dimension':
           return settings.x_axis !== '';
-          break;
+          
         case 'category':
         case 'y_axis': {
           if (this.state.newChartSettings.chart_type === 'heatmap') {
@@ -2503,11 +2503,10 @@ class ReportView extends Component {
           } else {
             return settings.metric !== ''
           }
-          break;
         }
         case 'value':
         case 'metric':
-          return settings.metric !== ''; break;
+          return settings.metric !== '';
         case 'period': {
           if (settings.dynamic_time_period !== null) {
             return settings.dynamic_time_period.value !== '';
@@ -2516,12 +2515,10 @@ class ReportView extends Component {
           } else {
             return false
           }
-          break;
         }
         default: return false;
       }
     };
-
 
     const giveConstructorTabFilterSelectedCount = () => {
       const filtersGlobal = this.state.dashboardSettings.filters;
@@ -2529,13 +2526,13 @@ class ReportView extends Component {
       let count = 0;
       // first count the globally applied filters
       for (let x in filtersGlobal) {
-        if (filtersGlobal.hasOwnProperty(x)) {
+        if (Object.prototype.hasOwnProperty.call(filtersGlobal, x)) {
           if (filtersGlobal[x].length > 0) { count++; }
         }
       }
       // now count locally applied but include only those which are not applied gloabally to avoid double counting
       for (let x in filtersLocal) {
-        if (filtersLocal.hasOwnProperty(x)) {
+        if (Object.prototype.hasOwnProperty.call(filtersLocal, x)) {
           if ((!filtersGlobal[x] || !filtersGlobal[x].length) && filtersLocal[x].length > 0) { count++; }
         }
       }
@@ -2554,7 +2551,7 @@ class ReportView extends Component {
                       const displayName = covertUnderscoreToSpaceInString(cType);
                       return (
                         <div key={cType} className="widget-type">
-                          <div key={cType} title={displayName} className={'widget-icon widget-type-btn ' + cType} onClick={(e) => this.handleInitialChartTypeSelect(cType)}>
+                          <div key={cType} title={displayName} className={'widget-icon widget-type-btn ' + cType} onClick={() => this.handleInitialChartTypeSelect(cType)}>
                           </div>
                         </div>
                       )
@@ -2574,7 +2571,6 @@ class ReportView extends Component {
         </div>
       );
     }
-
 
     const chartTypeAndNameHTML = (
       <>
@@ -2617,7 +2613,7 @@ class ReportView extends Component {
                       const displayName = covertUnderscoreToSpaceInString(cType);
                       return (
                         <div key={cType} className="widget-type">
-                          <div key={cType} title={displayName} className={'widget-icon widget-type-btn ' + cType + (isSelected ? ' selected' : '')} onClick={(e) => this.onNewConstructorSettingsChange('chart_type', cType)}>
+                          <div key={cType} title={displayName} className={'widget-icon widget-type-btn ' + cType + (isSelected ? ' selected' : '')} onClick={() => this.onNewConstructorSettingsChange('chart_type', cType)}>
                           </div>
                         </div>
                       )
@@ -2731,9 +2727,9 @@ class ReportView extends Component {
                             <div className={'color-picker-wrapper'}>
                               <div className="color-picker">
                                 {Object.keys(DefaultColorsList).map((colorKey) => {
-                                  return (<div className="color-col">
+                                  return (<div key={colorKey} className="color-col">
                                     {DefaultColorsList[colorKey].map((color) => {
-                                      return (<div key={color} className="color" style={{ backgroundColor: color }} onClick={(e) => this.handleColorPickerSelect('background', color)}></div>)
+                                      return (<div key={color} className="color" style={{ backgroundColor: color }} onClick={() => this.handleColorPickerSelect('background', color)}></div>)
                                     })}
                                   </div>)
                                 })}
@@ -2759,9 +2755,9 @@ class ReportView extends Component {
                             <div className={'color-picker-wrapper'}>
                               <div className="color-picker">
                                 {Object.keys(DefaultColorsList).map((colorKey) => {
-                                  return (<div className="color-col">
+                                  return (<div key={colorKey} className="color-col">
                                     {DefaultColorsList[colorKey].map((color) => {
-                                      return (<div key={`first_${color}`} className="color" style={{ backgroundColor: color }} onClick={(e) => this.handleColorPickerSelect('background', color, this.state.newChartSettings.chart_type, 'single')}></div>)
+                                      return (<div key={`first_${color}`} className="color" style={{ backgroundColor: color }} onClick={() => this.handleColorPickerSelect('background', color, this.state.newChartSettings.chart_type, 'single')}></div>)
                                     })}
                                   </div>)
                                 })}
@@ -2781,9 +2777,9 @@ class ReportView extends Component {
                             <div className={'color-picker-wrapper'}>
                               <div className="color-picker">
                                 {Object.keys(DefaultColorsList).map((colorKey) => {
-                                  return (<div className="color-col">
+                                  return (<div key={colorKey} className="color-col">
                                     {DefaultColorsList[colorKey].map((color) => {
-                                      return (<div key={`last_${color}`} className="color" style={{ backgroundColor: color }} onClick={(e) => this.handleColorPickerSelect('background', color, this.state.newChartSettings.chart_type, 'second')}></div>)
+                                      return (<div key={`last_${color}`} className="color" style={{ backgroundColor: color }} onClick={() => this.handleColorPickerSelect('background', color, this.state.newChartSettings.chart_type, 'second')}></div>)
                                     })}
                                   </div>)
                                 })}
@@ -2806,7 +2802,7 @@ class ReportView extends Component {
                               {
                                 ColorPalettes[this.state.newChartSettings.format.color.palette].map((color, i) => {
                                   if (i > 10) return;
-                                  return <span className="color-block" style={{ backgroundColor: color }}></span>
+                                  return <span key={i} className="color-block" style={{ backgroundColor: color }}></span>
                                 })
                               }
                             </div>
@@ -2819,14 +2815,14 @@ class ReportView extends Component {
                             <div className="color-palette-dropdown-wrapper">
                               {Object.keys(ColorPalettes).map((palette) => {
                                 return (
-                                  <div className={'color-palette-inner ' + (this.state.newChartSettings.format.color.palette === palette ? 'active' : '')} onClick={(e) => this.handleColorPaletteSelect(e, palette)}>
+                                  <div key={palette} className={'color-palette-inner ' + (this.state.newChartSettings.format.color.palette === palette ? 'active' : '')} onClick={(e) => this.handleColorPaletteSelect(e, palette)}>
                                     <div className="color-palette">
                                       <div className="label">{palette}</div>
                                       <div className="selected-palette">
                                         {
                                           ColorPalettes[palette].map((color, i) => {
                                             if (i > 10) return;
-                                            return <span className="color-block" style={{ backgroundColor: color }}></span>
+                                            return <span key={i} className="color-block" style={{ backgroundColor: color }}></span>
                                           })
                                         }
                                       </div>
@@ -2843,7 +2839,7 @@ class ReportView extends Component {
                         {(this.state.newChartSettings.chart_type === 'pie' || this.state.newChartSettings.chart_type === 'donut' || this.state.newChartSettings.chart_type === 'spider') ? (
                           xaxis_keys.length > 0 &&
                           xaxis_keys.map((xaxis) => {
-                            return (<div className="segment"><span>{xaxis}</span> <span className="color-block" style={{ backgroundColor: colorFunc(xaxis) }}></span></div>)
+                            return (<div key={xaxis} className="segment"><span>{xaxis}</span> <span className="color-block" style={{ backgroundColor: colorFunc(xaxis) }}></span></div>)
                           })
                         ) : (
                           segmented_keys.length > 0 &&
@@ -2860,7 +2856,7 @@ class ReportView extends Component {
               <div className="panel-widget chart-format-sorting">
                 <div className="widget-header">
                   <div className="widget-title">Sorting</div>
-                  <button className="btn-add-new" onClick={(e) => this.handleAddSortingCondition('or')}>Add New</button>
+                  <button className="btn-add-new" onClick={() => this.handleAddSortingCondition('or')}>Add New</button>
                 </div>
 
                 <div className="widget-content">
@@ -2873,7 +2869,7 @@ class ReportView extends Component {
                           <div className="sorting-condition-wrapper">
                             <div className="title">{this.state.newChartSettings.metric}</div>
                             {i > 0 &&
-                              <button className="btn-remove" onClick={(e) => this.handleRemoveSortingCondition('or', item)}>Remove</button>
+                              <button className="btn-remove" onClick={() => this.handleRemoveSortingCondition('or', item)}>Remove</button>
                             }
 
                             {this.state.newChartSettings.format.sorting[item].map((subitem, j) => {
@@ -2904,10 +2900,10 @@ class ReportView extends Component {
 
                                     <div className="action-buttons">
                                       {(j === (this.state.newChartSettings.format.sorting[item].length - 1)) &&
-                                        <button className="btn-add-new" onClick={(e) => this.handleAddSortingCondition('and', i)}>Add New</button>
+                                        <button className="btn-add-new" onClick={() => this.handleAddSortingCondition('and', i)}>Add New</button>
                                       }
                                       {j > 0 &&
-                                        <button className="btn-remove" onClick={(e) => this.handleRemoveSortingCondition('and', item, j)}>Remove</button>
+                                        <button className="btn-remove" onClick={() => this.handleRemoveSortingCondition('and', item, j)}>Remove</button>
                                       }
                                     </div>
                                   </div>
@@ -2935,7 +2931,7 @@ class ReportView extends Component {
                     <div className={'switch-toggle small legend-toggle'}>
                       <div className="label">Show Labels</div>
                       <div className="switch">
-                        <input type="checkbox" checked={this.state.newChartSettings.format.showLabel} onChange={(e) => this.handleToggleLabel('showLabel', !this.state.newChartSettings.format.showLabel)} />
+                        <input type="checkbox" checked={this.state.newChartSettings.format.showLabel} onChange={() => this.handleToggleLabel('showLabel', !this.state.newChartSettings.format.showLabel)} />
                         <label></label>
                       </div>
                     </div>
@@ -3113,7 +3109,7 @@ class ReportView extends Component {
     const filteredDimensionMetrics = this.state.newChartSettings.view_type === '' ? [] : (this.state.allDataSourcesDimensionsMetrics[this.state.newChartSettings.view_type] || []).filter(x => x.display_title.toLowerCase().includes(chartFormSearchInput));
     const openedFilterName = this.state.chartFormOpenedFilterId === '' ? '' : this.state.allDataSourcesDimensionsMetrics[this.state.newChartSettings.view_type].find(item => item.id === this.state.chartFormOpenedFilterId).display_title;
     const filteredFirstLevelFilters = filteredDimensionMetrics.filter(item => item.type === 'string');
-    const filteredSecondLevelFilters = this.state.chartFormOpenedFilterId === '' ? [] : this.state.allDataSourcesDimensionsList[this.state.newChartSettings.view_type][this.state.chartFormOpenedFilterId].filter(x => x.toLowerCase().includes(chartFormSearchInput));;
+    const filteredSecondLevelFilters = this.state.chartFormOpenedFilterId === '' ? [] : this.state.allDataSourcesDimensionsList[this.state.newChartSettings.view_type][this.state.chartFormOpenedFilterId].filter(x => x.toLowerCase().includes(chartFormSearchInput));
 
     const subOptionSelectedCount = this.state.newChartSettings.filters[this.state.chartFormOpenedFilterId] ? this.state.newChartSettings.filters[this.state.chartFormOpenedFilterId].length : 0;
     const isAllSuboptionsChecked = (subOptionSelectedCount === filteredSecondLevelFilters.length && this.state.newChartSettings.filters[this.state.chartFormOpenedFilterId]) ? this.state.newChartSettings.filters[this.state.chartFormOpenedFilterId].every(f => filteredSecondLevelFilters.includes(f)) : false;
@@ -3143,7 +3139,7 @@ class ReportView extends Component {
 
                     return <div key={tab} className={"constructor-settings-tabs-grid " + tab}>
                       <div data-id={tab + '-content'} className={'tab ' + (isActive ? 'active' : '') + (isDisabled ? ' disabled' : '')}
-                        onClick={(e) => this.setState({ constructorSettingsCurrentSubtab: tab, chartFormSearchInput: '' })}>
+                        onClick={() => this.setState({ constructorSettingsCurrentSubtab: tab, chartFormSearchInput: '' })}>
                         <div>
                           {tab.replaceAll("_", " ")}
                           {tab !== 'filter' && isConstructorTabValueSelected(tab) &&
@@ -3165,7 +3161,7 @@ class ReportView extends Component {
                 <div className="global-filter-count">
                   <span>{globalFilterCount}</span>
                   <p>Dashboard level filters applied, to edit click</p>
-                  <button className="btn-settings" onClick={(e) => this.navigateToDashboardSettings('data', 'filters')}>settings</button>
+                  <button className="btn-settings" onClick={() => this.navigateToDashboardSettings('data', 'filters')}>settings</button>
                 </div>
               }
               {constructorSettingsCurrentTab !== 'period' &&
@@ -3489,7 +3485,7 @@ class ReportView extends Component {
 
                           return (
                             <div key={item.id} className={'option' + (isAppliedAtGlobalLevel ? ' disabled' : '')}>
-                              <div className="option-inner" onClick={(e) => this.handleFilterOptionsList(item.id)} >
+                              <div className="option-inner" onClick={() => this.handleFilterOptionsList(item.id)}>
                                 <label >{item.display_title}</label>
                                 {subItemCheckedCount > 0 && <span className="option-count" >{subItemCheckedCount}</span>}
                               </div>
@@ -3508,26 +3504,21 @@ class ReportView extends Component {
                                 {openedFilterName}
                               </label>
                               <button className="btn btn-filter-ok" onClick={(e) => this.handleFilterOptionsList(e, '')}>Ok</button> */}
-                              <span className="back-btn" onClick={(e) => this.handleFilterOptionsList('')}></span>
+                              <span className="back-btn" onClick={() => this.handleFilterOptionsList('')}></span>
                               <label> {openedFilterName}</label>
                             </div>
                           </div>
 
                           <div className={'option checkbox sub-option select-all' + (chartFormSearchInput !== '' && filteredSecondLevelFilters.length === 0 ? ' disabled' : '')}>
-                            <input id={`dash-${this.getDashboardID()}-filter-lev2-select-all`} type="checkbox" checked={isAllSuboptionsChecked} onChange={(e) => this.handleNewConstructorFilterSelectAllClick(this.state.chartFormOpenedFilterId, !isAllSuboptionsChecked, filteredSecondLevelFilters)} />
+                            <input id={`dash-${this.getDashboardID()}-filter-lev2-select-all`} type="checkbox" checked={isAllSuboptionsChecked} onChange={() => this.handleNewConstructorFilterSelectAllClick(this.state.chartFormOpenedFilterId, !isAllSuboptionsChecked, filteredSecondLevelFilters)} />
                             <label htmlFor={`dash-${this.getDashboardID()}-filter-lev2-select-all`}>Select All</label>
                           </div>
 
                           {filteredSecondLevelFilters.map((subitem) => {
-                            // const isFirstLevelAppliedAtGlobalLevel = this.state.dashboardSettings.filters[this.state.chartFormOpenedFilterId] && !!this.state.dashboardSettings.filters[this.state.chartFormOpenedFilterId].length;
-                            // const isAppliedAtGlobalLevel = isFirstLevelAppliedAtGlobalLevel && this.state.dashboardSettings.filters[this.state.chartFormOpenedFilterId].includes(subitem);
-                            // const isAppliedAtLocalLevel = this.state.newChartSettings.filters[this.state.chartFormOpenedFilterId] && this.state.newChartSettings.filters[this.state.chartFormOpenedFilterId].includes(subitem);
-                            // let isSubOptionChecked = isFirstLevelAppliedAtGlobalLevel ? isAppliedAtGlobalLevel : isAppliedAtLocalLevel;
                             let isSubOptionChecked = this.state.newChartSettings.filters[this.state.chartFormOpenedFilterId] ? this.state.newChartSettings.filters[this.state.chartFormOpenedFilterId].includes(subitem) : false;
 
-
                             return (
-                              <div className={'option checkbox sub-option'}>
+                              <div key={subitem} className={'option checkbox sub-option'}>
                                 <input id={`${this.getDashboardID()}-chart-filter-lev2-${subitem}`} type="checkbox" value={subitem} checked={isSubOptionChecked} onChange={(e) => this.onNewConstructorSettingsChange('filters', e.target.value, this.state.chartFormOpenedFilterId)} />
                                 <label htmlFor={`${this.getDashboardID()}-chart-filter-lev2-${subitem}`}>{subitem}</label>
                               </div>
@@ -3549,7 +3540,7 @@ class ReportView extends Component {
                   {globalPeriod &&
                     <div className="global-range">
                       <p>Dashboard level period applied, to edit click</p>
-                      <button className="btn-settings" onClick={(e) => this.navigateToDashboardSettings('data', 'period')}>settings</button>
+                      <button className="btn-settings" onClick={() => this.navigateToDashboardSettings('data', 'period')}>settings</button>
                     </div>
                   }
                   <div className="widget-header">
@@ -3573,7 +3564,7 @@ class ReportView extends Component {
                             const isDisabled = globalPeriod;
 
                             return <div key={pre} className="preselect-grid">
-                              <div className={'preselect' + (isSelected ? ' selected' : '') + (isDisabled ? ' disabled' : '')} onClick={(e) => this.onNewConstructorSettingsChange('dynamic_time_period', pre)}>{pre}</div>
+                              <div className={'preselect' + (isSelected ? ' selected' : '') + (isDisabled ? ' disabled' : '')} onClick={() => this.onNewConstructorSettingsChange('dynamic_time_period', pre)}>{pre}</div>
                             </div>
                           })}
                         </div>
@@ -3638,9 +3629,8 @@ class ReportView extends Component {
   }
 
   //Switch toggle
-  handlePeriodSwitchToggle(e){
+  handlePeriodSwitchToggle(){
     this.setState({ dashboardFormShowTimePresets: !this.state.dashboardFormShowTimePresets });
-    // this.setState({ dashboardFormShowTimePresets: val === 'Dynamic' });
   }
 
   giveConsoleContentHtmlForControlsTab() {
@@ -3654,7 +3644,7 @@ class ReportView extends Component {
     let dashboardFitersListFirstLevel = Object.keys(dashboardFitersObject).filter(fname => fname.split('_').join(' ').toLocaleLowerCase().includes(this.state.dashboardFilterSearchInput.trim().toLocaleLowerCase()));
     if (!this.isDashboardInEditMode()) { dashboardFitersListFirstLevel = dashboardFitersListFirstLevel.filter(fn => this.state.dashboardSettings.presentationFilters.includes(fn)) }
     const dashboardOpenedFilterName = this.state.dashboardOpenedFilterName;
-    let dashboardFitersListSecondLevel = (dashboardFitersObject[dashboardOpenedFilterName] || []).filter(f => f.toLowerCase().includes(this.state.dashboardFilterSearchInput.toLowerCase().trim()));;
+    let dashboardFitersListSecondLevel = (dashboardFitersObject[dashboardOpenedFilterName] || []).filter(f => f.toLowerCase().includes(this.state.dashboardFilterSearchInput.toLowerCase().trim()));
 
     const noMatchFound = dashboardOpenedFilterName === '' ? this.state.dashboardFilterSearchInput.trim() !== '' && dashboardFitersListFirstLevel.length === 0 : this.state.dashboardFilterSearchInput.trim() !== '' && dashboardFitersListSecondLevel.length === 0;
     const subOptionSelectedCount = this.state.dashboardSettings.filters[dashboardOpenedFilterName] ? this.state.dashboardSettings.filters[dashboardOpenedFilterName].length : 0;
@@ -3671,7 +3661,7 @@ class ReportView extends Component {
                   <div className="label">Dynamic</div>
                   <div className="switch">
                     {/* <input type="checkbox" checked={this.state.dashboardFormShowTimePresets} onChange={(val) => this.handlePeriodSwitchToggle(val)} /> */}
-                    <input type="checkbox" checked={this.state.dashboardFormShowTimePresets} onChange={(e)=>this.handlePeriodSwitchToggle(e)} />
+                    <input type="checkbox" checked={this.state.dashboardFormShowTimePresets} onChange={()=>this.handlePeriodSwitchToggle()} />
                     <label></label>
                   </div>
                 </div>
@@ -3772,7 +3762,7 @@ class ReportView extends Component {
 
                     return (
                       <div key={fName} id={optionUniqueId} className={'option' + (selectedCount > 0 ? ' selected' : '')}>
-                        <div className="option-inner" onClick={(e) => this.handleDashboardFirstLevelFilterClick(fName)} >
+                        <div className="option-inner" onClick={() => this.handleDashboardFirstLevelFilterClick(fName)} >
                           <label >{formattedName}</label>
                           {selectedCount > 0 && <span className="option-count" >{selectedCount}</span>}
                         </div>
@@ -3787,7 +3777,7 @@ class ReportView extends Component {
                 <>
                   <div className={'option sub-option-heading'}>
                     <div className="option-inner">
-                      <span className="back-btn" onClick={(e) => this.handleDashboardFirstLevelFilterClick('')}></span>
+                      <span className="back-btn" onClick={() => this.handleDashboardFirstLevelFilterClick('')}></span>
                       <label> {dashboardOpenedFilterName === 'os' ? 'OS' : covertUnderscoreToSpaceInString(dashboardOpenedFilterName)}</label>
                     </div>
                   </div>
@@ -3802,7 +3792,7 @@ class ReportView extends Component {
 
                   {dashboardFitersListSecondLevel.lenght > 0 &&
                     <div className={'option checkbox sub-option select-all' + (noMatchFound ? ' disabled' : '')}>
-                      <input id={`dash-${this.getDashboardID()}-filter-lev2-select-all`} type="checkbox" checked={isAllSuboptionsChecked} onChange={(e) => this.handleDashboardFilterSelectAllClick(dashboardOpenedFilterName, !isAllSuboptionsChecked, dashboardFitersListSecondLevel)} />
+                      <input id={`dash-${this.getDashboardID()}-filter-lev2-select-all`} type="checkbox" checked={isAllSuboptionsChecked} onChange={() => this.handleDashboardFilterSelectAllClick(dashboardOpenedFilterName, !isAllSuboptionsChecked, dashboardFitersListSecondLevel)} />
                       <label htmlFor={`dash-${this.getDashboardID()}-filter-lev2-select-all`}>Select All</label>
                     </div>
                   }
@@ -3811,8 +3801,8 @@ class ReportView extends Component {
                     const subOptionUniqueId = `dash-${this.getDashboardID()}-filter-lev2-${subitem}`;
                     const isChecked = this.state.dashboardSettings.filters[this.state.dashboardOpenedFilterName] ? this.state.dashboardSettings.filters[this.state.dashboardOpenedFilterName].includes(subitem) : false;
                     return (
-                      <div className={'option checkbox sub-option'}>
-                        <input id={subOptionUniqueId} type="checkbox" checked={isChecked} onChange={(e) => this.handleDashboardSettingsChange('filters', subitem, this.state.dashboardOpenedFilterName)} />
+                      <div key={subitem} className={'option checkbox sub-option'}>
+                        <input id={subOptionUniqueId} type="checkbox" checked={isChecked} onChange={() => this.handleDashboardSettingsChange('filters', subitem, this.state.dashboardOpenedFilterName)} />
                         <label htmlFor={subOptionUniqueId}>{subitem}</label>
                       </div>
                     )
@@ -3922,7 +3912,7 @@ class ReportView extends Component {
                   <div className="users-filter">
                     {usersFilters.map(user => {
                       const isSelected = this.state.insightSelectedUsersIDs.includes(user.id);
-                      return <UserAvatar user={user} isSelected={isSelected} onClick={this.handleInsightUserFilterSelect} />
+                      return <UserAvatar key={user.id} user={user} isSelected={isSelected} onClick={this.handleInsightUserFilterSelect} />
                     })}
                   </div>
                 }
@@ -4057,8 +4047,7 @@ class ReportView extends Component {
                               {noteReplies.map(noteReply => {
                                 const formattedCreatedDate = giveDateTimeInString(new Date(noteReply.created_time));
                                 return (
-                                  <div className="note-widget">
-                                    {/* <span className="unread-indicator"></span> */}
+                                  <div key={noteReply.user.id} className="note-widget">
                                     <div className="header">
                                       <UserAvatar user={noteReply.user} />
                                       <span className="name">{noteReply.user.first_name[0].toUpperCase() + noteReply.user.first_name.slice(1) + ' ' + (noteReply.user.last_name[0] ? noteReply.user.last_name[0].toUpperCase() + noteReply.user.last_name.slice(1) : '')}</span>
@@ -4078,6 +4067,7 @@ class ReportView extends Component {
                                         </span>
                                       </div>
                                     </div>
+
                                     {this.state.insightEditNoteId !== noteReply.id && <div className="content" dangerouslySetInnerHTML={{ __html: noteReply.note }}></div>}
                                     {this.state.insightEditNoteId === noteReply.id &&
                                       <div className="note-edit-form">
@@ -4120,9 +4110,11 @@ class ReportView extends Component {
               <React.Fragment>
                 {this.state.insightClickedNoteInfo &&
                   <p>
-                    Showing charts for '{this.state.insightClickedNoteInfo.chart_name}' for '{xPointIsDateObj ? giveDateInString(this.state.insightClickedNoteInfo.x_axis_point) : this.state.insightClickedNoteInfo.x_axis_point}'
+                    Showing charts for &lsquo;{this.state.insightClickedNoteInfo.chart_name}&rsquo; for &lsquo;{xPointIsDateObj ? giveDateInString(this.state.insightClickedNoteInfo.x_axis_point) : this.state.insightClickedNoteInfo.x_axis_point}&rsquo;
                     <span style={{ border: '1px solid #fff', padding: '0px 2px' }} onClick={() => this.setState({ insightClickedNoteInfo: null })}>Show All</span>
-                  </p>}
+                  </p>
+                }
+
                 {chartNotes.map((note, i) => {
                   const formattedCreatedDate = new Date(note.created_time).toISOString().slice(0, 10);
                   const segmentInfo = note.segmentation ? JSON.parse(note.segmentation) : null;
@@ -4245,12 +4237,12 @@ class ReportView extends Component {
 
                     <div className="selected-charts">
                       <div className="label">Access : </div>
-                      {!!shareInfo.is_full_dashboard ?
+                      {!!shareInfo.is_full_dashboard===true ?
                         <span className="full-dash-msg"> Full Dashboard</span>
                         :
                         <ul>
                           {shareInfo.dashboard_config.split(',').map(p =>
-                            <li><span className="item">{p}</span></li>
+                            <li key={p}><span className="item">{p}</span></li>
                           )}
                         </ul>
                       }
@@ -4287,7 +4279,6 @@ class ReportView extends Component {
                                     <div className="option checkbox">
                                       <input id={`${this.getDashboardID()}-share-${auth}`} type="checkbox"
                                         checked={checked}
-                                        // disabled={disabled}
                                         onChange={() => this.handleShareEditAuthSelect(auth)} />
                                       <label htmlFor={`${this.getDashboardID()}-share-${auth}`}>
                                         {auth[0] + auth.slice(1).toLowerCase()}</label>
@@ -4467,7 +4458,7 @@ class ReportView extends Component {
                   <div className="widget-btn-opt">
                     {!renderInsideConstructor &&
                       <div className="hide-toggle checkbox">
-                        <input type="checkbox" onChange={(e) => this.handleShowHideChart(chart.id)} />
+                        <input type="checkbox" onChange={() => this.handleShowHideChart(chart.id)} />
                         <label></label>
                       </div>
                     }
@@ -4519,7 +4510,7 @@ class ReportView extends Component {
         </div>
       </div>
     );
-  };
+  }
 
 
 
@@ -4543,7 +4534,7 @@ class ReportView extends Component {
                   </div>
 
                   {(this.state.dashboardSettings.dashboard_other_settings.public_token!==undefined && this.state.dashboardSettings.dashboard_other_settings.public_token!=='') &&
-                    <div id="public-url" onClick={(e) => this.handleCopytoClipboard('public-url', 'Copied public url.')}>
+                    <div id="public-url" onClick={() => this.handleCopytoClipboard('public-url', 'Copied public url.')}>
                       {this.currentURL+'/'+this.state.client.id+'/'+this.state.dashboardSettings.dashboard_other_settings.public_token}
                     </div>
                   }
@@ -4764,7 +4755,7 @@ class ReportView extends Component {
     let dashboardFitersListFirstLevel = Object.keys(dashboardFitersObject).filter(fname => fname.split('_').join(' ').toLocaleLowerCase().includes(this.state.dashboardFilterSearchInput.trim().toLocaleLowerCase()));
     if (!this.isDashboardInEditMode()) { dashboardFitersListFirstLevel = dashboardFitersListFirstLevel.filter(fn => this.state.dashboardSettings.presentationFilters.includes(fn)) }
     const dashboardOpenedFilterName = this.state.dashboardOpenedFilterName;
-    let dashboardFitersListSecondLevel = (dashboardFitersObject[dashboardOpenedFilterName] || []).filter(f => f.toLowerCase().includes(this.state.dashboardFilterSearchInput.toLowerCase().trim()));;
+    let dashboardFitersListSecondLevel = (dashboardFitersObject[dashboardOpenedFilterName] || []).filter(f => f.toLowerCase().includes(this.state.dashboardFilterSearchInput.toLowerCase().trim()));
 
     const noMatchFound = dashboardOpenedFilterName === '' ? this.state.dashboardFilterSearchInput.trim() !== '' && dashboardFitersListFirstLevel.length === 0 : this.state.dashboardFilterSearchInput.trim() !== '' && dashboardFitersListSecondLevel.length === 0;
     const subOptionSelectedCount = this.state.dashboardSettings.filters[dashboardOpenedFilterName] ? this.state.dashboardSettings.filters[dashboardOpenedFilterName].length : 0;
@@ -4774,7 +4765,7 @@ class ReportView extends Component {
       const filtersObj = this.state.dashboardSettings.filters;
       let count = 0;
       for (let x in filtersObj) {
-        if (filtersObj.hasOwnProperty(x)) {
+        if (Object.prototype.hasOwnProperty.call(filtersObj, x)) {
           if (filtersObj[x].length > 0) { count++; }
         }
       }
@@ -5050,10 +5041,9 @@ class ReportView extends Component {
 
                                   return (
                                     <div key={fName} id={optionUniqueId} className={'option' + (selectedCount > 0 ? ' selected' : '')}>
-                                      <div className="option-inner" onClick={(e) => this.handleDashboardFirstLevelFilterClick(fName)} >
+                                      <div className="option-inner" onClick={() => this.handleDashboardFirstLevelFilterClick(fName)} >
                                         <label >{formattedName}</label>
                                         {selectedCount > 0 && <span className="option-count" >{selectedCount}</span>}
-
                                       </div>
                                     </div>
                                   )
@@ -5065,13 +5055,13 @@ class ReportView extends Component {
                                 <>
                                   <div className={'option sub-option-heading'}>
                                     <div className="option-inner">
-                                      <span className="back-btn" onClick={(e) => this.handleDashboardFirstLevelFilterClick('')}></span>
+                                      <span className="back-btn" onClick={() => this.handleDashboardFirstLevelFilterClick('')}></span>
                                       <label > {dashboardOpenedFilterName === 'os' ? 'OS' : covertUnderscoreToSpaceInString(dashboardOpenedFilterName)}</label>
                                     </div>
                                   </div>
 
                                   <div className={'option checkbox sub-option select-all' + (noMatchFound ? ' disabled' : '')}>
-                                    <input id={`dash-${this.getDashboardID()}-filter-lev2-select-all`} type="checkbox" checked={isAllSuboptionsChecked} onChange={(e) => this.handleDashboardFilterSelectAllClick(dashboardOpenedFilterName, !isAllSuboptionsChecked, dashboardFitersListSecondLevel)} />
+                                    <input id={`dash-${this.getDashboardID()}-filter-lev2-select-all`} type="checkbox" checked={isAllSuboptionsChecked} onChange={() => this.handleDashboardFilterSelectAllClick(dashboardOpenedFilterName, !isAllSuboptionsChecked, dashboardFitersListSecondLevel)} />
                                     <label htmlFor={`dash-${this.getDashboardID()}-filter-lev2-select-all`}>Select All</label>
                                   </div>
 
@@ -5079,8 +5069,8 @@ class ReportView extends Component {
                                     const subOptionUniqueId = `dash-${this.getDashboardID()}-filter-lev2-${subitem}`;
                                     const isChecked = this.state.dashboardSettings.filters[this.state.dashboardOpenedFilterName] ? this.state.dashboardSettings.filters[this.state.dashboardOpenedFilterName].includes(subitem) : false;
                                     return (
-                                      <div className={'option checkbox sub-option'}>
-                                        <input id={subOptionUniqueId} type="checkbox" checked={isChecked} onChange={(e) => this.handleDashboardSettingsChange('filters', subitem, this.state.dashboardOpenedFilterName)} />
+                                      <div key={subitem} className={'option checkbox sub-option'}>
+                                        <input id={subOptionUniqueId} type="checkbox" checked={isChecked} onChange={() => this.handleDashboardSettingsChange('filters', subitem, this.state.dashboardOpenedFilterName)} />
                                         <label htmlFor={subOptionUniqueId}>{subitem}</label>
                                       </div>
                                     )
@@ -5134,7 +5124,7 @@ class ReportView extends Component {
 
                             <div className="device-categories">
                               {Object.keys(Constants.DevicesSizes).map((category) => {
-                                return (<div className={category + ' cat ' + (hasNewLayoutSettings ? this.state.dashboardSettings.dashboard_other_settings.layout_setting.device_category === category ? 'selected' : '' : '')} onClick={(e) => this.handleDashboardLayoutSettingChange(e, 'device_category', category)}><i></i><span>{category}</span></div>);
+                                return (<div key={category} className={category + ' cat ' + (hasNewLayoutSettings ? this.state.dashboardSettings.dashboard_other_settings.layout_setting.device_category === category ? 'selected' : '' : '')} onClick={(e) => this.handleDashboardLayoutSettingChange(e, 'device_category', category)}><i></i><span>{category}</span></div>);
                               })}
                             </div>
 
@@ -5143,7 +5133,7 @@ class ReportView extends Component {
                                 {Constants.DevicesSizes[this.state.dashboardSettings.dashboard_other_settings.layout_setting.device_category].map((device) => {
                                   let formattedSize = device.size.split('*');
                                   return (
-                                    <div className="option radio" onClick={(e) => this.handleDashboardLayoutSettingChange(e, 'device', device.name)}>
+                                    <div key={device.name} className="option radio" onClick={(e) => this.handleDashboardLayoutSettingChange(e, 'device', device.name)}>
                                       <input type="radio" name="device" checked={hasNewLayoutSettings && this.state.dashboardSettings.dashboard_other_settings.layout_setting.device === device.name} value={device.name} className="rdo-box" />
                                       <label>
                                         <span className="name">{device.name}</span>
@@ -5199,7 +5189,7 @@ class ReportView extends Component {
             </div>
           }
 
-          {this.props.showDashboardCreatedMsg &&
+          {this.props.showDashboardCreatedMsg  &&
             <div className="form-content">
               <div className="new-dashboard-creation-msg-wrapper">
                 <div className="dashboard-msg">
@@ -5808,6 +5798,7 @@ class ReportView extends Component {
         })
         .catch(err => {
           this.setState({ chartFromOtherDashboardLoading: false })
+          console.log('error', err);
         });
     }
   }
@@ -5941,7 +5932,7 @@ class ReportView extends Component {
       }
       return this.state.newChartSettings[key] === metadataForType.limitations[key]
     });
-  };
+  }
 
 
   convertDateRangeInStringToRangeInObject(dateRangeStr) {
@@ -6795,7 +6786,7 @@ handleMoreButtonsDropDownToggle(e, id) {
 
 
   //On Run and Save Button Click
-  handleChartCreateOrUpdate(e) {
+  handleChartCreateOrUpdate() {
     const validationErrMsg = this.isChartSettingsValid();
     if (validationErrMsg !== '') {
       alertService.showToast('error', validationErrMsg);
@@ -6831,7 +6822,7 @@ handleMoreButtonsDropDownToggle(e, id) {
           // Fetch the bands data also if bands are applicable to this chart
           this.fetchChartBandsData()
             .then(bandsData => {
-              let bandsDataWithFormattedDate = bandsData.map(bd => formatChartData(bd, 'date'));;
+              let bandsDataWithFormattedDate = bandsData.map(bd => formatChartData(bd, 'date'));
               // Promise will resolve immediately if band is not applicable OR there is no band applied
               const chartId = this.state.newChartSettings.id;
               this.setState({
@@ -6847,6 +6838,7 @@ handleMoreButtonsDropDownToggle(e, id) {
           this.setState({
             chartOrDashboardSaveInProcess: false
           });
+          console.log('error', e);
           reject('API_FAILED')
         });
     });
@@ -7004,7 +6996,7 @@ handleMoreButtonsDropDownToggle(e, id) {
             updateTempChartsGridLayout[tempGridLayoutIndex]['x'] = updated_edit_x;
           }
         } else {
-          updateTempChartsGridLayout[tempGridLayoutIndex]['w'] = updateTempChartsGridLayout[tempGridLayoutIndex]['w'];
+          // updateTempChartsGridLayout[tempGridLayoutIndex]['w'] = updateTempChartsGridLayout[tempGridLayoutIndex]['w'];
           updateTempChartsGridLayout[tempGridLayoutIndex]['sw'] = 0;
         }
         stateObj['tempChartsGridLayout'] = updateTempChartsGridLayout;
@@ -7868,6 +7860,7 @@ handleMoreButtonsDropDownToggle(e, id) {
       })
       .catch(err => {
         this.setState({ chartsLoadingsObj: { ...this.state.chartsLoadingsObj, [copiedSettings.id]: false } });
+        console.log('error', err);
       });
   }
 
@@ -7898,7 +7891,7 @@ handleMoreButtonsDropDownToggle(e, id) {
   handleChartDeleteBtn(e, chartId) {
     if(chartId===undefined) return;
     if (this.state.legendOpen === chartId) {
-      this.handleMinimizeConsolePanel(e, true);
+      this.handleMinimizeConsolePanel(e);
       this.setState({ legendOpen: null });
     }
     const dashboardId = this.state.dashboardSettings.id;
@@ -8420,7 +8413,7 @@ handleMoreButtonsDropDownToggle(e, id) {
     if (this.state.insightNotes && chartId !== null) {
       let notes = [];
       this.state.insightNotes.chart_notes.forEach(cn => {
-        if (cn.chart_id === chartId) { notes.push(cn) };
+        if (cn.chart_id === chartId) { notes.push(cn) }
       });
       return notes;
     }
@@ -8846,121 +8839,115 @@ handleMoreButtonsDropDownToggle(e, id) {
   handleConsolePanelDragStart(e, id) {
     e.stopPropagation();
     e.preventDefault();
+    if(e.button !== 0) return;
 
-    if (e.button === 0) {
-      let element = document.querySelector('#d-' + this.getDashboardID() + ' #' + id);
-      document.addEventListener('mousemove', consolePanelMove);
-      document.addEventListener('mouseup', consolePanelDrop);
-      element.classList.add('mousedown');
+    let element = document.querySelector('#d-' + this.getDashboardID() + ' #' + id);
+    document.addEventListener('mousemove', consolePanelMove);
+    document.addEventListener('mouseup', consolePanelDrop);
+    element.classList.add('mousedown');
 
-      let attached_element = null;
-      if (id === 'console-content-wrapper') {
-        attached_element = document.querySelector('#d-' + this.getDashboardID() + ' #console-tabs-wrapper');
-      } else {
-        if (document.querySelector('#d-' + this.getDashboardID() + ' #console-content-wrapper')) {
-          attached_element = document.querySelector('#d-' + this.getDashboardID() + ' #console-content-wrapper');
-        }
+    let attached_element = null;
+    if (id === 'console-content-wrapper') {
+      attached_element = document.querySelector('#d-' + this.getDashboardID() + ' #console-tabs-wrapper');
+    } else {
+      if (document.querySelector('#d-' + this.getDashboardID() + ' #console-content-wrapper')) {
+        attached_element = document.querySelector('#d-' + this.getDashboardID() + ' #console-content-wrapper');
       }
+    }
 
-      let updatedConstructorPanelPosition = this.props.consolePanelPosition;
+    let updatedConstructorPanelPosition = this.props.consolePanelPosition;
+    let consoleButtonTop = element.getBoundingClientRect().top;
+    let consoleButtonLeft = element.getBoundingClientRect().left;
+    let consoleButtonRight = element.getBoundingClientRect().right;
+    let currentConsoleDragStartXY = { x: e.pageX, y: e.pageY };
+    let consoleAttachedEleTop;
 
-      let consoleButtonTop = element.getBoundingClientRect().top;
-      let consoleButtonLeft = element.getBoundingClientRect().left;
-      let consoleButtonRight = element.getBoundingClientRect().right;
-      let currentConsoleDragStartXY = { x: e.pageX, y: e.pageY };
-      let consoleAttachedEleTop;
+    if (attached_element) {
+      consoleAttachedEleTop = attached_element.getBoundingClientRect().top;
+    }
 
-      if (attached_element) {
-        consoleAttachedEleTop = attached_element.getBoundingClientRect().top;
-      }
+    //when console position is right
+    let leftTransform = (currentConsoleDragStartXY.x - consoleButtonRight);
+    let topTransform = (currentConsoleDragStartXY.y - consoleButtonTop);
+    let attachedEleTopTransform;
+    if (attached_element) { attachedEleTopTransform = (currentConsoleDragStartXY.y - consoleAttachedEleTop); }
+    if (leftTransform < 0) {
+      leftTransform = window.innerWidth - currentConsoleDragStartXY.x;
+    }
 
-      //when console position is right
-      let leftTransform = (currentConsoleDragStartXY.x - consoleButtonRight);
-      let topTransform = (currentConsoleDragStartXY.y - consoleButtonTop);
-      let attachedEleTopTransform;
-      if (attached_element) { attachedEleTopTransform = (currentConsoleDragStartXY.y - consoleAttachedEleTop); }
+    //when console position is left
+    if (updatedConstructorPanelPosition === 'left') {
+      leftTransform = (currentConsoleDragStartXY.x - consoleButtonLeft);
+    }
 
-      if (leftTransform < 0) {
-        leftTransform = window.innerWidth - currentConsoleDragStartXY.x;
-      }
+    let that = this;
+    function consolePanelMove(e) {
+      element.style.top = (e.pageY - topTransform) + 'px';
+      if (attached_element) { attached_element.style.top = (e.pageY - attachedEleTopTransform) + 'px'; }
 
-      //when console position is left
       if (updatedConstructorPanelPosition === 'left') {
-        leftTransform = (currentConsoleDragStartXY.x - consoleButtonLeft);
+        element.style.left = (e.pageX - leftTransform) + 'px';
+        element.style.right = 'auto';
+
+        if (attached_element) {
+          attached_element.style.left = (e.pageX - leftTransform) + 'px';
+          attached_element.style.right = 'auto';
+        }
+      } else {
+        element.style.right = (window.innerWidth - e.pageX - leftTransform) + 'px';
+        element.style.left = 'auto';
+
+        if (attached_element) {
+          attached_element.style.right = (window.innerWidth - e.pageX - leftTransform) + 'px'
+          attached_element.style.left = 'auto';
+        }
       }
 
-      // console.log('leftTransform-'+updatedConstructorPanelPosition, leftTransform+'--'+topTransform+'--'+e.pageX+'--'+consoleButtonRight+'--'+consoleButtonWidth/2);
-      let that = this;
-      function consolePanelMove(e) {
-        element.style.top = (e.pageY - topTransform) + 'px';
-        if (attached_element) { attached_element.style.top = (e.pageY - attachedEleTopTransform) + 'px'; }
+      element.style.userSelect = 'none';
+      if (attached_element) { attached_element.style.userSelect = 'none'; }
+      document.body.style.userSelect = 'none';
+      // that.consoleDrag = true; // used for tracking and preventing child element click
+    }
 
-        if (updatedConstructorPanelPosition === 'left') {
-          element.style.left = (e.pageX - leftTransform) + 'px';
-          element.style.right = 'auto';
+    function consolePanelDrop(e) {
+      e.stopPropagation();
 
-          if (attached_element) {
-            attached_element.style.left = (e.pageX - leftTransform) + 'px';
-            attached_element.style.right = 'auto';
-          }
-        } else {
-          element.style.right = (window.innerWidth - e.pageX - leftTransform) + 'px';
-          element.style.left = 'auto';
+      document.removeEventListener('mousemove', consolePanelMove);
+      document.removeEventListener('mouseup', consolePanelDrop);
+      element.classList.remove('mousedown');
 
-          if (attached_element) {
-            attached_element.style.right = (window.innerWidth - e.pageX - leftTransform) + 'px'
-            attached_element.style.left = 'auto';
-          }
+      if (id === 'console-content-wrapper') {
+        element.style.top = that.props.isPublicView!==undefined ? '35px' : '65px';
+        attached_element.style.top = 'auto';
+        attached_element.style.bottom = '5px';
+      } else {
+        element.style.top = 'auto';
+        if (attached_element) { 
+          attached_element.style.top = that.props.isPublicView!==undefined ? '35px' : '65px';
         }
-
-        element.style.userSelect = 'none';
-        if (attached_element) { attached_element.style.userSelect = 'none'; }
-        document.body.style.userSelect = 'none';
-        // that.consoleDrag = true; // used for tracking and preventing child element click
       }
 
-      function consolePanelDrop(e) {
-        e.stopPropagation();
+      if ((window.innerWidth - e.pageX) < window.innerWidth / 2) { // right
+        updatedConstructorPanelPosition = 'right';
+        element.style.left = 'auto';
+        element.style.right = 0;
 
-        document.removeEventListener('mousemove', consolePanelMove);
-        document.removeEventListener('mouseup', consolePanelDrop);
-        element.classList.remove('mousedown');
-
-        if (id === 'console-content-wrapper') {
-          element.style.top = that.props.isPublicView!==undefined ? '35px' : '65px';
-          alert(element.style.top);
-
-          attached_element.style.top = 'auto';
-          attached_element.style.bottom = '5px';
-        } else {
-          element.style.top = 'auto';
-          if (attached_element) { 
-            attached_element.style.top = that.props.isPublicView!==undefined ? '35px' : '65px';
-          }
+        if (attached_element) {
+          attached_element.style.left = 'auto';
+          attached_element.style.right = 0;
         }
+      } else { // left
+        updatedConstructorPanelPosition = 'left';
+        element.style.left = '0';
+        element.style.right = 'auto';
 
-        if ((window.innerWidth - e.pageX) < window.innerWidth / 2) { // right
-          updatedConstructorPanelPosition = 'right';
-          element.style.left = 'auto';
-          element.style.right = 0;
-
-          if (attached_element) {
-            attached_element.style.left = 'auto';
-            attached_element.style.right = 0;
-          }
-        } else { // left
-          updatedConstructorPanelPosition = 'left';
-          element.style.left = '0';
-          element.style.right = 'auto';
-
-          if (attached_element) {
-            attached_element.style.left = '0';
-            attached_element.style.right = 'auto';
-          }
+        if (attached_element) {
+          attached_element.style.left = '0';
+          attached_element.style.right = 'auto';
         }
-
-        that.props.onPanelPositionChange(that.props.dashboardData.id, updatedConstructorPanelPosition);
       }
+
+      that.props.onPanelPositionChange(that.props.dashboardData.id, updatedConstructorPanelPosition);
     }
   }
 
@@ -9017,8 +9004,6 @@ handleMoreButtonsDropDownToggle(e, id) {
         window.isScrolling = true;
         window.requestAnimationFrame(scroll);
       }
-
-
     } else {
       window.isScrolling = false;
     }
@@ -9031,114 +9016,113 @@ handleMoreButtonsDropDownToggle(e, id) {
     //console.log('drag start');
     e.stopPropagation();
 
-    if (e.button === 0) {
-      //to handle initial drag and drop
-      if (this.state.initialConstructorDrag) {
-        this.setState({ initialConstructorDrag: false });
-        return;
+    if (e.button !== 0) return;
+    //to handle initial drag and drop
+    if (this.state.initialConstructorDrag) {
+      this.setState({ initialConstructorDrag: false });
+      return;
+    }
+
+    let element = document.getElementById('chart-' + id);
+    document.addEventListener('mousemove', chartWidgetMove);
+    document.addEventListener('mouseup', chartWidgetDrop);
+    element.classList.add('mousedown');
+
+    this.handleChartSelection(id); // add selection
+
+    const widgetCordinates = element.getBoundingClientRect();
+    const distBwChartLeftEdgeAndMouseX = e.pageX - widgetCordinates.left;
+    const distBwChartTopEdgeAndMouseY = e.pageY - widgetCordinates.top;
+
+    let updatedTempGridLayouts = [...this.state.tempChartsGridLayout];
+    let chartLayoutIndex = updatedTempGridLayouts.findIndex((e) => e.id === id);
+    let updatedZIndex = this.updateAndGiveMaxZIndexAmongCharts(id);
+
+    const colChartWrapperDiv = document.querySelector(`#d-${this.getDashboardID()} #col-charts-wrapper`);
+    const multiChartsScrollableContainer = this.multiChartsScrollableWrapper.current;
+    const multiChartsContainer = multiChartsScrollableContainer.querySelector('#multicharts-wrapper');
+    const multiChartsContainerUsableWidth = multiChartsContainer.getBoundingClientRect().width - Number(window.getComputedStyle(multiChartsContainer).getPropertyValue(`padding-${this.props.consolePanelPosition}`).replace('px', ''));
+    const multiChartsContainerUsableHeight = multiChartsContainer.getBoundingClientRect().height;
+    let that = this;
+    let mouseMoved = false; // to detect wheather mouse was moved/dragged before releasing the mouse. This will help ignoring the calculation and hence preventing bugs in 'mouseUp' event
+
+    function chartWidgetMove(e) {
+      let multiChartsCord = multiChartsContainer.querySelector('#multicharts').getBoundingClientRect();
+
+      // compute mouse X and Y cordinates relative to chart container
+      const mouseXRelative = e.pageX - multiChartsCord.left;
+      const mouseYRelative = e.pageY - multiChartsCord.top;
+
+      const canNotBeMovedFurtherLeft = (mouseXRelative - distBwChartLeftEdgeAndMouseX) < 0;
+      const canNotBeMovedFurtherRight = (mouseXRelative - distBwChartLeftEdgeAndMouseX + widgetCordinates.width) > multiChartsContainerUsableWidth;
+      const canNotBeMovedFurtherTop = mouseYRelative - distBwChartTopEdgeAndMouseY < 0;
+      const canNotBeMovedFurtherBottom = (mouseYRelative - distBwChartTopEdgeAndMouseY + widgetCordinates.height) > multiChartsContainerUsableHeight;
+
+      if (!canNotBeMovedFurtherLeft && !canNotBeMovedFurtherRight) {
+        element.style.left = (mouseXRelative - distBwChartLeftEdgeAndMouseX) + 'px';
+        if (canNotBeMovedFurtherTop) {
+          element.style.top = 0 + 'px';
+        } else if (canNotBeMovedFurtherBottom) {
+          element.style.top = (multiChartsContainerUsableHeight - widgetCordinates.height) + 'px';
+        }
       }
-      let element = document.getElementById('chart-' + id);
-      document.addEventListener('mousemove', chartWidgetMove);
-      document.addEventListener('mouseup', chartWidgetDrop);
-      element.classList.add('mousedown');
-
-      this.handleChartSelection(id); // add selection
-
-      const widgetCordinates = element.getBoundingClientRect();
-      const distBwChartLeftEdgeAndMouseX = e.pageX - widgetCordinates.left;
-      const distBwChartTopEdgeAndMouseY = e.pageY - widgetCordinates.top;
-
-      let updatedTempGridLayouts = [...this.state.tempChartsGridLayout];
-      let chartLayoutIndex = updatedTempGridLayouts.findIndex((e) => e.id === id);
-      let updatedZIndex = this.updateAndGiveMaxZIndexAmongCharts(id);
-
-      const colChartWrapperDiv = document.querySelector(`#d-${this.getDashboardID()} #col-charts-wrapper`);
-      const multiChartsScrollableContainer = this.multiChartsScrollableWrapper.current;
-      const multiChartsContainer = multiChartsScrollableContainer.querySelector('#multicharts-wrapper');
-      const multiChartsContainerUsableWidth = multiChartsContainer.getBoundingClientRect().width - Number(window.getComputedStyle(multiChartsContainer).getPropertyValue(`padding-${this.props.consolePanelPosition}`).replace('px', ''));
-      const multiChartsContainerUsableHeight = multiChartsContainer.getBoundingClientRect().height;
-      let that = this;
-      let mouseMoved = false; // to detect wheather mouse was moved/dragged before releasing the mouse. This will help ignoring the calculation and hence preventing bugs in 'mouseUp' event
-
-      function chartWidgetMove(e) {
-        let multiChartsCord = multiChartsContainer.querySelector('#multicharts').getBoundingClientRect();
-
-        // compute mouse X and Y cordinates relative to chart container
-        const mouseXRelative = e.pageX - multiChartsCord.left;
-        const mouseYRelative = e.pageY - multiChartsCord.top;
-
-        const canNotBeMovedFurtherLeft = (mouseXRelative - distBwChartLeftEdgeAndMouseX) < 0;
-        const canNotBeMovedFurtherRight = (mouseXRelative - distBwChartLeftEdgeAndMouseX + widgetCordinates.width) > multiChartsContainerUsableWidth;
-        const canNotBeMovedFurtherTop = mouseYRelative - distBwChartTopEdgeAndMouseY < 0;
-        const canNotBeMovedFurtherBottom = (mouseYRelative - distBwChartTopEdgeAndMouseY + widgetCordinates.height) > multiChartsContainerUsableHeight;
-
-        if (!canNotBeMovedFurtherLeft && !canNotBeMovedFurtherRight) {
-          element.style.left = (mouseXRelative - distBwChartLeftEdgeAndMouseX) + 'px';
-          if (canNotBeMovedFurtherTop) {
-            element.style.top = 0 + 'px';
-          } else if (canNotBeMovedFurtherBottom) {
-            element.style.top = (multiChartsContainerUsableHeight - widgetCordinates.height) + 'px';
-          }
+      if (!canNotBeMovedFurtherTop && !canNotBeMovedFurtherBottom) {
+        element.style.top = (mouseYRelative - distBwChartTopEdgeAndMouseY) + 'px';
+        if (canNotBeMovedFurtherLeft) {
+          element.style.left = 0 + 'px';
         }
-        if (!canNotBeMovedFurtherTop && !canNotBeMovedFurtherBottom) {
-          element.style.top = (mouseYRelative - distBwChartTopEdgeAndMouseY) + 'px';
-          if (canNotBeMovedFurtherLeft) {
-            element.style.left = 0 + 'px';
-          }
-          if (canNotBeMovedFurtherRight) {
-            element.style.left = (multiChartsContainerUsableWidth - widgetCordinates.width) + 'px';
-          }
+        if (canNotBeMovedFurtherRight) {
+          element.style.left = (multiChartsContainerUsableWidth - widgetCordinates.width) + 'px';
         }
-        if ((!canNotBeMovedFurtherLeft && !canNotBeMovedFurtherRight) || (!canNotBeMovedFurtherTop && !canNotBeMovedFurtherBottom)) {
-          mouseMoved = true;
-          element.style.zIndex = updatedZIndex;
-          document.body.style.userSelect = 'none'; // disable user select to avoid selection while dragging  
-          // that.multiChartsWrapper.current.style.height = multiChartsWrapperScrollHeight + 'px';
-        }
-
-        // calling below method will handle the auto scroll of charts wrapper if needed
-        that.autoScrollChartWrapperIfNeeded(element, colChartWrapperDiv, multiChartsScrollableContainer, multiChartsContainerUsableWidth, that);
+      }
+      if ((!canNotBeMovedFurtherLeft && !canNotBeMovedFurtherRight) || (!canNotBeMovedFurtherTop && !canNotBeMovedFurtherBottom)) {
+        mouseMoved = true;
+        element.style.zIndex = updatedZIndex;
+        document.body.style.userSelect = 'none'; // disable user select to avoid selection while dragging  
       }
 
-      function chartWidgetDrop(e) {
-        window.isScrolling = false;
-        // that.multiChartsWrapper.current.style.height ='';
-        e.stopPropagation();
-        document.removeEventListener('mousemove', chartWidgetMove);
-        document.removeEventListener('mouseup', chartWidgetDrop);
-        element.classList.remove('mousedown');
-        document.body.style.userSelect = 'auto';  // revert userSelect property
+      // calling below method will handle the auto scroll of charts wrapper if needed
+      that.autoScrollChartWrapperIfNeeded(element, colChartWrapperDiv, multiChartsScrollableContainer, multiChartsContainerUsableWidth, that);
+    }
 
-        // Do nothing if there was no mouse movement, it will be the case when chart is just clicked
-        if (!mouseMoved) return;
+    function chartWidgetDrop(e) {
+      window.isScrolling = false;
+      // that.multiChartsWrapper.current.style.height ='';
+      e.stopPropagation();
+      document.removeEventListener('mousemove', chartWidgetMove);
+      document.removeEventListener('mouseup', chartWidgetDrop);
+      element.classList.remove('mousedown');
+      document.body.style.userSelect = 'auto';  // revert userSelect property
 
-        let gridMappedTop = Math.round(Number(element.style.top.replace('px', '')) / that.state.gridRowHeight);
-        let gridMappedLeft = Math.round(Number(element.style.left.replace('px', '')) / that.state.gridColWidth);
-        let posTop = (gridMappedTop * that.state.gridRowHeight);
-        let posLeft = (gridMappedLeft * that.state.gridColWidth);
+      // Do nothing if there was no mouse movement, it will be the case when chart is just clicked
+      if (!mouseMoved) return;
 
-        if (isNaN(posTop)) return;
+      let gridMappedTop = Math.round(Number(element.style.top.replace('px', '')) / that.state.gridRowHeight);
+      let gridMappedLeft = Math.round(Number(element.style.left.replace('px', '')) / that.state.gridColWidth);
+      let posTop = (gridMappedTop * that.state.gridRowHeight);
+      let posLeft = (gridMappedLeft * that.state.gridColWidth);
 
-        element.style.top = posTop + 'px';
-        element.style.left = posLeft + 'px';
+      if (isNaN(posTop)) return;
 
-        updatedTempGridLayouts[chartLayoutIndex]['x'] = posLeft;
-        updatedTempGridLayouts[chartLayoutIndex]['y'] = posTop;
-        updatedTempGridLayouts[chartLayoutIndex]['zindex'] = updatedZIndex;
+      element.style.top = posTop + 'px';
+      element.style.left = posLeft + 'px';
 
-        let stateObj = {
-          tempChartsGridLayout: updatedTempGridLayouts
-        }
+      updatedTempGridLayouts[chartLayoutIndex]['x'] = posLeft;
+      updatedTempGridLayouts[chartLayoutIndex]['y'] = posTop;
+      updatedTempGridLayouts[chartLayoutIndex]['zindex'] = updatedZIndex;
+
+      let stateObj = {
+        tempChartsGridLayout: updatedTempGridLayouts
+      }
+      if (that.isDashboardInEditMode()) {
+        stateObj['chartsGridLayout'] = updatedTempGridLayouts;
+      }
+
+      that.setState(stateObj, () => {
         if (that.isDashboardInEditMode()) {
-          stateObj['chartsGridLayout'] = updatedTempGridLayouts;
+          that.handleDashboardChartLayoutSave(); //save the layout
         }
-
-        that.setState(stateObj, () => {
-          if (that.isDashboardInEditMode()) {
-            that.handleDashboardChartLayoutSave(); //save the layout
-          }
-        });
-      }
+      });
     }
   }
 
@@ -9452,7 +9436,7 @@ handleMoreButtonsDropDownToggle(e, id) {
         <div className="grid-size"></div>
 
         {chartsOverlappingMessage !== '' &&
-          <button className="overlapping-msg" onClick={(e)=>this.handleZIndexSwitch(this.state.tempChartsGridLayout[chartLayoutIndex], chartsBehindCurrent)}>{chartsOverlappingMessage}</button>
+          <button className="overlapping-msg" onClick={()=>this.handleZIndexSwitch(this.state.tempChartsGridLayout[chartLayoutIndex], chartsBehindCurrent)}>{chartsOverlappingMessage}</button>
         }
 
         {chart.chart_type !== 'scorecard' &&
@@ -9598,11 +9582,11 @@ handleMoreButtonsDropDownToggle(e, id) {
        
         {chartIndex !== null &&
           <>
-            <div className="chart-resizer-corner" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'corner', segmentationValues)}></div>
-            <div className="chart-resizer-edge edge-left" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'left', segmentationValues)}></div>
-            <div className="chart-resizer-edge edge-right" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'right', segmentationValues)}></div>
-            <div className="chart-resizer-edge edge-top" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'top', segmentationValues)}></div>
-            <div className="chart-resizer-edge edge-bottom" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'bottom', segmentationValues)}></div>
+            <div className="chart-resizer-corner" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'corner')}></div>
+            <div className="chart-resizer-edge edge-left" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'left')}></div>
+            <div className="chart-resizer-edge edge-right" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'right')}></div>
+            <div className="chart-resizer-edge edge-top" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'top')}></div>
+            <div className="chart-resizer-edge edge-bottom" onMouseDown={(e) => this.handleMultiChartResizeStart(e, unique_key, 'bottom')}></div>
           </>
         }
 
@@ -9677,7 +9661,7 @@ handleMoreButtonsDropDownToggle(e, id) {
     // e.preventDefault();
     if (this.state.preferenceAutoHideConsolePanel && this.showConsoleMinimizedButton()) {
       if (e.target.classList.contains('tab-menu')) return; // stop conflict if clicked on tab penel icon click
-      this.handleMinimizeConsolePanel(e, true);
+      this.handleMinimizeConsolePanel(e);
     }
     //this.props.onPanelToggle(this.props.dashboardData.id, 'showConsolePanel');
   }
@@ -9692,7 +9676,7 @@ handleMoreButtonsDropDownToggle(e, id) {
   }
 
   //dashboard charts resize
-  handleMultiChartResizeStart(e, id, resizerName, segmentedValues = null) {
+  handleMultiChartResizeStart(e, id, resizerName) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -10072,9 +10056,11 @@ handleMoreButtonsDropDownToggle(e, id) {
 
       APIService.apiRequest(Constants.API_BASE_URL + '/user_preference', payload, false, requestType, null)
         .then(response => {
+          if(!response) return;
           localStorage.setItem(Constants.SITE_PREFIX + 'settings', JSON.stringify(sightSettings));
         })
         .catch(err => {
+          console.log('error', err);
         });
     }
   }
@@ -10095,10 +10081,10 @@ handleMoreButtonsDropDownToggle(e, id) {
       scoreCardClickedInfo['chartDateRangeToShow'] = giveDotSeparatedDateRange(scoreCardClickedInfo['chartDateRangeToShow']);
     }
 
-    let chartSegmentWidth = this.state.chart_dimensions.defaultSegmentWidth;
-    let chartWidthClass = '';
-    if (chartWidthClass === 'sm-grid-width') { chartSegmentWidth = this.state.chart_dimensions.smSegmentWidth; }
-    if (chartWidthClass === 'xs-grid-width') { chartSegmentWidth = this.state.chart_dimensions.xsSegmentWidth; }
+    // let chartSegmentWidth = this.state.chart_dimensions.defaultSegmentWidth;
+    // let chartWidthClass = '';
+    // if (chartWidthClass === 'sm-grid-width') { chartSegmentWidth = this.state.chart_dimensions.smSegmentWidth; }
+    // if (chartWidthClass === 'xs-grid-width') { chartSegmentWidth = this.state.chart_dimensions.xsSegmentWidth; }
 
     return (
       <div className="trend-view-wrapper">

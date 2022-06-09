@@ -147,7 +147,7 @@ class TrendMaster extends Component {
 
     componentDidUpdate(prev_props) {
         if (this.props.match.params.tab !== prev_props.match.params.tab) {
-            this.addTabIfNeeded(prev_props);
+            this.addTabIfNeeded();
         }
         if (this.props.match.params.tab === prev_props.match.params.tab
             && this.checkEditModeFromUrl(prev_props.location.search) !== this.checkEditModeFromUrl(this.props.location.search)) {
@@ -281,7 +281,7 @@ class TrendMaster extends Component {
             const removedTabInfo = {
                 index: this.state.tabs.findIndex((t) => t.id === tabId),
                 data: this.state.tabs.find((t) => t.id === tabId)
-            };;
+            };
             this.setState({
                 tabs: this.state.tabs.filter((t) => t.id !== tabId),
             });
@@ -331,7 +331,7 @@ class TrendMaster extends Component {
 
 
     /**Checks if tab corresponding to tabId in Url already exist in tab list. If No, adds a new tab to list. This method is called whenver tabId in url changes and also after initial data fetch */
-    addTabIfNeeded(prevRouteProps = null) {
+    addTabIfNeeded() {
         // check if tab being redirected to already available or not
         const alreadyAvailableTabInstance = this.state.tabs.find((t) => 'd-' + t.id === this.props.match.params.tab);
         if (!alreadyAvailableTabInstance) {
@@ -376,7 +376,6 @@ class TrendMaster extends Component {
         const tIndex = this.state.tabs.findIndex(t => t.id === tabId);
         if (String(tabId).includes('new')) {
             // A New Dashboard is saved, handle this case below
-
             // Remove the 'new' tab from list bcz now this tab should appear as saved tab and it will be added to tab list as soon as it is opened 
             const updatedTabs = [...this.state.tabs.slice(0, tIndex), ...this.state.tabs.slice(tIndex + 1)];
             stateChanges.tabs = updatedTabs;
@@ -388,7 +387,6 @@ class TrendMaster extends Component {
 
             // show the Tooltip 'Proceed to add charts' inside dashboard
             stateChanges.showDashboardCreatedMsg = true;
-
         } else {
             // An Existing Dashboard is edited, handle this case below
             // Update the edited tab's data 
@@ -404,8 +402,8 @@ class TrendMaster extends Component {
                 const updatedSavedDashboards = [...this.state.savedDashboards.slice(0, dIndex), updatedDashData, ...this.state.savedDashboards.slice(dIndex + 1)];
                 stateChanges.savedDashboards = updatedSavedDashboards;
             }
-
         }
+
         this.setState({ ...stateChanges });
         // Redirect to url having the newly generated id
         if (String(tabId).includes('new')) {
@@ -434,6 +432,7 @@ class TrendMaster extends Component {
             })
             .catch(err => {
                 this.setState({ deletingDashboardId: null });
+                console.log('error', err);
             });
     }
 
@@ -455,6 +454,7 @@ class TrendMaster extends Component {
             })
             .catch(err => {
                 this.setState({ copyingDashboardId: null });
+                console.log('error', err);
             });
     }
 
@@ -484,7 +484,7 @@ class TrendMaster extends Component {
 
             })
             .catch(err => {
-                console.log(err);
+                console.log('error', err);
                 this.setState({ bookmarkingDashboardId: null });
             });
     }
@@ -962,7 +962,7 @@ class TrendMaster extends Component {
                                                             <div className="switch-toggle small">
                                                                 <div className="label">Close plotter panel on outside click</div>
                                                                 <div className="switch">
-                                                                    <input type="checkbox" checked={this.state.preferenceAutoHideConsolePanel} onChange={(e) => this.handlepreferenceAutoHideConsolePanel()} />
+                                                                    <input type="checkbox" checked={this.state.preferenceAutoHideConsolePanel} onChange={() => this.handlepreferenceAutoHideConsolePanel()} />
                                                                     <label></label>
                                                                 </div>
                                                             </div>
@@ -1086,7 +1086,7 @@ class TrendMaster extends Component {
 
                             {this.state.tabs.length > 1 &&
                                 <React.Fragment>
-                                    {this.state.tabs.slice(1).map((t, i) => {
+                                    {this.state.tabs.slice(1).map((t) => {
                                         const isActiveDashboard = String(t.id) === activeTabId;
 
                                         return <div key={t.id} className="d-tab-content-wrapper" id={`d-${t.id}`} style={{ display: isActiveDashboard ? 'block' : 'none' }}>
@@ -1095,7 +1095,7 @@ class TrendMaster extends Component {
                                                 dashboardData={t}
                                                 onDashboardSaveOrEdit={(data) => this.handleDashboardAddOrEdit(t.id, data)}
                                                 showDashboardCreatedMsg={this.state.showDashboardCreatedMsg}
-                                                hideDashboardCreatedMsg={() => this.handleHideCreateMsg}
+                                                hideDashboardCreatedMsg={this.handleHideCreateMsg}
                                                 showConsolePanel={t.showConsolePanel}
                                                 consolePanelPosition={t.consolePanelPosition}
                                                 onPanelToggle={this.handlePanelToggle}
@@ -1221,10 +1221,10 @@ const GiveIndividualChartHtml = ({ chart, chartData }) => {
     chartDateRangeToShow = giveDotSeparatedDateRange(chartDateRangeToShow[0]);
 
     const showChartLoading = false;
-    let segmentationValues = [];
-    if (chartData && chart.segmentation !== '') {
-      segmentationValues = [...new Set(chartData.map(item => item[chart.segmentation]))];
-    }
+    // let segmentationValues = [];
+    // if (chartData && chart.segmentation !== '') {
+    //   segmentationValues = [...new Set(chartData.map(item => item[chart.segmentation]))];
+    // }
 
 
     //Chart Meta Info Mouse Hover
@@ -1300,11 +1300,7 @@ const GiveIndividualChartHtml = ({ chart, chartData }) => {
                             </div>
 
                             <div className='chart-menu'>
-                                {/* {(((chart.segmentation !== '' && segmentationValues.length > this.state.chart_dimensions.showLegendCount) || (chart.chart_type === 'pie' || chart.chart_type === 'donut' || chart.chart_type === 'spider')) && !chart.showLegend) &&
-                                    <button className="btn-asc-chart-legend" onClick={(e) => this.handleChartLegendDrodDownToggle(e, unique_key)} onMouseDown={e => e.stopPropagation()}>legend</button>
-                                } */}
                                 <button className="btn-asc-chart-meta" onClick={() => handleChartMetaDrodDownToggle(unique_key)} onMouseDown={e => e.stopPropagation()}>info</button>
-                                {/* <button className="btn-asc-chart-more" onClick={(e) => this.handleMoreButtonsDropDownToggle(e, unique_key)} onMouseDown={e => e.stopPropagation()}></button> */}
                             </div>
                         </div>
                     </div>
@@ -1338,69 +1334,7 @@ const GiveIndividualChartHtml = ({ chart, chartData }) => {
     )
 }
 
-
-const Pagination = ({ totalRowsCount, pageCount, currentPage, onPageChange, rowsPerPage, rowsPerPageOptions, onRowsPerPageChange, disabled }) => {
-    const [pageInput, setPageInput] = useState(currentPage);
-
-    const handlePageInputBlur = () => {
-        // check if pageInput has a valid value or not
-        let newPage = Number(pageInput);
-        const isValidInput = !Number.isNaN(newPage) && Number.isInteger(newPage);
-        // adjust the newPage value if goes out of range
-        newPage = newPage < 1 ? 1 : newPage > pageCount ? pageCount : newPage;
-        if (isValidInput && newPage !== currentPage) {
-            onPageChange(newPage);
-        } else {
-            setPageInput(currentPage);
-        }
-
-    };
-
-    useEffect(() => {
-        setPageInput(currentPage);
-    }, [currentPage]);
-
-    return (
-        <div className={'pagination-wrapper' + (disabled ? ' disabled' : '')}>
-            <div className="total-pages">
-                {'Total Pages ' + pageCount}
-            </div>
-            <ul className="pagination-buttons">
-                <li className={'page-btn page-btn-first' + (currentPage === 1 ? ' disabled' : '')}>
-                    <button onClick={() => onPageChange(1)}></button>
-                </li>
-                <li className={'page-btn page-btn-prev' + (currentPage === 1 ? ' disabled' : '')}>
-                    <button onClick={() => onPageChange(currentPage - 1)}></button>
-                </li>
-                <li className={'page-input'}>
-                    <input value={pageInput} onChange={(e) => setPageInput(e.target.value)} onBlur={handlePageInputBlur} />
-                </li>
-                <li className={'page-btn page-btn-next' + (currentPage === pageCount ? ' disabled' : '')}>
-                    <button onClick={() => onPageChange(currentPage + 1)}></button>
-                </li>
-                <li className={'page-btn page-btn-last' + (currentPage === pageCount ? ' disabled' : '')}>
-                    <button onClick={() => onPageChange(pageCount)}></button>
-                </li>
-            </ul>
-            <div className="rows-per-page">
-                <span>Entries Per Page</span>
-                <span className="dropdown">
-                    <select value={rowsPerPage} onChange={(e) => onRowsPerPageChange(e.target.value)}>
-                        {rowsPerPageOptions.map(op => (
-                            <option key={op} value={op} >{op}</option>
-                        ))}
-                    </select>
-                </span>
-            </div>
-            <div className="visible-rows-info">
-                {`Showing ${(currentPage - 1) * rowsPerPage + 1} - ${Math.min(totalRowsCount, (currentPage - 1) * rowsPerPage + rowsPerPage)} of ${totalRowsCount}`}
-            </div>
-        </div>
-    );
-};
-
 const ShareDashbaord = ({ dashboardData, userId, onShareCancel }) => {
-
     const [loadingSharedUsers, setLoadingSharedUsers] = useState(false);
     const [loadingChartList, setLoadingChartList] = useState(false);
     const [loadingOrganisations, setLoadingOrganisations] = useState(false);
@@ -1776,10 +1710,9 @@ const ShareDashbaord = ({ dashboardData, userId, onShareCancel }) => {
                                                         </div>
 
 
-
                                                         <div className="selected-charts">
                                                             <div className="label">Access : </div>
-                                                            {!!shareInfo.is_full_dashboard ?
+                                                            {!!shareInfo.is_full_dashboard===true ?
                                                                 <span className="full-dash-msg"> Full Dashboard</span>
                                                                 :
                                                                 <ul>
@@ -1870,7 +1803,7 @@ const ShareDashbaord = ({ dashboardData, userId, onShareCancel }) => {
                                                     </div>
                                                 );
                                             })}
-                                            
+
                                             {!sharedUsers.length &&
                                                 <div>Not shared with anyone yet</div>
                                             }
@@ -2024,4 +1957,3 @@ const ShareDashbaord = ({ dashboardData, userId, onShareCancel }) => {
         </div>
     );
 };
-

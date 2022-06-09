@@ -2,12 +2,10 @@ import React from 'react';
 import { isDateEqual, isDateInRange, isDateInBetween, isDateSmaller, isDateGreater, giveNextNthDate, giveEndDateOfNextNthMonth, giveEndDateOfNextNthYear, giveEndDateOfNextNthQuarter, giveQuarterFromMonth, giveDaysCountInRange, giveMonthsCountInRange, giveYearsCountInRange, giveQuartersCountInRange } from './utils';
 
 const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-// const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /**Gives the lighten version of given color */
 const ColorLuminance = (hex, lum) => {
-
     // validate hex string
     hex = String(hex).replace(/[^0-9a-f]/gi, '');
     if (hex.length < 6) {
@@ -114,7 +112,6 @@ const isDateEndOfAny = (dObj, ranges) => {
 };
 
 const isDateHovered = (dObj, ranges, currentRangeIndex, currentRangeDateType, rangeHoverDate, hoverRangeForNonBenchmarkRanges, pickerType) => {
-
     // check for not any date input focused for selection
     if (currentRangeIndex === null) return false;
 
@@ -144,8 +141,8 @@ const isDateHovered = (dObj, ranges, currentRangeIndex, currentRangeDateType, ra
     }
     return false;
 };
-const isDateHoveredStart = (dObj, ranges, currentRangeIndex, currentRangeDateType, rangeHoverDate, hoverRangeForNonBenchmarkRanges, pickerType) => {
 
+const isDateHoveredStart = (dObj, ranges, currentRangeIndex, currentRangeDateType, rangeHoverDate, hoverRangeForNonBenchmarkRanges, pickerType) => {
     if (currentRangeIndex === null) return false;
 
     const strt = ranges[currentRangeIndex][0];
@@ -171,8 +168,8 @@ const isDateHoveredStart = (dObj, ranges, currentRangeIndex, currentRangeDateTyp
         return isDateEqual(dObj, rangeHoverDate);
     }
 };
-const isDateHoveredEnd = (dObj, ranges, currentRangeIndex, currentRangeDateType, rangeHoverDate, hoverRangeForNonBenchmarkRanges, pickerType) => {
 
+const isDateHoveredEnd = (dObj, ranges, currentRangeIndex, currentRangeDateType, rangeHoverDate, hoverRangeForNonBenchmarkRanges, pickerType) => {
     if (currentRangeIndex === null) return false;
 
     const strt = ranges[currentRangeIndex][0];
@@ -208,19 +205,13 @@ const isDateSelectedForEdit = (dObj, ranges, currentRangeIndex, currentRangeDate
     return toEdit;
 };
 
-
 const DatePanel = ({ year, month, onDateClick, onMonthBtn, onYearBtn, onPrevMonthBtn, onNextMonthBtn, disable = () => false, ranges, currentRangeIndex, currentRangeDateType, hoverRangeForNonBenchmarkRanges, rangeHoverDate, onDateHover = () => { } }) => {
-
-
     const firstDay = (new Date(year, month)).getDay(); // btwn 0-6
     const daysInMonth = 32 - new Date(year, month, 32).getDate();
 
-
     const getMonthData = () => {
-
         let data = [[], [], [], [], [], []]; // data will be a 2-D array
         let weekCounter = 0, cellInWeekCounter = 1, dateCounter = 1;
-
         const prevMonthLastDate = new Date(year, month, 0);
 
         // FOR FIRST WEEK  
@@ -313,7 +304,6 @@ const DatePanel = ({ year, month, onDateClick, onMonthBtn, onYearBtn, onPrevMont
     const data = getMonthData();
     // console.log('Month data', month, data);
     return (
-
         <div className="asc-picker-date-panel">
             <PanelHeader panel="date" year={year} month={month}
                 onPrevBtn={onPrevMonthBtn} onNextBtn={onNextMonthBtn} onMonthBtn={onMonthBtn} onYearBtn={onYearBtn} />
@@ -383,8 +373,7 @@ const DatePanel = ({ year, month, onDateClick, onMonthBtn, onYearBtn, onPrevMont
     );
 };
 
-
-const MonthPanel = ({ year, month, onMonthClick, onYearBtn, onPrevYearBtn, onNextYearBtn, disable = () => false, ranges, currentRangeIndex, currentRangeDateType, hoverRangeForNonBenchmarkRanges, rangeHoverDate, onDateHover = () => { }, useInSingleView = false }) => {
+const MonthPanel = ({ year, onMonthClick, onYearBtn, onPrevYearBtn, onNextYearBtn, disable = () => false, ranges, currentRangeIndex, currentRangeDateType, hoverRangeForNonBenchmarkRanges, rangeHoverDate, onDateHover = () => { }, useInSingleView = false }) => {
     const getData = () => {
         let data = [[], [], [], []];
         let monthCounter = 0, quarterCounter = 0;
@@ -414,10 +403,7 @@ const MonthPanel = ({ year, month, onMonthClick, onYearBtn, onPrevYearBtn, onNex
         return data;
     };
 
-
     const data = getData();
-
-
     return (
         <div className="asc-picker-month-panel">
             <PanelHeader panel="month" year={year}
@@ -468,14 +454,10 @@ const MonthPanel = ({ year, month, onMonthClick, onYearBtn, onPrevYearBtn, onNex
                 </table>
             </div>
         </div>
-
     );
-
-
 };
 
 const YearPanel = ({ year, onYearClick, onPrevDecadeBtn, onNextDecadeBtn, disable = () => false, ranges, currentRangeIndex, currentRangeDateType, hoverRangeForNonBenchmarkRanges, rangeHoverDate, onDateHover = () => { }, useInSingleView = false }) => {
-
     const startYear = Math.floor(year / 10) * 10;
     const endYear = Math.floor(year / 10) * 10 + 9;
     const getData = () => {
@@ -572,14 +554,10 @@ const YearPanel = ({ year, onYearClick, onPrevDecadeBtn, onNextDecadeBtn, disabl
                 </table>
             </div>
         </div>
-
     );
-
-
 };
 
-const QuarterPanel = ({ year, month, onQuarterClick, onYearBtn, onPrevYearBtn, onNextYearBtn, disable = () => false, ranges, currentRangeIndex, currentRangeDateType, hoverRangeForNonBenchmarkRanges, rangeHoverDate, onDateHover = () => { } }) => {
-
+const QuarterPanel = ({ year, onQuarterClick, onYearBtn, onPrevYearBtn, onNextYearBtn, disable = () => false, ranges, currentRangeIndex, currentRangeDateType, hoverRangeForNonBenchmarkRanges, rangeHoverDate, onDateHover = () => { } }) => {
     const data = [1, 2, 3, 4].map(q => {
         const fdStart = new Date(year, 3 * (q - 1), 1);
         const fdEnd = new Date(year, 3 * (q - 1) + 2 + 1, 0);
@@ -653,9 +631,7 @@ const QuarterPanel = ({ year, month, onQuarterClick, onYearBtn, onPrevYearBtn, o
 
 };
 
-
 const PanelHeader = ({ panel, month, year, onPrevBtn, onNextBtn, onMonthBtn, onYearBtn }) => {
-
     const decade = panel === 'year' ? year + '-' + (year + 9) : '';
     return (
         <div className="asc-picker-header">
