@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {useTable} from 'react-table';
 
-function Table({columns, data, client, props}) {
+function Table({columns, data}) {
   const {
     getTableProps, 
     getTableBodyProps, 
@@ -14,9 +14,9 @@ function Table({columns, data, client, props}) {
   return (
     <table {...getTableProps()} className="custom-table">
       <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column,i) => {
+        {headerGroups.map((headerGroup, i) => (
+          <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column) => {
               return <th key={column.id} {...column.getHeaderProps()}><span className="bg"></span>{column.render('Header')}</th>
             })}
           </tr>
@@ -28,10 +28,10 @@ function Table({columns, data, client, props}) {
           prepareRow(row);
           
           return (
-            <tr {...row.getRowProps()}>
+            <tr key={i} {...row.getRowProps()}>
               {row.cells.map(cell => {
                 return (
-                  <td {...cell.getCellProps()}>
+                  <td key={cell.column.id} {...cell.getCellProps()}>
                     { cell.render('Cell') }
                   </td>
                 )

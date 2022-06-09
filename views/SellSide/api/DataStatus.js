@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import * as Constants from '../../../components/Constants.js';
-import subjectObj from '../../../subjects/Subject1';
 import Loader from '../../../components/Loader';
 
 import { getUser, exportCSVFile } from '../../../utils/Common'; //Import Common Functions

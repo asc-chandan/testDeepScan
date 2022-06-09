@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
-import * as Constants from '../../../components/Constants.js';
+// import * as Constants from '../../../components/Constants.js';
 import SpeedSelect from '../../../components/SpeedSelect/SpeedSelect';
 
-import { getClients, getUser } from '../../../utils/Common'; //Import Common Functions
+import { getClients } from '../../../utils/Common'; //Import Common Functions
 
 //Import Services
-import APIService from '../../../services/apiService';
-import moment from 'moment';
+// import APIService from '../../../services/apiService';
+// import moment from 'moment';
 
 class ConsoleFilters extends Component {
   constructor(props) {
     super(props);
-
     this.clients = getClients();
 
     this.state = {
@@ -34,11 +33,7 @@ class ConsoleFilters extends Component {
   componentDidMount(){
   }
 
-  componentDidUpdate(prev_props){
-    // if( (this.props.client.id!==prev_props.client.id) ||
-    //     (this.props.view_type && prev_props.view_type!==this.props.view_type) ){
-      
-    // }
+  componentDidUpdate(){
   }
 
 

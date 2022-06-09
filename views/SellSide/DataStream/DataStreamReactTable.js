@@ -5,7 +5,7 @@ import * as Constants from '../../../components/Constants.js';
 import { generateHashedPassword } from '../../../utils/Common';
 import APIService from '../../../services/apiService';
 
-function Table({columns, data, client, props}) {
+function Table({columns, data}) {
   const {
     getTableProps, 
     getTableBodyProps, 
@@ -83,7 +83,7 @@ function Table({columns, data, client, props}) {
     if(id==='revoke_password'){ setRevokePassword(e.target.value); }
   }
 
-  function handleCopyToken(e){
+  function handleCopyToken(){
     var copyText = document.getElementById("access-token");
     copyText.select();
     document.execCommand('copy');
@@ -94,13 +94,16 @@ function Table({columns, data, client, props}) {
     }, 4000);
   }
 
+  console.log('inprocess', inprocess);
+  console.log('message', message);
+
   // Render Data Table UI
   return (
     <table {...getTableProps()} className="custom-table">
       <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column,i) => {
+        {headerGroups.map((headerGroup, i) => (
+          <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column) => {
               let colWidth = 0;
               if(column.id==='id') { colWidth = 20; }
               if(column.id==='data_type') { colWidth = 50; }
@@ -117,7 +120,7 @@ function Table({columns, data, client, props}) {
           prepareRow(row);
           
           return (
-            <tr {...row.getRowProps()}>
+            <tr key={i} {...row.getRowProps()}>
               {row.cells.map(cell => {
                 let colWidth = 0;
                 if(cell.column.id==='id') { colWidth = 20; }
@@ -127,7 +130,7 @@ function Table({columns, data, client, props}) {
 
                 if(cell.column.id==='action' && cell.row.original.access_token==='Generate'){
                   return (
-                    <td {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
+                    <td key={cell.column.id} {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
                       { accessToken!=='' ? <input type="text" id="access-token" className="access-token" value={accessToken} /> : ''  }
                       <button className={'btn-copy '+(accessToken==='XXXXXXXXXXXXXXXXXXXXXXX' ? 'disabled' : '')} disabled={accessToken!=='XXXXXXXXXXXXXXXXXXXXXXX' ? false : true} onClick={(e) => handleCopyToken(e)}>copy</button>
                       {copyMsg!=='' && <span className="copy-msg">{copyMsg}</span>}
@@ -135,39 +138,39 @@ function Table({columns, data, client, props}) {
                   )
                 } else if(cell.column.id==='action' && cell.row.original.access_token==='Revoke'){
                   return (
-                    <td {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
+                    <td key={cell.column.id} {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
                       <button className={'btn outline xs btn-revoke-submit '+(revokeConfirm ? '' : 'disabled')} disabled={revokeConfirm ? false : true} onClick={(e)=>handleRevokeSubmit(e)}>Confirm Revoke</button>
                       {revokeMessage!=='' && <span className={'alert small '+(error ? 'error' : 'success')}>{revokeMessage}</span>}
                     </td>
                   )
                 } else if(cell.column.id==='authenticate' && cell.row.original.access_token==='Generate'){
                   return (
-                    <td {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
+                    <td key={cell.column.id} {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
                       { cell.render('Cell') }
                       <form name="frm-generate-token" onSubmit={(e) => handleTokenActionSubmit(e, 'generate')}>
-                        <input type="password" name="txt-generate-password" className="field-control" placeholder="Password" value={generatePassword} autocomplete="off" onChange={(e) => handleTextBoxChange(e, 'generate_password')} />
-                        <input type="submit" id="btn-generate-submit" name="btn-generate-submit" className="btn-submit" value="submit" autocomplete="off" />
+                        <input type="password" name="txt-generate-password" className="field-control" placeholder="Password" value={generatePassword} autoComplete="off" onChange={(e) => handleTextBoxChange(e, 'generate_password')} />
+                        <input type="submit" id="btn-generate-submit" name="btn-generate-submit" className="btn-submit" value="submit" autoComplete="off" />
                       </form>
                     </td>
                   )
                 } else if(cell.column.id==='authenticate' && cell.row.original.access_token==='Revoke'){
                   return (
-                    <td {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
+                    <td key={cell.column.id} {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
                       { cell.render('Cell') }
                       <form name="frm-revoke-token" onSubmit={(e) => handleTokenActionSubmit(e, 'revoke')}>
-                        <input type="password" name="txt-revoke-password" className="field-control" placeholder="Password" value={revokePassword} autocomplete="off" onChange={(e) => handleTextBoxChange(e, 'revoke_password')} />
+                        <input type="password" name="txt-revoke-password" className="field-control" placeholder="Password" value={revokePassword} autoComplete="off" onChange={(e) => handleTextBoxChange(e, 'revoke_password')} />
                         <button className="btn-submit" onClick={(e) => handleRevokeConfirmation(e)}>Revoke</button>
                       </form>
                     </td>
                   )
                 } else if(cell.column.id==='possible_segmentation'){
-                  return (<td {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
+                  return (<td key={cell.column.id} {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
                     {/* { cell.render('Cell') } */}
                     <div className="html-val" dangerouslySetInnerHTML={{ __html: cell.value }}></div>
                   </td>)
                 }  else {
                   return (
-                    <td {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
+                    <td key={cell.column.id} {...cell.getCellProps()} width={(colWidth > 0 ? colWidth : 'auto')}>
                       { cell.render('Cell') }
                     </td>
                   )

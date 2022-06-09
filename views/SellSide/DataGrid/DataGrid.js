@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect, useRef } from 'react';
+import React, { Component } from 'react';
 import * as Constants from '../../../components/Constants.js';
 import '../../../styles/DataGrid.scss';
 
@@ -248,7 +248,7 @@ class DataGrid extends Component {
             const removedTabInfo = {
                 index: this.state.tabs.findIndex((t) => t.id === tabId),
                 data: this.state.tabs.find((t) => t.id === tabId)
-            };;
+            };
             this.setState({
                 tabs: this.state.tabs.filter((t) => t.id !== tabId),
             });
@@ -289,7 +289,7 @@ class DataGrid extends Component {
     }
 
     //Open new analysis tab on click of button
-    handleNewAnalysisBtn(dataSource) {
+    handleNewAnalysisBtn() {
         this.openTab(`new_${this.state.newTabCounter}`, true);
         this.setState({ newTabCounter: this.state.newTabCounter + 1 });
     }
@@ -565,14 +565,14 @@ class DataGrid extends Component {
     //Get Values under Columns and Rows
     generateSelectedRowsColsElements(arr, valuesArr) {
         var selected_values;
-        var hasValues = arr.find((item, index) => {
+        var hasValues = arr.find((item) => {
             if (item.title === 'values') return true;
         });
         selected_values = this.getkeyValuesInArray(arr, 'title');
 
         if (hasValues) {
             var newValues = [];
-            selected_values.map((item, index) => {
+            selected_values.map((item) => {
                 if (item === 'values') {
                     newValues.push({ 'values': this.generateValues(valuesArr) });
                 } else {
@@ -581,7 +581,6 @@ class DataGrid extends Component {
             });
             return newValues;
         }
-
         return selected_values;
     }
 
@@ -597,7 +596,7 @@ class DataGrid extends Component {
     //Genrate Values
     generateValues(arr) {
         var newObj = [];
-        arr.map((item, index) => (
+        arr.map((item) => (
             newObj.push({
                 'id': item.title,
                 'operation': item.operation,
@@ -1004,7 +1003,7 @@ class DataGrid extends Component {
 
                         {this.state.tabs.length > 1 &&
                             <React.Fragment>
-                                {this.state.tabs.slice(1).map((t, i) => {
+                                {this.state.tabs.slice(1).map((t) => {
                                     const isActiveAnalysis = String(t.id) === activeTabId;
 
                                     // return <div key={t.id} className="d-tab-content-wrapper" style={{ visibility: isActiveAnalysis ? 'visible' : 'hidden',height :isActiveAnalysis ? 'auto' : 0,zIndex : isActiveAnalysis  ? 1 : -1  }}>
@@ -1035,67 +1034,3 @@ class DataGrid extends Component {
 }
 
 export default DataGrid;
-
-
-const Pagination = ({ totalRowsCount, pageCount, currentPage, onPageChange, rowsPerPage, rowsPerPageOptions, onRowsPerPageChange, disabled }) => {
-    const [pageInput, setPageInput] = useState(currentPage);
-
-    const handlePageInputBlur = () => {
-        // check if pageInput has a valid value or not
-        let newPage = Number(pageInput);
-        const isValidInput = !Number.isNaN(newPage) && Number.isInteger(newPage);
-        // adjust the newPage value if goes out of range
-        newPage = newPage < 1 ? 1 : newPage > pageCount ? pageCount : newPage;
-        if (isValidInput && newPage !== currentPage) {
-            onPageChange(newPage);
-        } else {
-            setPageInput(currentPage);
-        }
-
-    };
-
-    useEffect(() => {
-        setPageInput(currentPage);
-    }, [currentPage]);
-
-    return (
-        <div className={'pagination-wrapper' + (disabled ? ' disabled' : '')}>
-            <div className="total-pages">{'Total Pages ' + pageCount}</div>
-            <ul className="pagination-buttons">
-                <li className={'page-btn page-btn-first' + (currentPage === 1 ? ' disabled' : '')}>
-                    <button onClick={() => onPageChange(1)}></button>
-                </li>
-                <li className={'page-btn page-btn-prev' + (currentPage === 1 ? ' disabled' : '')}>
-                    <button onClick={() => onPageChange(currentPage - 1)}></button>
-                </li>
-                <li className={'page-input'}>
-                    <input value={pageInput} onChange={(e) => setPageInput(e.target.value)} onBlur={handlePageInputBlur} />
-                </li>
-                <li className={'page-btn page-btn-next' + (currentPage === pageCount ? ' disabled' : '')}>
-                    <button onClick={() => onPageChange(currentPage + 1)}></button>
-                </li>
-                <li className={'page-btn page-btn-last' + (currentPage === pageCount ? ' disabled' : '')}>
-                    <button onClick={() => onPageChange(pageCount)}></button>
-                </li>
-            </ul>
-
-            <div className="rows-per-page">
-                <span>Entries Per Page</span>
-                <span className="dropdown">
-                    <select value={rowsPerPage} onChange={(e) => onRowsPerPageChange(e.target.value)}>
-                        {rowsPerPageOptions.map(op => (
-                            <option key={op} value={op} >{op}</option>
-                        ))}
-                    </select>
-                </span>
-            </div>
-
-            <div className="visible-rows-info">
-                {`Showing ${(currentPage - 1) * rowsPerPage + 1} - ${Math.min(totalRowsCount, (currentPage - 1) * rowsPerPage + rowsPerPage)} of ${totalRowsCount}`}
-            </div>
-        </div>
-    );
-};
-
-
-

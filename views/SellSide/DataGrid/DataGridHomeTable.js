@@ -18,16 +18,14 @@ class DataGridHomeTable extends Component {
     };
   }
 
-
   componentDidMount() {
   }
 
-  componentDidUpdate(prev_props) {
+  componentDidUpdate() {
   }
 
   componentWillUnmount() {
   }
-
 
   render() {
     const columns = [
@@ -70,7 +68,7 @@ class DataGridHomeTable extends Component {
       let data = {};
       let content;
 
-      columns.map((col, i) => {
+      columns.map((col) => {
         content = <>
           <span className="bg"></span>
           {col.displayName}
@@ -88,12 +86,12 @@ class DataGridHomeTable extends Component {
       dataArray.push(dataRow);
       dataRow = [];
 
-      anaylsisList.map((row, i) => {
+      anaylsisList.map((row) => {
         const canEdit = row.privileges.includes('EDIT');
         const canDelete = row.privileges.includes('DELETE');
         const canShare = row.privileges.includes('SHARE');
         
-        columns.map((col, j) => {
+        columns.map((col) => {
           if (col.accessor === 'name') {
             content = <button className="btn-link icon-folder" onClick={() => onAnalysisClick(row.id)} >{row[col.accessor]}</button>;
           } else if (col.accessor === 'user_name') {
@@ -103,15 +101,13 @@ class DataGridHomeTable extends Component {
             const disableButtons = deletingAnalysisId || downloadingAnalysisId || bookmarkingAnalysisId;
             
             content = (
-              // <div className="action-buttons-wrapper">
               <div className="recent-action">
-
                 {(this.state.openeDownloadOptionsRowId === row.id && downloadingAnalysisId !== row.id) &&
                   <ClickOutsideListner onOutsideClick={() => this.setState({ openeDownloadOptionsRowId: null })} className="outside-listener">
                     <div className="download-options-wrapper">
                       <ul>
-                        <li onClick={(e) => onAnalysisDownload(row.id, 'saved_format')}>Saved Format</li>
-                        <li onClick={(e) => onAnalysisDownload(row.id, 'unfiltered_data')}>Unfiltered Data</li>
+                        <li onClick={() => onAnalysisDownload(row.id, 'saved_format')}>Saved Format</li>
+                        <li onClick={() => onAnalysisDownload(row.id, 'unfiltered_data')}>Unfiltered Data</li>
                       </ul>
                     </div>
                   </ClickOutsideListner>

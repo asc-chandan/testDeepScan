@@ -2556,7 +2556,6 @@ class ReportView extends Component {
                         </div>
                       )
                     })
-
                   }
                 </div>
               </div>
