@@ -11,7 +11,6 @@ import { getKeyByValue, getClients, getUser, orderObjectKey } from '../../../uti
 import APIService from '../../../services/apiService'; //Import Services
 import DateRangeSelector from '../../../components/DateRangeSelector/DateRangeSelector';
 import CustomReportReactTable from './CustomReportReactTable';
-import HideSubHeader from '../../../components/HideSubHeader';
 
 
 class CustomReportDetailed extends Component {
@@ -128,7 +127,6 @@ class CustomReportDetailed extends Component {
 
           if (defaultFormat === 'this_month') {
             formattedStartDate = moment(formattedEndDate).startOf('month').toDate();
-            formattedEndDate = formattedEndDate;
           }
 
           // let formattedStartDate = moment(formattedEndDate).subtract(defaultCount, defaultFormat).toDate();
@@ -235,7 +233,7 @@ class CustomReportDetailed extends Component {
 
     let reportData = [];
     if (this.state.reportColumns) {
-      this.state.reportData.map((item, i) => {
+      this.state.reportData.map((item) => {
         let obj = orderObjectKey(item, this.state.reportColumns);
         reportData.push(obj)
       });

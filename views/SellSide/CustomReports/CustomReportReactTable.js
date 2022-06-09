@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {useTable} from 'react-table';
 import { numberWithCommas } from '../../../utils/Common'; //Import Common Functions
 
-const amount_cols = ["sum revenue", "sum cpm", "sum rpm", "sum rpms", "sum rps", "sum rpu"];
-const number_cols = ["sum revenue", "sum impressions", "sum cpm", "sum rpm", "sum rpms", "sum rps", "sum rpu"];
+// const amount_cols = ["sum revenue", "sum cpm", "sum rpm", "sum rpms", "sum rps", "sum rpu"];
+// const number_cols = ["sum revenue", "sum impressions", "sum cpm", "sum rpm", "sum rpms", "sum rps", "sum rpu"];
 
-function Table({columns, data, client, props}) {
+function Table({columns, data, props}) {
   const {
     getTableProps, 
     getTableBodyProps, 
@@ -39,9 +39,9 @@ function Table({columns, data, client, props}) {
   return (
     <table {...getTableProps()} className="custom-table">
       <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column,i) => {
+        {headerGroups.map((headerGroup, i) => (
+          <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column) => {
               return <th key={column.id} {...column.getHeaderProps()}><span className="bg"></span>{column.render('Header')}</th>
             })}
           </tr>
@@ -51,14 +51,13 @@ function Table({columns, data, client, props}) {
       <tbody {...getTableBodyProps()}>
         {rows.map((row, i) => {
           prepareRow(row);
-          
           let highlight_class = ( (row.values.VIEW==='VIDEO' && row.values.Metric==='VIDEO') || (row.values.VIEW==='DISPLAY' && row.values.Metric==='DISPLAY') ) ? 'highlighted' : '';
 
           return (
-            <tr className={highlight_class} {...row.getRowProps()}>
+            <tr key={i} className={highlight_class} {...row.getRowProps()}>
               {row.cells.map(cell => {
                 return (
-                  <td {...cell.getCellProps()}>
+                  <td key={cell.column.id} {...cell.getCellProps()}>
                     {/* {amount_cols.includes(cell.column.id) && <span>$</span> }
                     {(isNumberCol && (typeof cell.value==='number')) &&
                       numberWithCommas(parseFloat(cell.value))

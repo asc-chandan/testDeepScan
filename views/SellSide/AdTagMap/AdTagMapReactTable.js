@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {useTable} from 'react-table';
-import * as Constants from '../../../components/Constants.js';
+// import * as Constants from '../../../components/Constants.js';
 import SpeedSelect from '../../../components/SpeedSelect/SpeedSelect';
 import moment from 'moment';
 
 //Import Services
-import APIService from '../../../services/apiService';
+// import APIService from '../../../services/apiService';
 
-function Table({columns, data, client, props}) {
+function Table({columns, data, props}) {
   const {
     getTableProps, 
     getTableBodyProps, 
@@ -16,7 +16,7 @@ function Table({columns, data, client, props}) {
     prepareRow
   } = useTable({columns, data});
 
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
   const [inprocess, setInprocess] = useState(false);
   const [dataType, setDataType] = useState("");
   const [advertiser, setAdvertiser] = useState("");
@@ -198,41 +198,41 @@ function Table({columns, data, client, props}) {
     console.log(apiPayload);
     return false;
 
-    APIService.apiRequest(Constants.API_BASE_URL+'/addRevShare', apiPayload)
-    .then(response => {
-      if(response.status===1){
-        //Remove Loading Icon
-        setInprocess(false);
+    // APIService.apiRequest(Constants.API_BASE_URL+'/addRevShare', apiPayload)
+    // .then(response => {
+    //   if(response.status===1){
+    //     //Remove Loading Icon
+    //     setInprocess(false);
         
-        props.onAddNewRevShare({
-          id: response['rev_share_id'][0],
-          data_type: apiPayload[0].data_type, 
-          advertiser_name: apiPayload[0].advertiser_name,
-          client_id: Number(props.client.id), 
-          client_name: props.client.name,
-          effective_start_date: apiPayload[0].effective_start_date,
-          effective_end_date: apiPayload[0].effective_end_date,
-          is_net: apiPayload[0].is_net,
-          revenue_share_percent: apiPayload[0].revenue_share_percent
-        });
+    //     props.onAddNewRevShare({
+    //       id: response['rev_share_id'][0],
+    //       data_type: apiPayload[0].data_type, 
+    //       advertiser_name: apiPayload[0].advertiser_name,
+    //       client_id: Number(props.client.id), 
+    //       client_name: props.client.name,
+    //       effective_start_date: apiPayload[0].effective_start_date,
+    //       effective_end_date: apiPayload[0].effective_end_date,
+    //       is_net: apiPayload[0].is_net,
+    //       revenue_share_percent: apiPayload[0].revenue_share_percent
+    //     });
 
-        setTimeout(() => {
-          setNewDataType("");
-          setNewAdvertiser("");
-          setNewIsNet("");
-          setNewStartDate("");
-          setNewEndDate("");
-          setNewRevSharePercent("");
-        },0);
-      } else {
-        setInprocess(false);
-        setError(response.msg);
-      }
-    })
-    .catch(err => {
-      setInprocess(false);
-      setError(err.msg);
-    });
+    //     setTimeout(() => {
+    //       setNewDataType("");
+    //       setNewAdvertiser("");
+    //       setNewIsNet("");
+    //       setNewStartDate("");
+    //       setNewEndDate("");
+    //       setNewRevSharePercent("");
+    //     },0);
+    //   } else {
+    //     setInprocess(false);
+    //     setError(response.msg);
+    //   }
+    // })
+    // .catch(err => {
+    //   setInprocess(false);
+    //   setError(err.msg);
+    // });
   }
 
   function checkRequiredField(){
@@ -311,15 +311,17 @@ function Table({columns, data, client, props}) {
     return output;
   }
 
+  // console.log('error', error);
+
 
   // Render Data Table UI
   return (
     <div className="table-wrapper">
       <table {...getTableProps()} className="custom-table">
         <thead>
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column,i) => {
+          {headerGroups.map((headerGroup, i) => (
+            <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => {
                 return <th key={column.id} {...column.getHeaderProps()}><span className="bg"></span>{column.render('Header')}</th>
               })}
             </tr>
@@ -329,14 +331,13 @@ function Table({columns, data, client, props}) {
         <tbody {...getTableBodyProps()}>
           {rows.map((row, i) => {
             prepareRow(row);
-            
             let highlight_class = ( (row.values.VIEW==='VIDEO' && row.values.Metric==='VIDEO') || (row.values.VIEW==='DISPLAY' && row.values.Metric==='DISPLAY') ) ? 'highlighted' : '';
 
             return (
-              <tr className={highlight_class} {...row.getRowProps()}>
+              <tr key={i} className={highlight_class} {...row.getRowProps()}>
                 {row.cells.map((cell, j) => {
                   return ( // Added event on both td and class text because click on text under td was not getting data attributes
-                    <td {...cell.getCellProps()} data-colid={cell.column.id} onClick={(e)=> handleColEdit(e,i,j)}>
+                    <td key={cell.column.id} {...cell.getCellProps()} data-colid={cell.column.id} onClick={(e)=> handleColEdit(e,i,j)}>
                       {cell.column.id!=='action' &&
                         <React.Fragment>
                           <span className="text" data-colid={cell.column.id} onClick={(e)=> handleColEdit(e,i,j)}>{cell.render('Cell')}</span>

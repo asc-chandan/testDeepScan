@@ -58,7 +58,7 @@ class CustomReports extends Component {
     APIService.abortAPIRequests(this.controller);
   }
 
-  getReportLists(e) {
+  getReportLists() {
     //Input Validations
     this.setState({ error: '', inprocess: true });
 

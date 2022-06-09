@@ -148,7 +148,7 @@ class RevShare extends Component {
   }
 
   //Get Dimension using API
-  getAllDimensions(evt) {
+  getAllDimensions() {
     //Input Validations and Send Fetch Request
     this.setState({ error: '', inprocess: true });
 
@@ -161,11 +161,9 @@ class RevShare extends Component {
     APIService.apiRequest(Constants.API_BASE_URL+'/getAllDimensions', dimensionPayLoad, false, 'POST', this.controller)
       .then(response => {
         if(response.status===1 && response.data!==undefined){
-          // let dimensions = JSON.parse(response.data);
-          let allDimensions = [];
           let parsedDimensions = [];
 
-          response.data.forEach((item, i) => {
+          response.data.forEach((item) => {
             let newData = {};
             let parsedData = JSON.parse(item['data']);
             let list = JSON.parse(parsedData['advertiser']);
@@ -213,7 +211,7 @@ class RevShare extends Component {
         //get combined list of advertiser for both view types
         if(item_val.length > 1){
           let updatedAdvertiser = [];
-          item_val.forEach((item, i) => {
+          item_val.forEach((item) => {
             if(updatedAdvertiser.length === 0){
               updatedAdvertiser = this.state.view_type_advertisers[item['id']];
             } else {
@@ -239,8 +237,7 @@ class RevShare extends Component {
   getRevShareFilters(){
     let obj = {
       "client_id": this.state.client.id,
-      "data_type": ["advertiser"],
-      // "advertiser_id": [],
+      "data_type": ["advertiser"]
     };
     return obj;
   }

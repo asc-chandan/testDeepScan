@@ -8,7 +8,7 @@ import {formatDate} from '../../../utils/Common';
 //Import Services
 import APIService from '../../../services/apiService';
 
-function Table({columns, data, client, props}) {
+function Table({columns, data, props}) {
   const {
     getTableProps, 
     getTableBodyProps, 
@@ -270,6 +270,7 @@ function Table({columns, data, client, props}) {
   function getEditableInputField(col, row){
     let output = '';
     // console.log(row.cells);
+    console.log('error', error);
 
     if(col==='data_type'){
       return (<div id="data_type" className="form-group">
@@ -353,9 +354,9 @@ function Table({columns, data, client, props}) {
     <div className="table-wrapper">
       <table {...getTableProps()} className="custom-table">
         <thead>
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column,i) => {
+          {headerGroups.map((headerGroup, i) => (
+            <tr key={i} {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => {
                 return <th key={column.id} {...column.getHeaderProps()}><span className="bg"></span>{column.render('Header')}</th>
               })}
             </tr>
@@ -365,14 +366,13 @@ function Table({columns, data, client, props}) {
         <tbody {...getTableBodyProps()}>
           {rows.map((row, i) => {
             prepareRow(row);
-            
             let highlight_class = ( (row.values.VIEW==='VIDEO' && row.values.Metric==='VIDEO') || (row.values.VIEW==='DISPLAY' && row.values.Metric==='DISPLAY') ) ? 'highlighted' : '';
 
             return (
-              <tr className={highlight_class} {...row.getRowProps()}>
+              <tr key={i} className={highlight_class} {...row.getRowProps()}>
                 {row.cells.map((cell, j) => {
                   return ( // Added event on both td and class text because click on text under td was not getting data attributes
-                    <td {...cell.getCellProps()} data-colid={cell.column.id} onClick={(e)=> handleColEdit(e,i,j)}>
+                    <td key={cell.column.id} {...cell.getCellProps()} data-colid={cell.column.id} onClick={(e)=> handleColEdit(e,i,j)}>
                       {cell.column.id!=='action' &&
                         <React.Fragment>
                           <span className="text" data-colid={cell.column.id} onClick={(e)=> handleColEdit(e,i,j)}>{cell.render('Cell')}</span>
