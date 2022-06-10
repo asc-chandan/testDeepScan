@@ -68,12 +68,12 @@ export const parseChartData = (args) => {
   let coly = args.coly.toLowerCase();
 
   for (var key in args.data) {
-    if (args.data.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(args.data, key)) {
       if (isComparisonEnabled) {
         let periodData = args.data[key];
 
         for (var subkey in periodData) {
-          if (periodData.hasOwnProperty(subkey)) {
+          if (Object.prototype.hasOwnProperty.call(periodData, subkey)) {
             var date = (periodData[subkey][colx]) ? periodData[subkey][colx] : periodData[subkey][colx.charAt(0).toUpperCase() + colx.slice(1)];
             var indexDate = '';
 
@@ -85,7 +85,6 @@ export const parseChartData = (args) => {
 
             var dataVal;
             var floatKeys = ['revenue', 'cpm', 'rpm', 'rps', 'rpms', 'rpu', 'rpmu', 'viewability', 'fill_rate', 'imp/pv', 'index'];
-
             if (floatKeys.includes(coly)) {
               dataVal = Number.parseFloat(periodData[subkey][coly]).toFixed(2);
             } else {
@@ -95,18 +94,14 @@ export const parseChartData = (args) => {
             //Format Date to YYYY-MM-DD
             var selectedDate = moment(date, 'YYYY-MM-DD');
             var formattedDate = moment.parseZone(selectedDate).format('YYYY-MM-DD');
-
             var selectedIndexDate = moment(indexDate, 'YYYY-MM-DD');
             var formattedIndexDate = moment.parseZone(selectedIndexDate).format('YYYY-MM-DD');
-
             var parsedData1 = {};
             parsedData1['id'] = key; //date
             parsedData1[colx] = formattedDate; //date
             parsedData1[coly] = +dataVal; //convert string to number
-            // parsedData1['index'] = +periodData[subkey]['index']; //convert string to number
             parsedData1[args.comparisonXAxisKey] = formattedIndexDate; //index date
             parsedData1['change'] = Number.parseFloat(periodData[subkey]['change']).toFixed(2); //index date
-
             arr.push(parsedData1);
           }
         }
@@ -300,7 +295,7 @@ export const drawDynamicChart = (args) => {
   function drawCharts() {
     let chart_ykey = chartConfig.metric;
     let chart_xkey = chartConfig.x_axis;
-    var parseDate = d3.timeParse("%Y-%m-%d");
+    // var parseDate = d3.timeParse("%Y-%m-%d");
 
     d3.select(chartConfig.ref.current).html(''); //make it empty first
 
@@ -326,9 +321,8 @@ export const drawDynamicChart = (args) => {
     };
 
     //console.log(chartParams)
-    // if (chartConfig.chart_type === 'line') {
     chartParams['chartBandsData'] = args.chartBandsData;
-    // }
+    
     if (chartConfig.chart_type !== 'flat_table') {
       // chartParams['chartNotes'] = args.chartNotes;
       // While showing notes on chart, only one note is to be shown for a given value of x_axis_point, hence remove the duplicates
@@ -567,7 +561,8 @@ function showAggregatedSegmentsDetails (args, initialConfig, color) {
   let chartSegmentation = (args.chartSegmentation && args.chartSegmentation !== '' && args.chartSegmentation !== ' ') ? args.chartSegmentation : '';
   let isSegmented = (chartSegmentation !== 'all' && chartSegmentation !== '' && chartSegmentation !== ' ');
   let isTableRequriedForNonSegmentedChart = args.chartType === 'pie' || args.chartType === 'donut';
-
+  var col_widths = [100, 30];
+  var col_header1;
   // let currentCanvasWidth = (window.innerWidth - 10);
   // let isFitToWidthMode = (args.screen && !args.isDashboardInEditMode && (args.viewModeType !== undefined && args.viewModeType.name === 'Fit to Width'));
   // let tblFontSize = isFitToWidthMode ? Math.round(10 * currentCanvasWidth / args.screen) : 10;
@@ -579,8 +574,7 @@ function showAggregatedSegmentsDetails (args, initialConfig, color) {
   if (args.chartType === 'spider') {
     let yAxisKeys = args.yaxiskey.split(',')
     let chartNetDetails = args.data;
-    var col_widths = [100, 30];
-    var col_header1 = args.xaxiskey;
+    col_header1 = args.xaxiskey;
 
     var table_details = '';
     yAxisKeys.forEach((key)=>{
@@ -626,9 +620,8 @@ function showAggregatedSegmentsDetails (args, initialConfig, color) {
       chartSegmentation = args.isComparisonEnabled ? 'id' : chartSegmentation; //for period comparison
 
       //Display Cross Hair Values
-      var col_header1 = args.isComparisonEnabled ? args.comparisonDataKey : (isTableRequriedForNonSegmentedChart ? args.xaxiskey : chartSegmentation.replace("_", " "));
-      var col_widths = [100, 30];
-
+      col_header1 = args.isComparisonEnabled ? args.comparisonDataKey : (isTableRequriedForNonSegmentedChart ? args.xaxiskey : chartSegmentation.replace("_", " "));
+      
       var chartNetDetails = "";
       if (args.isComparisonEnabled) {
         chartNetDetails = (args.chartsNetDetails) ? args.chartsNetDetails['net_detail'] : '';
@@ -888,27 +881,26 @@ const drawTreeMapChart = (args) => {
     height = height + initialConfig.chartInnerHeadingSectionHeightWithMargin + (initialConfig.chartWidgetBottomPadding - 5);
   }
   let innerHeight = (height - initialConfig.chartBottomPadding - initialConfig.chartTopPadding);
-  let xAxisBottomPos = (height - initialConfig.chartBottomPadding + initialConfig.inbetweenChartAndXAxisPadding);
+  // let xAxisBottomPos = (height - initialConfig.chartBottomPadding + initialConfig.inbetweenChartAndXAxisPadding);
 
   d3.select(args.chartWrapper.current).style("height", height + 'px'); //set chart height
 
   //Chart icons
-  let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
-  let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
-
-  let currentCanvasWidth = (window.innerWidth - 10);
-  let isFitToWidthMode = (args.screen && !args.isDashboardInEditMode && (args.viewModeType !== undefined && args.viewModeType.name === 'Fit to Width'));
+  // let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
+  // let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
+  // let currentCanvasWidth = (window.innerWidth - 10);
+  // let isFitToWidthMode = (args.screen && !args.isDashboardInEditMode && (args.viewModeType !== undefined && args.viewModeType.name === 'Fit to Width'));
   
   //Define charts configs
   let isSegmented = (args.chartSegmentation && args.chartSegmentation !== '' && args.chartSegmentation !== 'all' && args.chartSegmentation !== ' ');
-  let chartSegmentation = isSegmented ? args.chartSegmentation : '';
-  let chartHoverLocked = false;
+  // let chartSegmentation = isSegmented ? args.chartSegmentation : '';
+  // let chartHoverLocked = false;
   let defaultColor = (args.chartFormat.color && args.chartFormat.color.single_color !== '') ? args.chartFormat.color.single_color : chartColors[0]; //pick selected color
-  let color = getColor(args);
+  // let color = getColor(args);
 
-  let parseDate = d3.timeFormat("%m.%d.%Y"),
-    parsedDateString = d3.timeFormat("%d %b %Y"),
-    formatYNumber = d3.format("");
+  // let parseDate = d3.timeFormat("%m.%d.%Y"),
+  //   parsedDateString = d3.timeFormat("%d %b %Y"),
+  //   formatYNumber = d3.format("");
 
   // Data variable
   let chartMainData = [...args.data];
@@ -918,11 +910,11 @@ const drawTreeMapChart = (args) => {
   let chart = getGroupElement(svg, args.yaxiskey);
 
   
-  let xDomains
+  // let xDomains;
 
   //return from here if data is not available
   if (!args.data || args.data.length === 0) return;
-  xDomains = args.data.map((d) => d[args.xaxiskey]);
+  // xDomains = args.data.map((d) => d[args.xaxiskey]);
   let bgBottomPadding = 2;
   chart.append('rect')
     .attr('width', innerWidth)
@@ -937,16 +929,14 @@ const drawTreeMapChart = (args) => {
   // Hide the path(line) of y-axis so that only dummy x-axis line is visible
   chart.select('.y-axis').select('path').style('stroke-opacity', 0);
 
-  var chartHoverTrackPad = chart.append('rect')
+  chart.append('rect')
     .attr('width', innerWidth)
     .attr('height', innerHeight + 1)
     .attr('x', initialConfig.chartLeftPadding + initialConfig.inbetweenChartAndYAxisPadding)
     .attr('y', initialConfig.chartTopPadding)
     .attr('opacity', 0)
-    .attr('fill', 'red')
-  // .on("mouseout", handleChartMouseOut)
-  // .on("mousemove", handleChartMouseMove)
-  // .on("click", handleChartLock);
+    .attr('fill', 'red');
+
   var dataNest = []
   if (isSegmented) { return false }
   else {
@@ -960,24 +950,22 @@ const drawTreeMapChart = (args) => {
 
     // make dataset array 
     chartMainData.forEach(item => {
-      let obj = {}
-      obj['name'] = typeof item[args.xaxiskey] == 'string' ? item[args.xaxiskey].substring(0, 10) : item[args.xaxiskey]
-      obj['value'] = item[args.yaxiskey]
-      obj['parent'] = args.xaxiskey
-      dataNest.push(obj)
+      let obj = {};
+      obj['name'] = typeof item[args.xaxiskey] == 'string' ? item[args.xaxiskey].substring(0, 10) : item[args.xaxiskey];
+      obj['value'] = item[args.yaxiskey];
+      obj['parent'] = args.xaxiskey;
+      dataNest.push(obj);
     })
 
     // generate root dataset for tree
     let root = d3.stratify()
       .id((d) => { return d.name; })
-      .parentId((d) => { return d.parent; })
-      (dataNest);
+      .parentId((d) => { return d.parent; })(dataNest);
     root.sum((d) => { return +d.value })
 
     d3.treemap()
       .size([innerWidth, innerHeight])
-      .padding(2)
-      (root)
+      .padding(2)(root)
 
     // console.log(root.leaves())  
     // draw treemap  
@@ -1057,16 +1045,16 @@ const draw2DDensityChart = (args) => {
   let yAxisTickTopPos = isFitToWidthMode ? Math.round(5 * currentCanvasWidth / args.screen) : 5;
   let tickSliderFontSize = isFitToWidthMode ? Math.round(11 * currentCanvasWidth / args.screen) : 11;
   let toolTipFontSize = isFitToWidthMode ? Math.round(11 * currentCanvasWidth / args.screen) : 11;
-  let circleSize = isFitToWidthMode ? Math.round(1.5 * currentCanvasWidth / args.screen) : 1.5;
+  // let circleSize = isFitToWidthMode ? Math.round(1.5 * currentCanvasWidth / args.screen) : 1.5;
   let highlighterCircleSize = isFitToWidthMode ? Math.round(4 * currentCanvasWidth / args.screen) : 4;
-  let noteCircleSize = isFitToWidthMode ? Math.round(5 * currentCanvasWidth / args.screen) : 5;
+  // let noteCircleSize = isFitToWidthMode ? Math.round(5 * currentCanvasWidth / args.screen) : 5;
 
   //Define charts configs
-  let isSegmented = (args.chartSegmentation && args.chartSegmentation !== '' && args.chartSegmentation !== 'all' && args.chartSegmentation !== ' ');
-  let chartSegmentation = isSegmented ? args.chartSegmentation : '';
+  // let isSegmented = (args.chartSegmentation && args.chartSegmentation !== '' && args.chartSegmentation !== 'all' && args.chartSegmentation !== ' ');
+  // let chartSegmentation = isSegmented ? args.chartSegmentation : '';
   let chartHoverLocked = false;
   let defaultColor = (args.chartFormat.color && args.chartFormat.color.single_color !== '') ? args.chartFormat.color.single_color : chartColors[0]; //pick selected color
-  let color = getColor(args);
+  // let color = getColor(args);
   let parseDate = d3.timeFormat("%m.%d.%Y"),
     parsedDateString = d3.timeFormat("%d %b %Y"),
     formatYNumber = d3.format("");
@@ -1084,14 +1072,14 @@ const draw2DDensityChart = (args) => {
   let yStartPoint = xAxisBottomPos - initialConfig.inbetweenChartAndXAxisPadding - 1;
   let yEndPoint = initialConfig.chartTopPadding;
   let yScaleLimits;
-  let series;
+  // let series;
   let xDomains
 
   //return from here if data is not available
   if (!args.data || args.data.length === 0) return;
   xDomains = args.data.map((d) => d[args.xaxiskey]);
 
-  var xAxisTickValues = getXAxisTickValues(initialConfig, args.data.map((d) => d[args.xaxiskey]), chartMainData, args); // get x axis calculated tick values
+  // var xAxisTickValues = getXAxisTickValues(initialConfig, args.data.map((d) => d[args.xaxiskey]), chartMainData, args); // get x axis calculated tick values
 
   //Define X-Axis for each chart - date/string
   let xScaleType = typeof xDomains[0] === 'number' ? 'linear' : 'point';
@@ -1402,16 +1390,17 @@ const draw2DDensityChart = (args) => {
     var mouse = d3.mouse(chartHoverTrackPad.node());
     xValOnMouseMove = xScale.invert(mouse[0]);
 
-    var xAxisVal;
-    if (args.xaxiskey === 'date') {
-      var date = new Date(d[args.xaxiskey]);
-      xAxisVal = parsedDateString(date);
-    } else {
-      xAxisVal = d[args.xaxiskey];
-    }
+    // var xAxisVal;
+    // if (args.xaxiskey === 'date') {
+    //   var date = new Date(d[args.xaxiskey]);
+    //   xAxisVal = parsedDateString(date);
+    // } else {
+    //   xAxisVal = d[args.xaxiskey];
+    // }
+
     //Generate tooltip details
-    var chartWidth = width - 80;
-    var chartXPos = 0;
+    // var chartWidth = width - 80;
+    // var chartXPos = 0;
 
     //show horizontal line on mouse hover on chart
     hoverYGridLine.style('display', 'block')
@@ -1531,12 +1520,12 @@ const draw2DDensityChart = (args) => {
     tooltip_top = (yScale(d[args.yaxiskey]) - tooltip_pos_adjustment); //if totalVal is set use that position else use individual bar/bar_block position
     tooltip_top = tooltip_top < 0 ? (yScale(d[args.yaxiskey]) + initialConfig.tooltipHeight / 2) : tooltip_top;
 
-    chartXPos = (xScale(xValOnMouseMove) + tooltip_width);
-    let tooltip_left = chartXPos > chartWidth ? Math.ceil(xScale(xValOnMouseMove) - tooltip_width) - 5 : Math.ceil(xScale(xValOnMouseMove)) + 5;
+    // chartXPos = (xScale(xValOnMouseMove) + tooltip_width);
+    // let tooltip_left = chartXPos > chartWidth ? Math.ceil(xScale(xValOnMouseMove) - tooltip_width) - 5 : Math.ceil(xScale(xValOnMouseMove)) + 5;
 
     //show tooltip in bottom on extra small widget size
     if (!initialConfig.showXAxisTicks) {
-      tooltip_left = 0;
+      // tooltip_left = 0;
       tooltip_top = xAxisBottomPos;
     }
     //show hover indicator and tooptip
@@ -1563,15 +1552,14 @@ const draw2DDensityChart = (args) => {
         .attr('y', 0)
         .style('display', initialConfig.showXAxisTicks ? 'block' : 'none');
     });
-
   }
+
   // geopath object
   var densityData = d3.contourDensity()
     .x((d) => { return xScale(d[args.xaxiskey]); })
     .y((d) => { return yScale(d[args.yaxiskey]); })
     .size([width, height])
-    .bandwidth(18)
-    (args.data)
+    .bandwidth(18)(args.data)
 
   // scale function to scale center/width/height
   const scale = (scaleFactor, width, height) => {
@@ -1629,14 +1617,14 @@ const drawBoxPlot = (args) => {
   d3.select(args.chartWrapper.current).style("height", `${height}px`) // set chart height
 
   // chart icons
-  let iconLock = ''
-  let iconUnlock = ''
+  // let iconLock = ''
+  // let iconUnlock = ''
 
   let isFitToWidthMode = (args.screen && !args.isDashboardInEditMode && (args.viewModeType !== undefined && args.viewModeType.name === 'Fit to Width'))
   let tickFontSize = isFitToWidthMode ? Math.floor(10 * window.innerWidth / args.screen) : 10;
   let xAxisTickStartPos = isFitToWidthMode ? Math.floor(75 * window.innerWidth / args.screen) : 75;
   let yAxisTickTopPos = isFitToWidthMode ? Math.floor(5 * window.innerWidth / args.screen) : 5;
-  let tickSliderFontSize = isFitToWidthMode ? Math.floor(11 * window.innerWidth / args.screen) : 10;
+  // let tickSliderFontSize = isFitToWidthMode ? Math.floor(11 * window.innerWidth / args.screen) : 10;
   let toolTipFontSize = isFitToWidthMode ? Math.floor(11 * window.innerWidth / args.screen) : 11;
 
 
@@ -1647,14 +1635,13 @@ const drawBoxPlot = (args) => {
   let defaultColor = (args.chartFormat.color && args.chartFormat.color.single_color !== '') ? args.chartFormat.color.single_color : chartColors[0]; //pick selected color
   let color = getColor(args); //Set Color Scales
   let parseDate = d3.timeFormat("%m.%d.%Y"),
-    parsedDateString = d3.timeFormat("%d %b %Y"),
+    // parsedDateString = d3.timeFormat("%d %b %Y"),
     formatYNumber = d3.format("");
 
   //Data variable
   let chartMainData = [...args.data];
 
   //Define SVG and group element
-
   let svg = getSVGElement(args.chartWrapper.current, width, height);
   let chart = getGroupElement(svg, args.yaxiskey);
 
@@ -1665,8 +1652,7 @@ const drawBoxPlot = (args) => {
   let yEndPoint = initialConfig.chartTopPadding;
 
   let yScaleLimits;
-  let series;
-  let xDomains
+  let xDomains;
 
   //return from here if data is not available
   if (!args.data || args.data.length === 0) return;
@@ -1689,8 +1675,6 @@ const drawBoxPlot = (args) => {
 
   let bgBottomPadding = 2;
 
-  let segments
-
   // let boxPlotWrapper = chart.append('g').attr("clip-path", `url(#clip-${args.unique_key})`);
   const quantile = (arr, q) => {
     const pos = (arr.length - 1) * q;
@@ -1702,8 +1686,8 @@ const drawBoxPlot = (args) => {
       return arr[base];
     }
   };
+
   if (isSegmented) {
-    let formattedData = []
     let minVal = 0
     let maxVal = 0
     dataNest = d3.nest().key((d) => d[chartSegmentation])
@@ -1751,12 +1735,9 @@ const drawBoxPlot = (args) => {
     })
     var data_sorted = dataNest.sort(d3.ascending)
     var q1 = quantile(data_sorted, .25);
-
     var median = quantile(data_sorted, .50);
-
     var q3 = quantile(data_sorted, .75);
-
-    var interQuantileRange = q3 - q1
+    // var interQuantileRange = q3 - q1;
     var min = data_sorted[0]
 
     var max = data_sorted[data_sorted.length - 1]
@@ -1849,6 +1830,7 @@ const drawBoxPlot = (args) => {
     alignYAxisTicks(innerHeight, args.unique_key, initialConfig, yAxisTickTopPos);
   });
 
+  var boxWidth = 10;
   if (isSegmented) {
     chart
       .selectAll("vertLines")
@@ -1865,7 +1847,6 @@ const drawBoxPlot = (args) => {
       .style("width", 40)
 
     // rectangle for the main box
-    var boxWidth = 10
     chart
       .selectAll("boxes")
       .data(dataNest)
@@ -1892,10 +1873,9 @@ const drawBoxPlot = (args) => {
       .attr("y2", (d) => { return (yScale(d.value.median)) })
       .attr("stroke", defaultColor)
       .style("width", 80)
-  }
-  else {
-    var center = width / 2
-    var boxWidth = innerWidth / 4
+  } else {
+    var center = width / 2;
+    boxWidth = innerWidth / 4;
     chart
       .append("line")
       .attr("x1", center)
@@ -1926,7 +1906,7 @@ const drawBoxPlot = (args) => {
       .attr("y2", (d) => { return (yScale(d)) })
       .attr("stroke", color)
   }
-  var chartHoverTrackPad = chart.append('rect')
+  chart.append('rect')
     .attr('width', innerWidth)
     .attr('height', innerHeight + bgBottomPadding)
     .attr('x', initialConfig.chartLeftPadding + initialConfig.inbetweenChartAndYAxisPadding)
@@ -2002,7 +1982,6 @@ const drawBoxPlot = (args) => {
   let tooltip_text_width = 0;
   let tooltip_width = 0;
   let tooltip_top = 0;
-  let tooltip_pos_adjustment = 0;
   let tooltip_left = 0;
   if (args.pointSelectionModeOn) {
     tooltip_text_median = 'Click to select';
@@ -2021,7 +2000,7 @@ const drawBoxPlot = (args) => {
     tooltip_text_width = calculateTextWidth(text, toolTipFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
     tooltip_width = tooltip_text_width + 4;
     //tooltip_width = tooltip_width <= maxTooltipWidth ? tooltip_width : maxTooltipWidth;
-    tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
+    // tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
     tooltip_top = yScale(top) - 6
     tooltip_left = center + boxWidth / 2 + 12
 
@@ -2103,22 +2082,19 @@ const drawBoxPlot = (args) => {
   function handleChartMouseMove() {
     if (isSegmented) return false
     if (chartHoverLocked) return false; //if locked no hover allowed
-    var x0, y0, i, d1;
+    // var y0;
 
-    var mouseX = d3.mouse(args.chartWrapper.current)[0];
-    var mouseY = d3.mouse(args.chartWrapper.current)[1];
-
-    //x0 - val, i= index, d0 - prev data obj, d1 - current data obj
-    //x0 = xScale.invert(mouseX);
-    y0 = yScale.invert(mouseY);
-
-    var mouse = d3.mouse(args.chartWrapper.current)
+    // var mouseX = d3.mouse(args.chartWrapper.current)[0];
+    // var mouseY = d3.mouse(args.chartWrapper.current)[1];
+    // y0 = yScale.invert(mouseY);
+    // var mouse = d3.mouse(args.chartWrapper.current)
 
     if (args.chartFormat.showLabel == false) {
       showLabelData()
     }
   }
 }
+
 /*************************
  * Draw Area Chart
 - padding: padding,
@@ -2165,7 +2141,7 @@ const drawAreaChart = (args) => {
   let defaultColor = (args.chartFormat.color && args.chartFormat.color.single_color !== '') ? args.chartFormat.color.single_color : chartColors[0]; //pick selected color
   let color = getColor(args); //Set Color Scales
   let parseDate = d3.timeFormat("%m.%d.%Y"),
-    parsedDateString = d3.timeFormat("%d %b %Y"),
+    // parsedDateString = d3.timeFormat("%d %b %Y"),
     formatYNumber = d3.format("");
 
   //Data variable
@@ -2184,7 +2160,7 @@ const drawAreaChart = (args) => {
   let yScaleLimits;
   let series;
   let xDomains
-  let xScaleType = args.xaxiskey === 'date' ? 'time' : 'band'
+  // let xScaleType = args.xaxiskey === 'date' ? 'time' : 'band'
   xDomains = args.data.map((d) => d[args.xaxiskey]);
   let xAxisTickValues = getXAxisTickValues(initialConfig, args.data.map((d) => d[args.xaxiskey]), chartMainData, args); // get x axis calculated tick values
   let dataNest;
@@ -2196,7 +2172,7 @@ const drawAreaChart = (args) => {
       .entries(chartMainData);
 
     let formattedData = [];
-    dataNest.forEach((item, i) => {
+    dataNest.forEach((item) => {
       let obj = {};
       obj[args.xaxiskey] = item.values[0][args.xaxiskey];
       item.values.forEach((subitem) => {
@@ -2239,8 +2215,7 @@ const drawAreaChart = (args) => {
   /* Define and create xScale, xAxis, ticks */
   let xScale;
   let xAxis;
-  let xAxisRegion
-
+  
   //console.log(xDomains)
   const defineXScale = async () => {
     //Set the scales  
@@ -2256,7 +2231,7 @@ const drawAreaChart = (args) => {
       .tickFormat((args.xaxiskey === 'date' ? d3.timeFormat("%m.%d.%Y") : (d) => (typeof d === 'string') ? d.substring(0, 10) : d));
 
     //Draw x-axis
-    xAxisRegion = chart.append("g")
+    chart.append("g")
       .attr("class", "axis x-axis")
       .attr("id", `clip-${args.unique_key}`)
       .attr("transform", "translate(0, " + xAxisBottomPos + ")") //start with 10px instead of 0
@@ -2360,8 +2335,7 @@ const drawAreaChart = (args) => {
   if (!args.data || args.data.length === 0) return;
 
   let areaPointWrapper = chart.append('g').attr("clip-path", `url(#clip-${args.unique_key})`);
-  let areaLayer
-
+  
   //x-axis tick slider elements
   let xAxisSliderGroup;
   let xHoverRect;
@@ -2439,7 +2413,7 @@ const drawAreaChart = (args) => {
   let tooltip_pos_adjustment = 0;
   let tooltip_left = 0;
 
-  var brush = d3.brushX()
+  d3.brushX()
     .extent([[initialConfig.chartLeftPadding + initialConfig.inbetweenChartAndYAxisPadding, initialConfig.chartTopPadding], [innerWidth + initialConfig.chartLeftPadding + initialConfig.inbetweenChartAndYAxisPadding, innerHeight]])
     .on("end", () => { return }) //  disabled brushing , call updateChart
 
@@ -2464,7 +2438,7 @@ const drawAreaChart = (args) => {
     .attr("class", "tooltip-text");
 
   // remove for brushing
-  var chartHoverTrackPad = chart.append('rect')
+  chart.append('rect')
     .attr('width', innerWidth)
     .attr('height', innerHeight + 1)
     .attr('x', initialConfig.chartLeftPadding + initialConfig.inbetweenChartAndYAxisPadding)
@@ -2508,7 +2482,7 @@ const drawAreaChart = (args) => {
 
   if (isSegmented) {
     // color palette
-    areaLayer = areaPointWrapper
+    areaPointWrapper
       .selectAll("rect")
       .data(series)
       .enter()
@@ -2521,7 +2495,7 @@ const drawAreaChart = (args) => {
   }
   else {
     //draw chart here
-    areaLayer = areaPointWrapper
+    areaPointWrapper
       .append("path")
       .datum(chartMainData)
       .attr("class", 'area')
@@ -2576,9 +2550,8 @@ const drawAreaChart = (args) => {
   // })
 
   function generateArea() {
-    let areaGen
     if (isSegmented) {
-      return areaGen = d3.area()
+      return d3.area()
         .x(d => {
           return xScale(d.data[args.xaxiskey])
         })
@@ -2592,7 +2565,7 @@ const drawAreaChart = (args) => {
         })
     }
     else {
-      return areaGen = d3.area()
+      return d3.area()
         .x(d => {
           return xScale(d[args.xaxiskey])
         })
@@ -2602,6 +2575,7 @@ const drawAreaChart = (args) => {
         .y0(yScale(0))
     }
   }
+
   function findNearesetPointToMouse(pointList, mousePos) {
     let np = null, npIndex = -1, nDistSq = Number.POSITIVE_INFINITY;
     pointList.forEach((p, i) => {
@@ -2677,7 +2651,7 @@ const drawAreaChart = (args) => {
     try {
       d = d1
     } catch (error) {
-
+      //do nothhing
     }
 
     var mouse = d3.mouse(this);
@@ -2751,7 +2725,7 @@ const drawAreaChart = (args) => {
       }
 
       let xAxisSliderTextPos = (xAxisLeftPadding + 5);
-      xAxisSliderGroup.attr("transform", "translate(" + parseInt(xTickValPos) + "," + parseInt(xAxisBottomPos - xAxisSliderRectWidthPadding) + ")").style('display', 'block');; // bgBottomPadding is extra bg rect padding
+      xAxisSliderGroup.attr("transform", "translate(" + parseInt(xTickValPos) + "," + parseInt(xAxisBottomPos - xAxisSliderRectWidthPadding) + ")").style('display', 'block'); // bgBottomPadding is extra bg rect padding
       xAxisSliderGroup.select(".hover-line-status").attr("x", lockIconXPos).attr("y", initialConfig.tickSliderPadding); //lock icon position
 
       async function renderXSliderText() {
@@ -2785,7 +2759,6 @@ const drawAreaChart = (args) => {
       let yaxis_box_width = calculateTextWidth(yaxis_text, tickSliderFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica') + 4 + 10;
       let yaxis_box_left_pos = 3;
 
-      // let ySliderPos = yScale(d[args.yaxiskey]);
       let ySliderPos = (mouseY - 2);
       if (ySliderPos < 6) {
         ySliderPos = 6;
@@ -2793,8 +2766,7 @@ const drawAreaChart = (args) => {
         ySliderPos = innerHeight - 7;
       }
 
-      // yAxisSliderGroup.attr("transform", "translate(" + yaxis_box_left_pos + "," + ySliderPos + ")"); // bgBottomPadding is extra bg rect padding
-      yAxisSliderGroup.attr("transform", "translate(" + yaxis_box_left_pos + "," + ySliderPos + ")").style('display', 'block');; // bgBottomPadding is extra bg rect padding
+      yAxisSliderGroup.attr("transform", "translate(" + yaxis_box_left_pos + "," + ySliderPos + ")").style('display', 'block'); // bgBottomPadding is extra bg rect padding
       yHoverRect
         .attr('width', (initialConfig.chartLeftPadding + 5))
         .attr('x', 0)
@@ -2812,7 +2784,7 @@ const drawAreaChart = (args) => {
       let inViewPoints = [];
       var xPos, yPos
       areaPointWrapper.selectAll('.area')
-        .each(function (d, i) {
+        .each(() => {
           const pt = d3.select(this);
           xPos = mouseX
           yPos = mouseY
@@ -2821,9 +2793,9 @@ const drawAreaChart = (args) => {
             inViewPoints.push({ xPos, yPos, segment, xVal: xScale.invert(xPos), yVal: yScale.invert(yPos), ptColor: pt.attr("fill") });
           }
         });
-      let [pointToFocusOnMouseMove, pointToFocusOnMouseMoveIndex] = findNearesetPointToMouse(inViewPoints, d3.mouse(this));
+      let [pointToFocusOnMouseMove] = findNearesetPointToMouse(inViewPoints, d3.mouse(this));
       // If Segementation is ON,find the points which lie exactly at the same point as 'pointToFocusOnMouseMove'
-      const superImposingPoints = chartSegmentation ? inViewPoints.filter((p, i) => i !== pointToFocusOnMouseMoveIndex && p.xPos === pointToFocusOnMouseMove.xPos && p.yPos === pointToFocusOnMouseMove.yPos) : [];
+      // const superImposingPoints = chartSegmentation ? inViewPoints.filter((p, i) => i !== pointToFocusOnMouseMoveIndex && p.xPos === pointToFocusOnMouseMove.xPos && p.yPos === pointToFocusOnMouseMove.yPos) : [];
 
       if (!pointToFocusOnMouseMove) return;
       let xAxisHoverGrpPos = pointToFocusOnMouseMove.xPos;
@@ -2831,7 +2803,6 @@ const drawAreaChart = (args) => {
 
       //Sort segmentated values
       var dataValuesIndex = dataNest.findIndex((e) => args.xaxiskey === 'date' ? parseDate(e.values[0][args.xaxiskey]) === xAxisVal : e.values[0][args.xaxiskey] === xAxisVal);
-      // console.log(dataValuesIndex)
       if (dataValuesIndex > -1) {
         var dataValues = dataNest[dataValuesIndex]['values'];
 
@@ -3062,7 +3033,7 @@ function drawBarChart(args) {
 
     // console.log('nest data length: '+dataNest.length+', new bar org width: '+barOrgWidth+', bar width after padding: '+barWidthAfterPadding+', bar padding: '+barPadding);
     let formattedData = [];
-    dataNest.forEach((item, i) => {
+    dataNest.forEach((item) => {
       let obj = {};
       obj[args.xaxiskey] = item.values[0][args.xaxiskey];
       item.values.forEach((subitem) => {
@@ -3209,10 +3180,10 @@ function drawBarChart(args) {
     barWrapper.selectAll("rect").data((d) => d).enter().append("rect")
       // .attr("class", function(d){ return "barblock " + d.data[args.xaxiskey] }) // Add a class to each subgroup: their name
       .attr("class", 'bar-block')
-      .attr("x", function (d, i) {
+      .attr("x", function (d) {
         return xScale(d.data[args.xaxiskey]);
       })
-      .attr("y", function (d, i) {
+      .attr("y", function (d) {
         if (yScale(d[1]) === undefined) return;
 
         let y_pos = (series.length > 1) ? yScale(d[1]) : yScale(d[1]);
@@ -3224,7 +3195,7 @@ function drawBarChart(args) {
         segmentedBarBlocksYPos[d.data[args.xaxiskey]] = segmentedBarBlocksYPos[d.data[args.xaxiskey]] ? segmentedBarBlocksYPos[d.data[args.xaxiskey]] + ',' + y_pos : y_pos;
         return y_pos;
       })
-      .attr("height", function (d, i) {
+      .attr("height", function (d) {
         if (yScale(d[1]) === undefined) return;
 
         let bar_height = 0;
@@ -3309,15 +3280,15 @@ function drawBarChart(args) {
 
   function stackBarMouseMove(d) {
     if (chartHoverLocked) return false; //if locked no hover allowed
-    var x0, y0, i, d1;
+    var y0;
     var mouseX = d3.mouse(this)[0];
     var mouseY = d3.mouse(this)[1];
 
     //x0 - val, i= index, d0 - prev data obj, d1 - current data obj
-    x0 = xScale.invert(mouseX);
+    // x0 = xScale.invert(mouseX);
     y0 = yScale.invert(mouseY);
-    i = args.data.findIndex((e) => e[args.xaxiskey] === x0);
-    d1 = args.data[i];
+    // i = args.data.findIndex((e) => e[args.xaxiskey] === x0);
+    // d1 = args.data[i];
 
     var mouse = d3.mouse(this);
     xValOnMouseMove = xScale.invert(mouse[0]);
@@ -3565,12 +3536,13 @@ function drawBarChart(args) {
       .attr('font-size', '12px')
       .attr('class', 'note-marker')
       .attr('fill', '#ff0000')
-      .attr('x', function (d, i) {
+      .attr('x', function (d) {
         return giveXPositionOfNote(d.x_axis_point);
       })
-      .attr('y', function (d, i) {
+      .attr('y', function (d) {
         return giveYPositionOfNote(d.x_axis_point);
       });
+
     // Append hover circle 
     var noteMarkerHover = noteMarkersWrapper.append('circle').attr('class', 'note-marker-hover').style('display', 'none');
   }
@@ -3658,7 +3630,7 @@ function drawBarChart(args) {
   let tooltip_top = 0;
   let tooltip_pos_adjustment = 0;
   let tooltip_left = 0;
-
+  
   let tooltip = chart.append("g")
     .attr("class", "tooltip1")
     .attr("transform", "translate(0, 0)");
@@ -3692,7 +3664,7 @@ function drawBarChart(args) {
   //   .attr("class", "hover-indicator");
 
   if (!isSegmented) {
-    var chartHoverTrackPad = chart.append('rect')
+    chartHoverTrackPad = chart.append('rect')
       .attr('width', innerWidth)
       .attr('height', innerHeight + 1)
       .attr('x', initialConfig.chartLeftPadding + initialConfig.inbetweenChartAndYAxisPadding)
@@ -3947,7 +3919,7 @@ function drawBarChart(args) {
         yval = args.chartFormat.yaxis.min;
       }
       let bar_hightlighter_left = xScale(xValOnMouseMove) - barPadding / 2 / 2;
-      let bar_hightlighter_top = yScale(yval);
+      // let bar_hightlighter_top = yScale(yval);
       let bar_height = Number.parseFloat(innerHeight - yScale(yval) + initialConfig.chartTopPadding).toFixed(2);
       if (bar_height < 0) bar_height = 0;
       // barHoverHighlighter
@@ -4201,24 +4173,24 @@ function trimFromAnyCharacter(text, max_width = 140) {
 
 
 //Formatted date pick
-function multiFormat(d, i, axis) {
-  var formatDay = d3.timeFormat("%d"),
-    formatMonth = d3.timeFormat("%d %b"),
-    formatYear = d3.timeFormat("%d \n %b \n %Y");
+// function multiFormat(d, i, axis) {
+//   var formatDay = d3.timeFormat("%d"),
+//     formatMonth = d3.timeFormat("%d %b"),
+//     formatYear = d3.timeFormat("%d \n %b \n %Y");
 
-  const ticks = axis.scale().ticks();
-  if (i > 0 && ticks[i - 1].getMonth() === d.getMonth()) {
-    return (formatDay)(d);
-  } if (i > 0 && ticks[i - 1].getYear() !== d.getYear()) {
-    return (formatYear)(d);
-  } else {
-    return (formatMonth)(d);
-  }
-}
+//   const ticks = axis.scale().ticks();
+//   if (i > 0 && ticks[i - 1].getMonth() === d.getMonth()) {
+//     return (formatDay)(d);
+//   } if (i > 0 && ticks[i - 1].getYear() !== d.getYear()) {
+//     return (formatYear)(d);
+//   } else {
+//     return (formatMonth)(d);
+//   }
+// }
 
-function onlyUnique(value, index, self) {
-  return self.indexOf(value) === index;
-}
+// function onlyUnique(value, index, self) {
+//   return self.indexOf(value) === index;
+// }
 
 //Draw line chart - crosshair free flow
 function drawLineChartFreeCrossHair(args) {
@@ -4593,7 +4565,7 @@ function drawLineChartFreeCrossHair(args) {
     .data(dataNest.reduce((dataPts, dn) => dataPts.concat(dn.values), []))
     .enter()
     .append('circle')
-    .attr('class', (d) => { count += 1; return `line-pt line-pt-${args.unique_key}-${count}` })
+    .attr('class', () => { count += 1; return `line-pt line-pt-${args.unique_key}-${count}` })
     .attr('cx', (d) => xScale(d[args.xaxiskey]))
     .attr('cy', (d) => yScale(d[args.yaxiskey]))
     .attr('r', circleSize)
@@ -4617,11 +4589,11 @@ function drawLineChartFreeCrossHair(args) {
   if (chartMainData.length === 1) {
     chart.selectAll('.line-pt')
       .data(chartMainData).enter().append('circle')
-      .attr('cx', function (d, i) {
+      .attr('cx', function (d) {
         let xVal = d[args.xaxiskey];
         return xScale(xVal);
       })
-      .attr('cy', function (d, i) {
+      .attr('cy', function (d) {
         let yVal = d[args.yaxiskey];
         if (args.chartFormat.yaxis.max && yVal > args.chartFormat.yaxis.max) {
           yVal = parseInt(args.chartFormat.yaxis.max);
@@ -4633,7 +4605,7 @@ function drawLineChartFreeCrossHair(args) {
       })
       .attr('r', circleSize)
       .attr('class', 'scatter-pt')
-      .attr('fill', function (d, i) { return lineColor; });
+      .attr('fill', function () { return lineColor; });
   }
 
   // Draw the marker for notes if chartNotes are available
@@ -4645,8 +4617,8 @@ function drawLineChartFreeCrossHair(args) {
       .attr('font-size', '1.5em')
       .attr('class', 'note-marker')
       .attr('fill', '#ff0000')
-      .attr('x', function (d, i) { return xScale(d.x_axis_point); })
-      .attr('y', function (d, i) { return innerHeight / 2 });
+      .attr('x', function (d) { return xScale(d.x_axis_point); })
+      .attr('y', function () { return innerHeight / 2 });
   }
 
   //tooltip 
@@ -4752,15 +4724,15 @@ function drawLineChartFreeCrossHair(args) {
     }
   }
 
-  function scalePointPosition(mousePos) {
-    var domain = xScale.domain();
-    var range = xScale.range();
-    var rangePoints = d3.range(range[0], range[1], xScale.step());
-    var xPos = mousePos;
-    var yPos = domain[d3.bisect(rangePoints, xPos) - 1];
-    // console.log('range', range[0]+'---'+range[1]+'---step: '+xScale.step()+'--x: '+xPos+'--y: '+yPos);
-    return yPos;
-  }
+  // function scalePointPosition(mousePos) {
+  //   var domain = xScale.domain();
+  //   var range = xScale.range();
+  //   var rangePoints = d3.range(range[0], range[1], xScale.step());
+  //   var xPos = mousePos;
+  //   var yPos = domain[d3.bisect(rangePoints, xPos) - 1];
+  //   // console.log('range', range[0]+'---'+range[1]+'---step: '+xScale.step()+'--x: '+xPos+'--y: '+yPos);
+  //   return yPos;
+  // }
 
   let inViewPoints = [];
   if (isSegmented) {
@@ -4963,7 +4935,7 @@ function drawLineChartFreeCrossHair(args) {
       let [pointToFocusOnMouseMove, pointToFocusOnMouseMoveIndex] = findNearesetPointToMouse(inViewPoints, d3.mouse(this));
 
       // If Segementation is ON,find the points which lie exactly at the same point as 'pointToFocusOnMouseMove'
-      const superImposingPoints = chartSegmentation ? inViewPoints.filter((p, i) => i !== pointToFocusOnMouseMoveIndex && p.xPos === pointToFocusOnMouseMove.xPos && p.yPos === pointToFocusOnMouseMove.yPos) : [];
+      // const superImposingPoints = chartSegmentation ? inViewPoints.filter((p, i) => i !== pointToFocusOnMouseMoveIndex && p.xPos === pointToFocusOnMouseMove.xPos && p.yPos === pointToFocusOnMouseMove.yPos) : [];
 
       if (!pointToFocusOnMouseMove) return;
       let xAxisHoverGrpPos = pointToFocusOnMouseMove.xPos;
@@ -5127,7 +5099,7 @@ function drawScatterChart2(args) {
   let toolTipFontSize = isFitToWidthMode ? Math.round(11 * currentCanvasWidth / args.screen) : 11;
   let circleSize = isFitToWidthMode ? Math.round(1.5 * currentCanvasWidth / args.screen) : 1.5;
   let highlighterCircleSize = isFitToWidthMode ? Math.round(4 * currentCanvasWidth / args.screen) : 4;
-  let noteCircleSize = isFitToWidthMode ? Math.round(5 * currentCanvasWidth / args.screen) : 5;
+  // let noteCircleSize = isFitToWidthMode ? Math.round(5 * currentCanvasWidth / args.screen) : 5;
 
   //Define charts configs
   let isSegmented = (args.chartSegmentation && args.chartSegmentation !== '' && args.chartSegmentation !== 'all' && args.chartSegmentation !== ' ');
@@ -5382,17 +5354,17 @@ function drawScatterChart2(args) {
       .data(dataNest.reduce((dataPts, dn) => dataPts.concat(dn.values), []))
       .enter()
       .append('circle')
-      .attr('class', (d, i) => `scatter-pt scatter-pt-${args.unique_key}-${i}`)
-      .attr('cx', function (d, i) { return xScale(d[args.xaxiskey]); })
-      .attr('cy', function (d, i) { return yScale(d[args.yaxiskey]); })
+      .attr('class', (i) => `scatter-pt scatter-pt-${args.unique_key}-${i}`)
+      .attr('cx', function (d) { return xScale(d[args.xaxiskey]); })
+      .attr('cy', function (d) { return yScale(d[args.yaxiskey]); })
       .attr('r', circleSize)
-      .attr(`data-${chartSegmentation}`, function (d, i) { return d[chartSegmentation]; })
-      .attr('fill', function (d, i) { return color(d[chartSegmentation]); });
+      .attr(`data-${chartSegmentation}`, function (d) { return d[chartSegmentation]; })
+      .attr('fill', function (d) { return color(d[chartSegmentation]); });
 
   } else {
     scatterPointsWrapper.selectAll('.scatter-pt')
       .data(chartMainData).enter().append('circle')
-      .attr('cx', function (d, i) {
+      .attr('cx', function (d) {
         let xVal = d[args.xaxiskey];
         if (xScaleType === 'linear') {
           if (args.chartFormat.xaxis.max && xVal > args.chartFormat.xaxis.max) {
@@ -5404,7 +5376,7 @@ function drawScatterChart2(args) {
         }
         return xScale(xVal);
       })
-      .attr('cy', function (d, i) {
+      .attr('cy', function (d) {
         let yVal = d[args.yaxiskey];
         if (args.chartFormat.yaxis.max && yVal > args.chartFormat.yaxis.max) {
           yVal = parseInt(args.chartFormat.yaxis.max);
@@ -5415,8 +5387,8 @@ function drawScatterChart2(args) {
         return yScale(yVal);
       })
       .attr('r', circleSize)
-      .attr('class', (d, i) => `scatter-pt scatter-pt-${args.unique_key}-${i}`)
-      .attr('fill', function (d, i) { return circleColor; });
+      .attr('class', (i) => `scatter-pt scatter-pt-${args.unique_key}-${i}`)
+      .attr('fill', function () { return circleColor; });
   }
 
   // Draw the marker for notes if chartNotes are available
@@ -5428,8 +5400,8 @@ function drawScatterChart2(args) {
       .attr('font-size', '1.5em')
       .attr('class', 'note-marker')
       .attr('fill', '#ff0000')
-      .attr('x', function (d, i) { return xScale(d.x_axis_point); })
-      .attr('y', function (d, i) { return innerHeight / 2 });
+      .attr('x', function (d) { return xScale(d.x_axis_point); })
+      .attr('y', function () { return innerHeight / 2 });
   }
 
   //tooltip
@@ -5520,15 +5492,13 @@ function drawScatterChart2(args) {
   var pointToFocusOnMouseMove = null;
   var xValOnMouseMove = null;
   var maxTooltipWidth = isFitToWidthMode ? Math.round((initialConfig.maxTooltipWidth * currentCanvasWidth) / args.screen) : initialConfig.maxTooltipWidth;
-  let tooltipTextXPos = isFitToWidthMode ? Math.round(2 * currentCanvasWidth / args.screen) : 2;
-  let segmentedTooltipTextXPos = isFitToWidthMode ? Math.round(1 * currentCanvasWidth / args.screen) : 1;
-  let tooltipTextYPos = isFitToWidthMode ? Math.floor(.2 * currentCanvasWidth / args.screen) : .2;
-  let tooltipRectPadding = isFitToWidthMode ? Math.round(3 * currentCanvasWidth / args.screen) : 3;
-  let tooltipPadding = isFitToWidthMode ? Math.round(4 * currentCanvasWidth / args.screen) : 4;
+  // let tooltipTextXPos = isFitToWidthMode ? Math.round(2 * currentCanvasWidth / args.screen) : 2;
+  // let segmentedTooltipTextXPos = isFitToWidthMode ? Math.round(1 * currentCanvasWidth / args.screen) : 1;
+  // let tooltipTextYPos = isFitToWidthMode ? Math.floor(.2 * currentCanvasWidth / args.screen) : .2;
+  // let tooltipRectPadding = isFitToWidthMode ? Math.round(3 * currentCanvasWidth / args.screen) : 3;
+  // let tooltipPadding = isFitToWidthMode ? Math.round(4 * currentCanvasWidth / args.screen) : 4;
 
   xScale.invert = function (x) {
-    // console.log(this.domain())
-
     if (args.xaxiskey === 'date' || typeof xDomains[0] === 'string') {
       return d3.scaleQuantize().domain(this.range()).range(this.domain())(x);
     } else {
@@ -5639,36 +5609,36 @@ function drawScatterChart2(args) {
 
     // Now change the text of xaxis grp, adjust the position and size of the text and box - START
     let xaxis_text = args.xaxiskey === 'date' ? parsedDateString(new Date(pointToFocusOnMouseMove.xVal)) : pointToFocusOnMouseMove.xVal;
-    let xaxis_box_width = calculateTextWidth(xaxis_text, tickSliderFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica') + xAxisSliderRectWidthPadding;
-    let max_xslider_width = innerWidth + initialConfig.inbetweenChartAndXAxisPadding;
+    // let xaxis_box_width = calculateTextWidth(xaxis_text, tickSliderFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica') + xAxisSliderRectWidthPadding;
+    // let max_xslider_width = innerWidth + initialConfig.inbetweenChartAndXAxisPadding;
     // let xBoxWidth = Math.min(max_xslider_width, xaxis_box_width + (initialConfig.tickSliderPadding * 2));
-    xaxis_box_width = xaxis_box_width <= max_xslider_width ? xaxis_box_width : max_xslider_width;
+    // xaxis_box_width = xaxis_box_width <= max_xslider_width ? xaxis_box_width : max_xslider_width;
 
     const widthAvailableAtLeftOfPointInFocus = xAxisHoverGrpPos + initialConfig.inbetweenChartAndXAxisPadding;
     const widthAvailableAtRightOfPointInFocus = innerWidth + initialConfig.inbetweenChartAndXAxisPadding - widthAvailableAtLeftOfPointInFocus;
 
-    let xBoxLeftPos;
-    if (widthAvailableAtLeftOfPointInFocus < xaxis_box_width / 2) {
-      xBoxLeftPos = - widthAvailableAtLeftOfPointInFocus;
-    } else {
-      // Enought space is available at left side
-      // Now, further check if there is enough space at right side or not
-      if (widthAvailableAtRightOfPointInFocus < xaxis_box_width / 2) {
-        xBoxLeftPos = -  (xaxis_box_width - widthAvailableAtRightOfPointInFocus);
-      } else {
-        xBoxLeftPos = -  xaxis_box_width / 2;
-      }
-    }
+    // let xBoxLeftPos;
+    // if (widthAvailableAtLeftOfPointInFocus < xaxis_box_width / 2) {
+    //   xBoxLeftPos = - widthAvailableAtLeftOfPointInFocus;
+    // } else {
+    //   // Enought space is available at left side
+    //   // Now, further check if there is enough space at right side or not
+    //   // if (widthAvailableAtRightOfPointInFocus < xaxis_box_width / 2) {
+    //     // xBoxLeftPos = -  (xaxis_box_width - widthAvailableAtRightOfPointInFocus);
+    //   // } else {
+    //     // xBoxLeftPos = -  xaxis_box_width / 2;
+    //   // }
+    // }
 
     // Now change the text of xaxis grp, adjust the position and size of the text and box
     // START
-    const yval_digits_count = getDigitsCount(pointToFocusOnMouseMove.yVal);
-    const round_var = yval_digits_count - 2;
-    const rounded_val = Math.round(pointToFocusOnMouseMove.yVal * Math.pow(10, round_var) / Math.pow(10, round_var));
-    const yTxt = formatNumber(rounded_val);
-    const yTxtWidth = calculateTextWidth(yTxt, tickFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
-    const yBoxWidth = yTxtWidth + 4 + 10;
-    const yBoxLeftPos = 3;
+    // const yval_digits_count = getDigitsCount(pointToFocusOnMouseMove.yVal);
+    // const round_var = yval_digits_count - 2;
+    // const rounded_val = Math.round(pointToFocusOnMouseMove.yVal * Math.pow(10, round_var) / Math.pow(10, round_var));
+    // const yTxt = formatNumber(rounded_val);
+    // const yTxtWidth = calculateTextWidth(yTxt, tickFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
+    // const yBoxWidth = yTxtWidth + 4 + 10;
+    // const yBoxLeftPos = 3;
 
     //show horizontal line on mouse hover on chart
     hoverYGridLine.style('display', 'block')
@@ -5718,7 +5688,7 @@ function drawScatterChart2(args) {
       }
 
       // adjust starting bars x slider left position
-      let lockIconXPos = 0;
+      // let lockIconXPos = 0;
       let leftMouseXScrollPos = (mouseX - initialConfig.chartLeftPadding - (initialConfig.inbetweenChartAndYAxisPadding + 1));
       xTickValPos = xTickValPosOrg - xaxis_box_width / 2 - xAxisLeftPadding / 2; //default
 
@@ -5726,7 +5696,7 @@ function drawScatterChart2(args) {
         let leftAvailableWidth = xTickValPosOrg - initialConfig.chartLeftPadding - initialConfig.inbetweenChartAndYAxisPadding;
         xTickValPos = xTickValPosOrg - leftAvailableWidth;
         xAxisLeftPadding = 0;
-        lockIconXPos = xaxis_box_width + 2;
+        // lockIconXPos = xaxis_box_width + 2;
       }
       // adjust end bars x slider right position
       if (xTickValAvailableWidth <= xaxis_box_width / 2) { // adjust end bars x slider right position
@@ -5893,7 +5863,7 @@ function drawScatterChart2(args) {
   .on("click", handleChartLock);
 
   //Place a  background of chart area just to hide the points which goes out of its boundary
-  const brushClipArea = chart.append("defs").append("clipPath")
+  chart.append("defs").append("clipPath")
     .attr("id", `clip-${args.unique_key}`)
     .append("rect")
     .attr("width", innerWidth)
@@ -5918,7 +5888,7 @@ function drawScatterChart2(args) {
     chartHoverLocked = false;
     
 
-    let xScaleNew, xDomainNew;
+    let xDomainNew;
       if(!extent){
         if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
         xDomainNew = [ 4,8];
@@ -5959,13 +5929,13 @@ function drawScatterChart2(args) {
 
     scatterPointsWrapper
       .selectAll(".scatter-pt")
-      .attr('cx', function (d, i) {
+      .attr('cx', function (d) {
         return xScale(d[args.xaxiskey]); 
       })
-      .attr('cy', function (d, i) { return yScale(d[args.yaxiskey]); });
+      .attr('cy', function (d) { return yScale(d[args.yaxiskey]); });
 
 
-      let newXTickValues = getStringTickValues(newXDomains, 0, newXDomains.length, x_steps);
+    let newXTickValues = getStringTickValues(newXDomains, 0, newXDomains.length, x_steps);
 
     async function defineNewXAxis() {
       let newXAxis = d3.axisBottom(xScale)
@@ -6015,10 +5985,10 @@ function drawScatterChart2(args) {
     async function setPoints() {
     scatterPointsWrapper
       .selectAll(".scatter-pt")
-      .attr('cx', function (d, i) {
+      .attr('cx', function (d) {
           return xScale(d[args.xaxiskey]); 
       })
-      .attr('cy', function (d, i) { return yScale(d[args.yaxiskey]); });
+      .attr('cy', function (d) { return yScale(d[args.yaxiskey]); });
     }
 
     setPoints().then(() => {trackAllScatterPoints()});
@@ -6087,7 +6057,7 @@ function drawPieChart(args, isDountChart) {
 
   //basic configurations
   let width = args.chartWrapper.current.offsetWidth;
-  let innerWidth = width - (initialConfig.chartLeftPadding + initialConfig.chartRightPadding + initialConfig.inbetweenChartAndYAxisPadding);
+  // let innerWidth = width - (initialConfig.chartLeftPadding + initialConfig.chartRightPadding + initialConfig.inbetweenChartAndYAxisPadding);
   let chartWrapperHeight = d3.select('#chart-' + args.unique_key).node().getBoundingClientRect().height;
   let height = chartWrapperHeight - initialConfig.chartWidgetBottomPadding - initialConfig.chartHeadingSectionHeight;
   if (args.excludeChartHeader !== undefined) { // if chart width is less than default add removed chart header+margin heightto chart height
@@ -6098,11 +6068,10 @@ function drawPieChart(args, isDountChart) {
   let toolTipFontSize = isFitToWidthMode ? Math.floor(11 * window.innerWidth / args.screen) : 11;
   let tickFontSize = isFitToWidthMode ? Math.floor(10 * window.innerWidth / args.screen) : 10;
 
-  let innerHeight = (height - initialConfig.chartBottomPadding - initialConfig.chartTopPadding);
-  let xAxisBottomPos = (height - initialConfig.chartBottomPadding + initialConfig.inbetweenChartAndXAxisPadding);
+  // let innerHeight = (height - initialConfig.chartBottomPadding - initialConfig.chartTopPadding);
+  // let xAxisBottomPos = (height - initialConfig.chartBottomPadding + initialConfig.inbetweenChartAndXAxisPadding);
   let widthForChart = width;
-  let heightForChart = height// - (height - xAxisBottomPos)// - (headerFontSize * 2);//args.chartWrapper.current.offsetHeight === 0 ? innerHeight : args.chartWrapper.current.offsetHeight;
-
+  let heightForChart = height // - (height - xAxisBottomPos)// - (headerFontSize * 2);//args.chartWrapper.current.offsetHeight === 0 ? innerHeight : args.chartWrapper.current.offsetHeight;
   let angleForEachArc = (Math.PI * 2) / args.data.length;
   let smallestArc = angleForEachArc;
 
@@ -6110,13 +6079,11 @@ function drawPieChart(args, isDountChart) {
   d3.select(args.chartWrapper.current).style("height", height + 'px'); //set chart height
 
   let chartHoverLocked = false;
-  let parseDate = d3.timeFormat("%m.%d.%Y"),
-    parsedDateString = d3.timeFormat("%d %b %Y"),
-    formatYNumber = d3.format("");
+  let parsedDateString = d3.timeFormat("%d %b %Y");
 
   //Chart icons
-  let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
-  let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
+  // let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
+  // let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
 
   let firstText = args.xaxiskey[0].toUpperCase() + args.xaxiskey.substring(1, args.xaxiskey.length);
   let secondText = args.yaxiskey[0].toUpperCase() + args.yaxiskey.substring(1, args.yaxiskey.length);
@@ -6138,7 +6105,7 @@ function drawPieChart(args, isDountChart) {
       .style('margin', '20px')
       .text(() => 'Please select different filters or time period as there is no data available for selected filters or time period.')
     return
-  };
+  }
 
   // function handleChartClick() {
   //   let chartData = document.getElementById(`chart-${args.unique_key}`);
@@ -6238,7 +6205,7 @@ function drawPieChart(args, isDountChart) {
     .data(pieGenerator)
     .join('path')
     .attr('d', arcGenetrator)
-    .attr('fill', (d, i) => {
+    .attr('fill', (d) => {
       let value = d.data[args.xaxiskey];
       if (args.xaxiskey === 'date') {
         value = new Date(value);
@@ -6258,7 +6225,7 @@ function drawPieChart(args, isDountChart) {
     .join('path')
     .attr('d', arcGenetrator2)
     .attr("class", (d) => `path-pie_donut-chart-${args.unique_key} path-pie_donut-chart-${args.unique_key}-${d.index}`)
-    .attr('fill', (d, i) => {
+    .attr('fill', (d) => {
       let value = d.data[args.xaxiskey];
       if (args.xaxiskey === 'date') {
         value = new Date(value);
@@ -6348,16 +6315,16 @@ function drawPieChart(args, isDountChart) {
     .style("font-size", fontSizeForChart);
 
   //Tooltip 
-  let tooltip_text = '';
-  let tooltip_text_width = 0;
-  let tooltip_top = 0;
-  let tooltip_pos_adjustment = 0;
-  let tooltip_left = 0;
+  // let tooltip_text = '';
+  // let tooltip_text_width = 0;
+  // let tooltip_top = 0;
+  // let tooltip_pos_adjustment = 0;
+  // let tooltip_left = 0;
 
   let tooltip = svg.append("g")
     .attr("class", "tooltip1")
     .attr("transform", "translate(0, 0)");
-  let tooltipRect = tooltip.append("rect")
+  tooltip.append("rect")
     .attr("x", 0)
     .attr("y", 0)
     .attr("width", 0)
@@ -6366,7 +6333,7 @@ function drawPieChart(args, isDountChart) {
     .attr('fill', '#dedede')
     .attr("rx", 2)
     .attr("class", 'tooltip-rect');
-  let tooltipRectText = tooltip.append("text")
+  tooltip.append("text")
     .attr('font-size', toolTipFontSize + 'px')
     .text('')
     .attr('x', 0)
@@ -6414,7 +6381,7 @@ function drawPieChart(args, isDountChart) {
 
   function handleChartMouseMove(d) {
     if (chartHoverLocked) return false; //if locked no hover allowed
-    const [x, y] = d3.mouse(args.chartWrapper.current);
+    // const [x, y] = d3.mouse(args.chartWrapper.current);
     d3.select(`.path-pie_donut-chart-${args.unique_key}-${d.index}`).style("display", "block")
 
     if (args.data.length > 10 || smallestArc <= Math.PI / 25) {
@@ -6436,14 +6403,14 @@ function drawPieChart(args, isDountChart) {
     }
 
     //Generate tooltip details
-    var chartXPos = 0;
-    var block_tooltip_text = '';
-    var tooltip_width = 0;
+    // var chartXPos = 0;
+    // var block_tooltip_text = '';
+    // var tooltip_width = 0;
 
     let leftKey = args.xaxiskey[0].toUpperCase() + args.xaxiskey.substring(1, args.xaxiskey.length);
     let rightKey = args.yaxiskey[0].toUpperCase() + args.yaxiskey.substring(1, args.yaxiskey.length);
     if (args.xaxiskey === 'date') {
-      var date = new Date(d.data[args.xaxiskey]);
+      date = new Date(d.data[args.xaxiskey]);
       firstText = parsedDateString(date);
     } else {
       firstText = d.data[args.xaxiskey][0].toUpperCase() + d.data[args.xaxiskey].substring(1, d.data[args.xaxiskey].length);
@@ -6488,23 +6455,21 @@ function drawBubbleChart(args) {
   }
   let innerHeight = (height - initialConfig.chartBottomPadding - initialConfig.chartTopPadding);
   let xAxisBottomPos = (height - initialConfig.chartBottomPadding + initialConfig.inbetweenChartAndXAxisPadding);
-  let segmentedValues = [];
+  // let segmentedValues = [];
 
   //Data variable
   let chartMainData = [...args.data];
 
   //Chart icons
-  let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
-  let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
+  // let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
+  // let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
 
   let isFitToWidthMode = (args.screen && !args.isDashboardInEditMode && (args.viewModeType !== undefined && args.viewModeType.name === 'Fit to Width'));
   let toolTipFontSize = isFitToWidthMode ? Math.floor(11 * window.innerWidth / args.screen) : 11;
 
   //Define charts configs
   let chartHoverLocked = false;
-  let parseDate = d3.timeFormat("%m.%d.%Y"),
-    parsedDateString = d3.timeFormat("%d %b %Y"),
-    formatYNumber = d3.format("");
+  let parsedDateString = d3.timeFormat("%d %b %Y");
   let widthForChart = args.chartWrapper.current.offsetWidth;
   let heightForChart = height - (height - xAxisBottomPos);//args.chartWrapper.current.offsetHeight === 0 ? innerHeight : args.chartWrapper.current.offsetHeight;;
 
@@ -6526,7 +6491,7 @@ function drawBubbleChart(args) {
       .style('magin', '20px')
       .text(() => 'Please select different filters as there is no data available for selected filters')
     return
-  };
+  }
 
   if (isSegmented) {
     dataNestForHoverSegmentation = d3.nest().key((d) => d[args.xaxiskey])
@@ -6575,8 +6540,7 @@ function drawBubbleChart(args) {
   node
     .append("circle")
     .attr("r", (d) => d.r)
-    .attr("fill", (d, i) => {
-      // console.log(d);
+    .attr("fill", (d) => {
       if (isSegmented) {
         return color(d.data[chartSegmentation]);
       } else {
@@ -6592,7 +6556,7 @@ function drawBubbleChart(args) {
     .style("text-anchor", "middle")
     .text((d) => {
       if (args.xaxiskey === 'date') {
-        const [p1, p2, p3, p4] = String(d.data[args.xaxiskey]).split(' ');
+        const [p2, p3, p4] = String(d.data[args.xaxiskey]).split(' ');
         return `${isSegmented ? d.data[chartSegmentation].substring(0, d.r / 3.2) : `${p3} ${p2} ${p4}`}: `
       }
       return `${isSegmented ? d.data[chartSegmentation].substring(0, d.r / 3.2) : d.data[args.xaxiskey].substring(0, d.r / 3.2)}: `
@@ -6620,7 +6584,7 @@ function drawBubbleChart(args) {
   let tooltip_text = '';
   let tooltip_text_width = 0;
   let tooltip_top = 0;
-  let tooltip_pos_adjustment = 0;
+  // let tooltip_pos_adjustment = 0;
   let tooltip_left = 0;
 
   let tooltip = svg.append("g")
@@ -6680,11 +6644,11 @@ function drawBubbleChart(args) {
     const [x, y] = d3.mouse(args.chartWrapper.current);
 
     //Generate tooltip details
-    var chartXPos = 0;
+    // var chartXPos = 0;
 
     var xAxisVal;
     if (args.xaxiskey === 'date') {
-      var date = new Date(d.data[args.xaxiskey]);
+      date = new Date(d.data[args.xaxiskey]);
       xAxisVal = parsedDateString(date);
     } else {
       xAxisVal = d.data[args.xaxiskey];
@@ -6725,15 +6689,14 @@ function drawBubbleChart(args) {
     tooltip_text = block_tooltip_text;
     calculateTooltipPositionAndWidth(tooltip_text);
 
-    function calculateTooltipPositionAndWidth(text, totalVal = null) {
+    function calculateTooltipPositionAndWidth(text) {
       tooltip_text_width = calculateTextWidth(text, toolTipFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
       tooltip_width = tooltip_text_width + 4;
-      tooltip_width = tooltip_width; //<= maxTooltipWidth ? tooltip_width : maxTooltipWidth;
-      tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
-      tooltip_top = y//(y(totalVal ? totalVal : d[args.yaxiskey]) - tooltip_pos_adjustment); //if totalVal is set use that position else use individual bar/bar_block position
-
-      var base_left = x//(xValOnMouseMove);
-      chartXPos = (base_left + tooltip_width);
+      // tooltip_width = tooltip_width; //<= maxTooltipWidth ? tooltip_width : maxTooltipWidth;
+      // tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
+      tooltip_top = y; //(y(totalVal ? totalVal : d[args.yaxiskey]) - tooltip_pos_adjustment); //if totalVal is set use that position else use individual bar/bar_block position
+      var base_left = x; //(xValOnMouseMove);
+      // chartXPos = (base_left + tooltip_width);
       var base_right = innerWidth - base_left;
 
       if (base_left > base_right && tooltip_width < base_left) {
@@ -6771,24 +6734,23 @@ function drawBubbleChart(args) {
 }
 
 // Get red, green and blue values of rgb from hash color
-function hashToRgb(color) {
-  let red = parseInt(color[1] + color[2], 16);
-  let green = parseInt(color[3] + color[4], 16);
-  let blue = parseInt(color[5] + color[6], 16);
-
-  return { red, green, blue };
-}
+// function hashToRgb(color) {
+//   let red = parseInt(color[1] + color[2], 16);
+//   let green = parseInt(color[3] + color[4], 16);
+//   let blue = parseInt(color[5] + color[6], 16);
+//   return { red, green, blue };
+// }
 //Get hash color value from red, green and blue values of rgb
-function rgbToHash(red, green, blue) {
-  let first = red.toString(16);
-  first = first.length === 1 ? "0" + first : first;
-  let second = green.toString(16);
-  second = second.length === 1 ? "0" + second : second;
-  let third = blue.toString(16);
-  third = third.length === 1 ? "0" + third : third;
+// function rgbToHash(red, green, blue) {
+//   let first = red.toString(16);
+//   first = first.length === 1 ? "0" + first : first;
+//   let second = green.toString(16);
+//   second = second.length === 1 ? "0" + second : second;
+//   let third = blue.toString(16);
+//   third = third.length === 1 ? "0" + third : third;
 
-  return `#${first}${second}${third}`
-}
+//   return `#${first}${second}${third}`
+// }
 
 // Draw HeatMap chart
 function drawHeatMapChart(args) {
@@ -6814,7 +6776,7 @@ function drawHeatMapChart(args) {
   let isFitToWidthMode = (args.screen && !args.isDashboardInEditMode && (args.viewModeType !== undefined && args.viewModeType.name === 'Fit to Width'));
   let tickFontSize = isFitToWidthMode ? Math.round(10 * currentCanvasSize / args.screen) : 10;
   // let xAxisTickStartPos = isFitToWidthMode ? Math.round(75*currentCanvasSize/args.screen) : 75;
-  let yAxisTickTopPos = isFitToWidthMode ? Math.round(5 * currentCanvasSize / args.screen) : 5;
+  // let yAxisTickTopPos = isFitToWidthMode ? Math.round(5 * currentCanvasSize / args.screen) : 5;
   let tickSliderFontSize = isFitToWidthMode ? Math.round(11 * currentCanvasSize / args.screen) : 10;
   let toolTipFontSize = isFitToWidthMode ? Math.round(11 * currentCanvasSize / args.screen) : 11;
 
@@ -6865,19 +6827,18 @@ function drawHeatMapChart(args) {
   d3.select(args.chartWrapper.current).style("height", height + 'px'); //set chart height
 
   //Chart icons
-  let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
-  let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
+  // let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
+  // let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
 
   //Define charts configs
   let chartHoverLocked = false;
   let defaultColor = (args.chartFormat.color && args.chartFormat.color.single_color !== '') ? args.chartFormat.color.single_color : DefaultColorsList["green"][0]; //pick selected color
   let secondColor = (args.chartFormat.color && args.chartFormat.color.second_color !== '') ? args.chartFormat.color.second_color : DefaultColorsList["green"][4];
-  let color = getColor(args); //Set Color Scales
+  // let color = getColor(args); //Set Color Scales
   let colorScale;
-  let colorForSegmentedChart = [];
+  // let colorForSegmentedChart = [];
   let parseDate = d3.timeFormat("%m.%d.%Y"),
-    parsedDateString = d3.timeFormat("%d %b %Y"),
-    formatYNumber = d3.format("");
+    parsedDateString = d3.timeFormat("%d %b %Y");
 
   //Data variable
   let chartMainData = [...args.data];
@@ -6892,12 +6853,6 @@ function drawHeatMapChart(args) {
   let yEndPoint = initialConfig.chartTopPadding;
 
   let yScaleLimits;
-  let series;
-  let segmentedBarHeights = {};
-  let segmentedBarBlocksYPos = {};
-  let segmentedBarBlocksHeight = {};
-
-
   let xAxisTickValues = getXAxisTickValues(initialConfig, xDomains, chartMainData, args, 'heatmap'); // get x axis calculated tick values
 
   //Define SVG and group element
@@ -6907,7 +6862,6 @@ function drawHeatMapChart(args) {
   let boxHeightObj = getBoxHeight(innerHeight, yDomains);
   let boxHeight = boxHeightObj.height;
   let boxPadding = boxHeightObj.padding;
-
   measurementValue = args.yaxiskey;
 
   dataNest = d3.nest().key((d) => d[args.xaxiskey])
@@ -7029,33 +6983,31 @@ function drawHeatMapChart(args) {
     return dataForY;
   }
 
-  let hasCustomFormat = (args.chartFormat.yaxis.tick || args.chartFormat.yaxis.min || args.chartFormat.yaxis.max) ? true : false;
-  let customTickInterval = hasCustomFormat ? args.chartFormat.yaxis.tick : null;
+  // let hasCustomFormat = (args.chartFormat.yaxis.tick || args.chartFormat.yaxis.min || args.chartFormat.yaxis.max) ? true : false;
+  // let customTickInterval = hasCustomFormat ? args.chartFormat.yaxis.tick : null;
   let yDomainsAxis = (y_steps > 1) ? getTickValuesForYAxis() : [];
   let yTickValues = (initialConfig.showYAxisTicks) ? [...yDomainsAxis] : [];
   let yScale;
   let yAxis;
 
-  async function defineYScale() {
-    //Define y scale
-    yScale = d3.scaleBand()
-      .domain(yDomainsAxis)
-      .range([yStartPoint, yEndPoint])
-      .paddingInner(.25)
+  //Define y scale
+  yScale = d3.scaleBand()
+    .domain(yDomainsAxis)
+    .range([yStartPoint, yEndPoint])
+    .paddingInner(.25)
 
-    //Define the ticks
-    yAxis = d3.axisLeft(yScale)
-      .tickValues(yTickValues)
-      .tickSize(0)
-      .tickPadding(3)
+  //Define the ticks
+  yAxis = d3.axisLeft(yScale)
+    .tickValues(yTickValues)
+    .tickSize(0)
+    .tickPadding(3)
 
-    //Draw y-axis
-    chart.append("g")
-      .attr("class", "axis y-axis")
-      .attr("transform", "translate(" + (widthForYaxisTicks + 5) + ",0)") //start with 10px instead of 0
-      .call(yAxis)
-      .attr('font-size', tickFontSize + 'px');
-  }
+  //Draw y-axis
+  chart.append("g")
+    .attr("class", "axis y-axis")
+    .attr("transform", "translate(" + (widthForYaxisTicks + 5) + ",0)") //start with 10px instead of 0
+    .call(yAxis)
+    .attr('font-size', tickFontSize + 'px');
 
   //if no data available
   if (args.isEmpty) {
@@ -7068,7 +7020,6 @@ function drawHeatMapChart(args) {
       .style("fill", "#fff")
       .attr("class", "no-data");
   }
-
 
   let y = d3.scaleBand()
     .domain(yDomains)
@@ -7121,15 +7072,15 @@ function drawHeatMapChart(args) {
     const [x, y] = d3.mouse(args.chartWrapper.current);
 
     //Generate tooltip details
-    var chartXPos = 0;
+    // var chartXPos = 0;
 
-    var xAxisVal;
-    if (args.xaxiskey === 'date') {
-      var date = new Date(d[args.xaxiskey]);
-      xAxisVal = parsedDateString(date);
-    } else {
-      xAxisVal = d[args.xaxiskey];
-    }
+    // var xAxisVal;
+    // if (args.xaxiskey === 'date') {
+      // date = new Date(d[args.xaxiskey]);
+      // xAxisVal = parsedDateString(date);
+    // } else {
+      // xAxisVal = d[args.xaxiskey];
+    // }
 
     d3.select(`.rect-heatmapchart-${args.unique_key}-${index}`)
       .style("stroke", "white")// colorScale(d[measurementValue] === 0 ? 0 : Math.ceil(d[measurementValue])))
@@ -7140,15 +7091,15 @@ function drawHeatMapChart(args) {
     tooltip_text = measurementValue + ': ' + args.chartCurrencySymbol + numberWithCommas(d[measurementValue]) + args.chartPercentSymbol;
     calculateTooltipPositionAndWidth(tooltip_text);
 
-    function calculateTooltipPositionAndWidth(text, totalVal = null) {
+    function calculateTooltipPositionAndWidth(text) {
       tooltip_text_width = calculateTextWidth(text, toolTipFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
       tooltip_width = tooltip_text_width + 4;
       //tooltip_width = tooltip_width <= maxTooltipWidth ? tooltip_width : maxTooltipWidth;
-      tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
+      // tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
       tooltip_top = y//(y(totalVal ? totalVal : d[args.yaxiskey]) - tooltip_pos_adjustment); //if totalVal is set use that position else use individual bar/bar_block position
 
       var base_left = x//(xValOnMouseMove);
-      chartXPos = (base_left + tooltip_width);
+      // chartXPos = (base_left + tooltip_width);
       var base_right = innerWidth - base_left;
 
       if ((base_left - widthForYaxisTicks) > base_right && tooltip_width < (base_left - widthForYaxisTicks)) {
@@ -7228,7 +7179,7 @@ function drawHeatMapChart(args) {
       }
 
       xAxisSliderGroup.attr("transform", "translate(" + parseInt(xTickValPos) + "," + parseInt(xAxisBottomPos - xAxisSliderRectWidthPadding) + ")")
-        .style("display", "block");; // bgBottomPadding is extra bg rect padding
+        .style("display", "block"); // bgBottomPadding is extra bg rect padding
       xAxisSliderGroup.select(".hover-line-status").attr("x", lockIconXPos).attr("y", initialConfig.tickSliderPadding); //lock icon position
       let xAxisSliderTextTopPos = isFitToWidthMode ? parseInt(10 * currentCanvasSize / args.screen) : 10;
       let xAxisSliderTextLeftPos = (xAxisLeftPadding + (isFitToWidthMode ? parseInt(5 * currentCanvasSize / args.screen) : 5));
@@ -7363,7 +7314,7 @@ function drawHeatMapChart(args) {
   let tooltip_text = '';
   let tooltip_text_width = 0;
   let tooltip_top = 0;
-  let tooltip_pos_adjustment = 0;
+  // let tooltip_pos_adjustment = 0;
   let tooltip_left = 0;
 
   let tooltip = chart.append("g")
@@ -7394,36 +7345,34 @@ function drawSpiderChart(args) {
   if (!initialConfig) return;
 
   //basic configurations
-  let width = args.chartWrapper.current.offsetWidth;
-  let innerWidth = width - (initialConfig.chartLeftPadding + initialConfig.chartRightPadding + initialConfig.inbetweenChartAndYAxisPadding);
+  // let width = args.chartWrapper.current.offsetWidth;
+  // let innerWidth = width - (initialConfig.chartLeftPadding + initialConfig.chartRightPadding + initialConfig.inbetweenChartAndYAxisPadding);
   let chartWrapperHeight = d3.select('#chart-' + args.unique_key).node().getBoundingClientRect().height;
   let height = chartWrapperHeight - initialConfig.chartWidgetBottomPadding - initialConfig.chartHeadingSectionHeight;
   if (args.excludeChartHeader !== undefined) { // if chart width is less than default add removed chart header+margin heightto chart height
     height = height + initialConfig.chartInnerHeadingSectionHeightWithMargin + (initialConfig.chartWidgetBottomPadding - 5);
   }
-  let innerHeight = (height - initialConfig.chartBottomPadding - initialConfig.chartTopPadding);
+  // let innerHeight = (height - initialConfig.chartBottomPadding - initialConfig.chartTopPadding);
   let xAxisBottomPos = (height - initialConfig.chartBottomPadding + initialConfig.inbetweenChartAndXAxisPadding);
   d3.select(args.chartWrapper.current).style("height", height + 'px'); //set chart height
 
   //Chart icons
-  let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
-  let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
+  // let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
+  // let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
 
   let isFitToWidthMode = (args.screen && !args.isDashboardInEditMode && (args.viewModeType !== undefined && args.viewModeType.name === 'Fit to Width'));
   let tickFontSize = isFitToWidthMode ? Math.floor(10 * window.innerWidth / args.screen) : 10;
   let toolTipFontSize = isFitToWidthMode ? Math.floor(11 * window.innerWidth / args.screen) : 11;
 
   //Define charts configs
-  let isSegmented = (args.chartSegmentation && args.chartSegmentation !== '' && args.chartSegmentation !== 'all' && args.chartSegmentation !== ' ');
-  let chartSegmentation = isSegmented ? args.chartSegmentation : '';
+  // let isSegmented = (args.chartSegmentation && args.chartSegmentation !== '' && args.chartSegmentation !== 'all' && args.chartSegmentation !== ' ');
+  // let chartSegmentation = isSegmented ? args.chartSegmentation : '';
   let chartHoverLocked = false;
-  let defaultColor = (args.chartFormat.color && args.chartFormat.color.single_color !== '') ? args.chartFormat.color.single_color : chartColors[0]; //pick selected color
+  // let defaultColor = (args.chartFormat.color && args.chartFormat.color.single_color !== '') ? args.chartFormat.color.single_color : chartColors[0]; //pick selected color
   let color = getColor(args); //Set Color Scales
-  let parseDate = d3.timeFormat("%m.%d.%Y"),
-    parsedDateString = d3.timeFormat("%d %b %Y"),
-    formatYNumber = d3.format("");
+  let parsedDateString = d3.timeFormat("%d %b %Y");
   let widthForChart = args.chartWrapper.current.offsetWidth;
-  let heightForChart = height;//args.chartWrapper.current.offsetHeight;
+  let heightForChart = height; //args.chartWrapper.current.offsetHeight;
 
   //return from here if data is not available
   if (!args.data || args.data.length === 0) return;
@@ -7468,7 +7417,6 @@ function drawSpiderChart(args) {
   });
 
   let radius;
-
   if (args.chartSizeClass !== '') {
     radius = widthForChart <= heightForChart ? ((widthForChart / 2) - (widthForChart / 10)) : ((heightForChart / 2) - (heightForChart / 10));
   } else {
@@ -7499,7 +7447,7 @@ function drawSpiderChart(args) {
       .domain([minValues[measurements[i]], maxValues[measurements[i]]]);
 
     rScales = { ...rScales, [measurements[i]]: scale };
-  };
+  }
 
   let g = svg.append("g")
     .attr("transform", "translate(" + widthForChart / 2 + ", " + heightForChart / 2 + ")");
@@ -7511,7 +7459,7 @@ function drawSpiderChart(args) {
     .enter()
     .append("circle")
     .attr("class", "gridCircle")
-    .attr("r", function (d, i) { return (radius / levels) * d; })
+    .attr("r", function (d) { return (radius / levels) * d; })
     .style("fill", "#CDCDCD")
     .style("stroke", "#CDCDCD")
     .style("fill-opacity", "0.1")
@@ -7532,7 +7480,7 @@ function drawSpiderChart(args) {
     .attr("dy", "0.4em")
     .style("font-size", tickFontSize)
     .attr("fill", "white")
-    .text(function (d, i) {
+    .text(function (d) {
       let value = (100 / levels) * d;
       if (value.toString().length > 5) {
         value = value.toString().split('.');
@@ -7572,7 +7520,7 @@ function drawSpiderChart(args) {
         width = calculateTextWidth(d, tickFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
         scaleValueX = scaleValueX - width / 2 - dotRadius * 4;
       } else {
-        scaleValueX = scaleValueX;
+        // scaleValueX = scaleValueX;
       }
 
       let scaleValueY = rScales[measurements[i]](maxValues[measurements[i]] * 1.1) * Math.sin(angleSlice * i - Math.PI / 2) * 1.1;
@@ -7608,9 +7556,9 @@ function drawSpiderChart(args) {
 
   blobWrapper
     .append("path")
-    .attr("class", (d, i) => `radarArea-spiderchart-${args.unique_key} radarArea-spiderchart-${args.unique_key}-${i}`)
-    .attr("d", function (d, i) { return pathValues[i]; })
-    .style("fill", function (d, i) {
+    .attr("class", (i) => `radarArea-spiderchart-${args.unique_key} radarArea-spiderchart-${args.unique_key}-${i}`)
+    .attr("d", function (i) { return pathValues[i]; })
+    .style("fill", function (d) {
       let value = d[args.xaxiskey];
       if (args.xaxiskey === 'date') {
         value = new Date(value);
@@ -7627,7 +7575,7 @@ function drawSpiderChart(args) {
     .attr("class", "radarStroke")
     .attr("d", (d, i) => pathValues[i])
     .style("stroke-width", strokeWidth + "px")
-    .style("stroke", (d, i) => {
+    .style("stroke", (d) => {
       let value = d[args.xaxiskey];
       if (args.xaxiskey === 'date') {
         value = new Date(value);
@@ -7638,7 +7586,7 @@ function drawSpiderChart(args) {
     .style("fill", "none")
     .on("mousemove", (d, i) => handleBlobMouseMove(d, i))
     .on("mouseout", handleBlobMouseOut)
-    .on("click",  () => {if (window.currentSelectedWidget===args.unique_key){handleChartLock()}});
+    .on("click",  () => {if (window.currentSelectedWidget===args.unique_key){ handleChartLock() }});
 
   for (let i = 0; i < args.data.length; i += 1) {
     //Append the circles
@@ -7651,7 +7599,7 @@ function drawSpiderChart(args) {
       .attr("r", dotRadius)
       .attr("cx", function (d, k) { return rScales[d](args.data[i][d]) * Math.cos(angleSlice * k - Math.PI / 2); })
       .attr("cy", function (d, k) { return rScales[d](args.data[i][d]) * Math.sin(angleSlice * k - Math.PI / 2); })
-      .style("fill", (d, k) => {
+      .style("fill", () => {
         let value = args.data[i][args.xaxiskey];
         if (args.xaxiskey === 'date') {
           value = new Date(value);
@@ -7670,7 +7618,7 @@ function drawSpiderChart(args) {
   let tooltip_text = '';
   let tooltip_text_width = 0;
   let tooltip_top = 0;
-  let tooltip_pos_adjustment = 0;
+  // let tooltip_pos_adjustment = 0;
   let tooltip_left = 0;
 
   let tooltip = svg.append("g")
@@ -7720,9 +7668,8 @@ function drawSpiderChart(args) {
   handleChartMouseOut();
 
   //Remove tooltip on mouse out
-  function handleChartMouseOut(index) {
+  function handleChartMouseOut() {
     if (chartHoverLocked) return false; //if locked no hover allowed
-
     d3.selectAll(`.radarArea-spiderchart-${args.unique_key}`)
       .style("fill-opacity", 0.4);
 
@@ -7751,8 +7698,7 @@ function drawSpiderChart(args) {
     }
   }
 
-  var dataValues = null;
-
+  // var dataValues = null;
   function handleChartMouseMove(measurement, d, index) {
     if (chartHoverLocked) return false; //if locked no hover allowed
 
@@ -7767,12 +7713,11 @@ function drawSpiderChart(args) {
       .style("fill-opacity", 0.8);
 
     //Generate tooltip details
-    var chartXPos = 0;
+    // var chartXPos = 0;
 
     // Show Tooltip
     var block_tooltip_text = '';
     var tooltip_width = 0;
-
     if (args.pointSelectionModeOn) {
       block_tooltip_text = 'Click to Select';
     } else {
@@ -7788,15 +7733,15 @@ function drawSpiderChart(args) {
     tooltip_text = block_tooltip_text;
     calculateTooltipPositionAndWidth(tooltip_text);
 
-    function calculateTooltipPositionAndWidth(text, totalVal = null) {
+    function calculateTooltipPositionAndWidth(text) {
       tooltip_text_width = calculateTextWidth(text, toolTipFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
       tooltip_width = tooltip_text_width + 4;
       //tooltip_width = tooltip_width <= maxTooltipWidth ? tooltip_width : maxTooltipWidth;
-      tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
+      // tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
       tooltip_top = y//(y(totalVal ? totalVal : d[args.yaxiskey]) - tooltip_pos_adjustment); //if totalVal is set use that position else use individual bar/bar_block position
 
       var base_left = x//(xValOnMouseMove);
-      chartXPos = (base_left + tooltip_width);
+      // chartXPos = (base_left + tooltip_width);
       var base_right = widthForChart - base_left;
 
       if (base_left > base_right && tooltip_width < base_left) {
@@ -7852,8 +7797,8 @@ function drawWaterFallChart(args) {
   d3.select(args.chartWrapper.current).style("height", height + 'px'); //set chart height
 
   //Chart icons
-  let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
-  let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
+  // let iconLock = '<g class="nc-icon-wrapper" fill="#ff0000" transform="translate(0, 0)"><path d="M21,10H18V6.01A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Zm4-9H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.957,3.957,0,0,1,16,6Z" fill="#ff0000"></path></g>';
+  // let iconUnlock = '<g class="nc-icon-wrapper" fill="#00ff7f" transform="translate(0, 0)"><path d="M21,10H8V5.91A3.957,3.957,0,0,1,11.959,2h.131A3.955,3.955,0,0,1,16,5.99l2,.02A5.96,5.96,0,0,0,12.1,0h-.09A5.94,5.94,0,0,0,6,5.9V10H3a1,1,0,0,0-1,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V11A1,1,0,0,0,21,10Zm-9,9a2,2,0,1,1,2-2A2,2,0,0,1,12,19Z" fill="#00ff7f"></path></g>';
 
   let currentCanvasSize = (window.innerWidth - 10);
   let isFitToWidthMode = (args.screen && !args.isDashboardInEditMode && (args.viewModeType !== undefined && args.viewModeType.name === 'Fit to Width'));
@@ -7927,10 +7872,10 @@ function drawWaterFallChart(args) {
 
   let yScaleLimits;
   let series;
-  let totalSegmentData = {};
-  let segmentedBarHeights = {};
-  let segmentedBarBlocksYPos = {};
-  let segmentedBarBlocksHeight = {};
+  // let totalSegmentData = {};
+  // let segmentedBarHeights = {};
+  // let segmentedBarBlocksYPos = {};
+  // let segmentedBarBlocksHeight = {};
 
   //Define X-Axis for each chart - date/string
   // let xDomains = args.data.map((d) => d[args.xaxiskey]);
@@ -7954,7 +7899,7 @@ function drawWaterFallChart(args) {
 
   //Add the chartHoverTrackPad before when it is segmented
   if (isSegmented) {
-    var chartHoverTrackPad = chart.append('rect')
+    chart.append('rect')
       .attr('width', innerWidth)
       .attr('height', innerHeight + 1)
       .attr('x', initialConfig.chartLeftPadding + initialConfig.inbetweenChartAndYAxisPadding)
@@ -7997,7 +7942,7 @@ function drawWaterFallChart(args) {
       let totalPos = 0, totalNeg = 0;
       let pos = [], neg = [];
 
-      dataNest[i].values.map((d, k) => {
+      dataNest[i].values.map((d) => {
         if (d[args.yaxiskey] < 0) {
           totalNeg += d[args.yaxiskey];
           neg.push(d);
@@ -8007,13 +7952,10 @@ function drawWaterFallChart(args) {
         }
       });
 
-      // console.log(cumulative)
-
       totalPositiveObjects = [ ...totalPositiveObjects, pos ];
       totalNegaticeObjects = [ ...totalNegaticeObjects, neg ];
       totalPositiveValues += totalPos;
       totalNegativeValues += totalNeg;
-
 
       cumulative = cumulative + (totalPos + totalNeg);
       dataForChart[i] = { ...dataForChart[i], end: cumulative }
@@ -8021,7 +7963,6 @@ function drawWaterFallChart(args) {
       dataForChart[i] = { ...dataForChart[i], totalNegative: totalNeg }
       dataForChart[i] = { ...dataForChart[i], positiveValues: pos }
       dataForChart[i] = { ...dataForChart[i], negativeValues: neg }
-
 
       if ((cumulative - totalPositiveValues) < min) {
         min = cumulative-totalPositiveValues;
@@ -8074,7 +8015,7 @@ function drawWaterFallChart(args) {
     barPadding = barWidthObj.padding;
     
     let formattedData = [];
-    dataNest.forEach((item, i) => {
+    dataNest.forEach((item) => {
       let obj = {};
       obj[args.xaxiskey] = item.values[0][args.xaxiskey];
       item.values.forEach((subitem) => {
@@ -8130,14 +8071,12 @@ function drawWaterFallChart(args) {
       }
     });
 
-    for (var i = 0; i < args.data.length; i++) {
+    for (let i = 0; i < args.data.length; i++) {
       dataForChart[i] = { ...dataForChart[i], start: cumulative };
       cumulative += args.data[i][args.yaxiskey];
       dataForChart[i] = { ...dataForChart[i], end: cumulative };
-  
       dataForChart[i] = { ...dataForChart[i], [args.xaxiskey]: args.data[i][args.xaxiskey] };
       dataForChart[i] = { ...dataForChart[i], [args.yaxiskey]: args.data[i][args.yaxiskey] };
-  
       dataForChart[i] = { ...dataForChart[i], class: (args.data[i][args.yaxiskey] >= 0) ? 'positive' : 'negative' }
     }
     dataForChart.push({
@@ -8274,23 +8213,18 @@ function drawWaterFallChart(args) {
           .enter()
           .append("rect")
             .attr("class", `negative-rect-${i}`)
-            .attr("transform", (d, j) => {
-              // console.log('d', d);
-              // let yPoint = point;
+            .attr("transform", (d) => {
               previousPoint = point;
               point += d[args.yaxiskey];
               heightArray.push(Math.abs(yScale(previousPoint) - yScale(point)));
               return `translate(${xScale(d[args.xaxiskey])}, ${yScale(Math.max(previousPoint, point))})`;
             })
-            .attr("height", (d, j) => heightArray[j])
+            .attr("height", (j) => heightArray[j])
             .attr("width", (dataForChart[i].totalPositive !== 0 ? (xScale.bandwidth())/2 : xScale.bandwidth()))
-            .style("fill", (d, j) => {
-              let colorValue = hashToRgb(color(d[chartSegmentation]));
-              // return `rgba(${colorValue.red}, ${colorValue.green}, ${colorValue.blue})`
+            .style("fill", (d) => {
+              // let colorValue = hashToRgb(color(d[chartSegmentation]));
               return color(d[chartSegmentation])
             })
-              // .style("fill-opacity", "50%")
-            // .on("mousemove", () => handleSegmentChartMouseMove());
         heightArray = []
       }
 
@@ -8306,20 +8240,17 @@ function drawWaterFallChart(args) {
           .data(dataForChart[i].positiveValues)
           .enter()
           .append("rect")
-            .attr("transform", (d, j) => {
-              // console.log('d', d);
-              // let yPoint = point;
+            .attr("transform", (d) => {
               previousPoint = point;
               point += d[args.yaxiskey];
               heightArray.push(Math.abs(yScale(previousPoint) - yScale(point)));
               return `translate(${xScale(d[args.xaxiskey]) + (dataForChart[i].totalNegative !== 0 ? (xScale.bandwidth())/2 : 0)}, ${yScale(Math.max(previousPoint, point))})`;
             })
-            .attr("height", (d, j) => {
+            .attr("height", (j) => {
               return heightArray[j];
             })
             .attr("width", (dataForChart[i].totalNegative !== 0 ? (xScale.bandwidth())/2 : xScale.bandwidth()))
-            .style("fill", (d, j) => color(d[chartSegmentation]))
-            // .style("fill-opacity", "50%")
+            .style("fill", (d) => color(d[chartSegmentation]))
         heightArray = []
       }
     }
@@ -8328,10 +8259,10 @@ function drawWaterFallChart(args) {
       .data(dataForChart)
       .enter()
       .append("rect")
-      .attr("transform", (d, i) => {
+      .attr("transform", (d) => {
         return `translate(${xScale(d[args.xaxiskey])}, ${yScale(Math.max(d.start, d.end))})`
       })
-      .attr("height", (d, i) => Math.abs(yScale(d.start) - yScale(d.end)))
+      .attr("height", (d) => Math.abs(yScale(d.start) - yScale(d.end)))
       .attr("width", xScale.bandwidth())
       .style("fill", (d) => d.class === 'negative' ? 'red' : defaultColor)
       .on('mousemove', (d) => handleChartMouseMove(d))
@@ -8370,15 +8301,15 @@ function drawWaterFallChart(args) {
 
   //y-axis hover elements
   let yAxisSliderGroup;
-  let yHoverRect;
-  let yHoverRectText;
+  // let yHoverRect;
+  // let yHoverRectText;
   let yTickSliderHeight = args.screen ? initialConfig.tickHoverBoxHeight * window.innerWidth / args.screen : initialConfig.tickHoverBoxHeight;
   let yTickSliderWidth = isFitToWidthMode ? Math.round(30 * window.innerWidth / args.screen) : 30;
   let yTickSliderRectPosLeft = isFitToWidthMode ? Math.round(5 * window.innerWidth / args.screen) : 5;
-  let yTickSliderTextPosTop = isFitToWidthMode ? Math.round(5 * window.innerWidth / args.screen) : 5;
+  // let yTickSliderTextPosTop = isFitToWidthMode ? Math.round(5 * window.innerWidth / args.screen) : 5;
   if (initialConfig.showYAxisTicks) {
     yAxisSliderGroup = chart.append("g").attr("class", "yaxis-slider-group").style("display", "none");
-    yHoverRect = yAxisSliderGroup.append("rect")
+    yAxisSliderGroup.append("rect")
       .attr("x", yTickSliderRectPosLeft)
       .attr("y", 0)
       .attr("width", yTickSliderWidth)
@@ -8386,7 +8317,7 @@ function drawWaterFallChart(args) {
       .attr("rx", 1)
       .attr("class", 'hover-yaxis-bg')
       .style("display", "none");
-    yHoverRectText = yAxisSliderGroup.append("text")
+    yAxisSliderGroup.append("text")
       .attr('font-size', tickSliderFontSize + 'px')
       .text('')
       .attr('x', 0)
@@ -8400,7 +8331,7 @@ function drawWaterFallChart(args) {
   let tooltip_text = '';
   let tooltip_text_width = 0;
   let tooltip_top = 0;
-  let tooltip_pos_adjustment = 0;
+  // let tooltip_pos_adjustment = 0;
   let tooltip_left = 0;
 
   let tooltip = svg.append("g")
@@ -8451,8 +8382,7 @@ function drawWaterFallChart(args) {
     }
   }
 
-  var dataValues = null;
-
+  // var dataValues = null;
   // xScale.invert = function (x) {
   //   return d3.scaleQuantize().domain(this.range()).range(this.domain())(x);
   // };
@@ -8467,8 +8397,7 @@ function drawWaterFallChart(args) {
     const [x, y] = d3.mouse(args.chartWrapper.current);
 
     //Generate tooltip details
-    var chartXPos = 0;
-
+    // var chartXPos = 0;
     var xAxisVal;
     if (args.xaxiskey === 'date') {
       if (d[args.xaxiskey] === 'Total') {
@@ -8516,15 +8445,14 @@ function drawWaterFallChart(args) {
     tooltip_text = block_tooltip_text;
     calculateTooltipPositionAndWidth(tooltip_text);
 
-    function calculateTooltipPositionAndWidth(text, totalVal = null) {
+    function calculateTooltipPositionAndWidth(text) {
       tooltip_text_width = calculateTextWidth(text, toolTipFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
       tooltip_width = tooltip_text_width + 4;
-      tooltip_width = tooltip_width; //<= maxTooltipWidth ? tooltip_width : maxTooltipWidth;
-      tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
-      tooltip_top = y//(y(totalVal ? totalVal : d[args.yaxiskey]) - tooltip_pos_adjustment); //if totalVal is set use that position else use individual bar/bar_block position
+      // tooltip_pos_adjustment = initialConfig.tooltipHeight + (initialConfig.inbetweenChartAndXAxisPadding < 5 ? 5 : initialConfig.inbetweenChartAndXAxisPadding);
+      tooltip_top = y; //(y(totalVal ? totalVal : d[args.yaxiskey]) - tooltip_pos_adjustment); //if totalVal is set use that position else use individual bar/bar_block position
 
-      var base_left = x//(xValOnMouseMove);
-      chartXPos = (base_left + tooltip_width);
+      var base_left = x; //(xValOnMouseMove);
+      // chartXPos = (base_left + tooltip_width);
       var base_right = innerWidth - base_left;
 
       if (base_left > base_right && tooltip_width < base_left) {
@@ -8606,7 +8534,7 @@ function drawWaterFallChart(args) {
       }
 
       xAxisSliderGroup.attr("transform", "translate(" + parseInt(xTickValPos) + "," + parseInt(xAxisBottomPos - xAxisSliderRectWidthPadding) + ")")
-        .style("display", "block");; // bgBottomPadding is extra bg rect padding
+        .style("display", "block"); // bgBottomPadding is extra bg rect padding
       xAxisSliderGroup.select(".hover-line-status").attr("x", lockIconXPos).attr("y", initialConfig.tickSliderPadding); //lock icon position
       let xAxisSliderTextTopPos = isFitToWidthMode ? parseInt(10 * currentCanvasSize / args.screen) : 10;
       let xAxisSliderTextLeftPos = (xAxisLeftPadding + (isFitToWidthMode ? parseInt(5 * currentCanvasSize / args.screen) : 5));
@@ -8700,8 +8628,8 @@ function drawTable(args) {
   if (!initialConfig) return;
 
   var chartHeadingSectionHeight = initialConfig.chartHeadingSectionHeight;
-  var chartBottomPadding = 5;
-  var width = args.chartWrapper.current.offsetWidth;
+  // var chartBottomPadding = 5;
+  // var width = args.chartWrapper.current.offsetWidth;
   var chartWrapperHeight = d3.select('#chart-' + args.unique_key).node().getBoundingClientRect().height;
   var height = chartWrapperHeight - initialConfig.chartWidgetBottomPadding - chartHeadingSectionHeight; // 20 is reduced because sub header is not there in table
   if (args.excludeChartHeader !== undefined) { // if chart width is less than default add removed chart header+margin heightto chart height
@@ -8752,13 +8680,12 @@ function drawTable(args) {
 
     //table body
     if (args.data.length > 0) {
-      args.data.forEach((item, i) => {
+      args.data.forEach((item) => {
         if (Object.keys(item).length > 0) {
           tableWrapper += '<tr>';
           headers.forEach((header) => {
             let col_val = (header === 'date') ? parsedDateString(item[header]) : item[header];
             let value_class = (values.includes(header) ? ' value' : '');
-            // tableWrapper += '<td class="'+ (i % 2 === 0 ? 'even' : 'odd') + (value_class) +'">' + col_val + '</td>';
             tableWrapper += '<td style="padding: ' + tdPadding + 'px" class="' + (value_class) + '">' + col_val + '</td>';
           });
           tableWrapper += '<tr>';
@@ -8858,12 +8785,12 @@ function getTickValues(min, max, steps = 4, custom_format = false, customTickInt
 
 
 //get number round
-function getNumberRound(num, max_yval) {
-  let digits_count_before_decimal = getDigitsCount(max_yval);
-  let round_var = digits_count_before_decimal - 2;
-  let tick_value = Math.round(num);
-  return parseFloat(tick_value).toFixed(round_var);
-}
+// function getNumberRound(num, max_yval) {
+//   let digits_count_before_decimal = getDigitsCount(max_yval);
+//   let round_var = digits_count_before_decimal - 2;
+//   let tick_value = Math.round(num);
+//   return parseFloat(tick_value).toFixed(round_var);
+// }
 
 //get text width
 // function calculateTextWidth(text, font) {
