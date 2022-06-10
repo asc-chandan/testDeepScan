@@ -101,11 +101,6 @@ const reorder = (list, currIndex, newIndex) => {
   return listCopy;
 };
 
-const uniqueID = () => {
-  return Math.random().toString(36).substr(2, 9);
-};
-
-
 class AnalysisView extends Component {
   constructor(props) {
     super(props);
@@ -420,11 +415,10 @@ class AnalysisView extends Component {
 
 
   componentDidUpdate(prev_props) {
-    const scriptsAlreadyLoaded = this.state.data_sources.length > 0;
     if (!prev_props.isActiveTab && this.props.isActiveTab && this.state.inprocess_get_analysis) {
       this.setState({ inprocess_get_analysis: false })
     }
-    if (!prev_props.isActiveTab && this.props.isActiveTab && !this.state.isAnalysisDataLoaded){// && !scriptsAlreadyLoaded) {
+    if (!prev_props.isActiveTab && this.props.isActiveTab && !this.state.isAnalysisDataLoaded){
       this.setState({ isTimeoutCancelled: false });
       // If tab has become active and load apis are not loaded yet, trigger them
       if (!this.isNewAnalysis()) {
@@ -693,7 +687,7 @@ class AnalysisView extends Component {
   handleAnalysisFullscreenBtn() {
     const ele = document.querySelector(`#d-${this.props.analysisSavedSettings.id} #analysis`);
     const fullScreenFunc = ele.requestFullscreen || ele.webkitRequestFullscreen || ele.msRequestFullscreen;
-    fullScreenFunc.call(ele).catch(err => console.log('Some error occured while opening full-screen mode'));
+    fullScreenFunc.call(ele).catch(err => console.log('Some error occured while opening full-screen mode', err));
   }
 
   //save the analysis
@@ -771,7 +765,7 @@ class AnalysisView extends Component {
         let defaultConditionalColorsRefs = [];
         let conditionalFormatting = [];
         if (allAnalysisDetails && allAnalysisDetails['config'] && allAnalysisDetails['config'].conditional_formatting) { // For saved report, initialize according to the saved condtions
-          defaultConditionalColorsRefs = allAnalysisDetails['config'].conditional_formatting.map(x => ({ 'bg': React.createRef(), 'color': React.createRef() }));
+          defaultConditionalColorsRefs = allAnalysisDetails['config'].conditional_formatting.map(() => ({ 'bg': React.createRef(), 'color': React.createRef() }));
           conditionalFormatting = allAnalysisDetails['config'].conditional_formatting;
         }
         
@@ -812,7 +806,7 @@ class AnalysisView extends Component {
         this.setState(stateObj);
       })
       .catch(err => {
-        console.log('Error on informing  server about tab opening for tab: ' + this.props.analysisSavedSettings.id);
+        console.log('Error on informing  server about tab opening for tab: ' + this.props.analysisSavedSettings.id, err);
       });
   }
 
@@ -939,7 +933,7 @@ class AnalysisView extends Component {
 
   //get default/saved date ranges
   getLastUpdatedDate() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       let defaultCount = 29; //incase default is not coming from api
       let defaultFormat = 'days';
       let formattedDate = '';
@@ -1289,7 +1283,7 @@ class AnalysisView extends Component {
       for(let i=0; i<default_rows; i++){
         //add empty data to existing columns of rows
         if(i < updatedanalysisData.length){
-          updatedanalysisData.forEach((item, i) => {
+          updatedanalysisData.forEach((item) => {
             updatedAnalysisColumns.forEach((col)=>{
               if(col.includes('blank_')){ item[col] = ''; }
             });
@@ -1425,13 +1419,14 @@ class AnalysisView extends Component {
           errorOccuredInStartOrGetAnalysis: true,
           inprocess_get_analysis: false,
         });
+        console.log('error', err);
       });
     });
     
   }
 
   //Get Analysis Data
-  getAnalysisSubLevelData(analysisPayLoad, row_index, level_details) {
+  getAnalysisSubLevelData(analysisPayLoad, row_index) {
     this.setState({ inprocess_sublevel: true });
 
     APIService.apiRequest(Constants.API_BASE_URL + '/getAnalysisLData', analysisPayLoad, true, 'POST', this.controller)
@@ -1515,13 +1510,14 @@ class AnalysisView extends Component {
       })
       .catch(err => {
         this.setState({ inprocess_sublevel: false });
+        console.log('error', err);
       });
   }
 
   //Get Values under Columns and Rows
   generateSelectedRowsColsElements(arr) {
     var selected_values;
-    var hasValues = arr.find((item, index) => {
+    var hasValues = arr.find((item) => {
       if (item.title === 'values') return true;
     });
     selected_values = this.getkeyValuesInArray(arr, 'title');
@@ -2020,7 +2016,7 @@ class AnalysisView extends Component {
   }
 
   // On Drag Start of FliterPanle floating Div
-  handleAnalysisFloatingPanelDragStart(e, id) {
+  handleAnalysisFloatingPanelDragStart(e) {
     e.stopPropagation();
 
     // handle only the left mouse click(It has e.button = 0)
@@ -2234,7 +2230,7 @@ class AnalysisView extends Component {
       }
     });
     this.setState({ collapseAllRows: false });
-    this.getAnalysisSubLevelData(analysisPayLoad, row_index, level_details);
+    this.getAnalysisSubLevelData(analysisPayLoad, row_index);
   }
 
   //On click of exppand icon - fetch sub level data of analysis
@@ -2273,7 +2269,7 @@ class AnalysisView extends Component {
 
   //Genrate Values
   generateValues(arr) {
-    return arr.map((item, index) => {
+    return arr.map((item) => {
       // In api, default_action shud be 'calculated' for Any calculated field, so handle that
       const actionsToBeSentInShowDataAs = ['percentage_of_row_total', 'percentage_of_column_total'];
       const defaultAction = item.default_action === 'no_calculation' ? 'calculated' : actionsToBeSentInShowDataAs.includes(item.default_action) ? 'sum' : item.default_action;
@@ -2292,7 +2288,6 @@ class AnalysisView extends Component {
       // Now It might happen that a value item is one of the calculated fields and its operation includes another calculated field
       // So, in this case, we need to send another key 'needed_operations'@type Object, which includes all the used calculated field and their repective operations
       if (isCalculatedField(value)) {
-
         const needed_operations = this.giveNeededOperationsForGivenCalculatedFieldOperation(value.operation);
         // append needed_operations in 'value'
         if (needed_operations !== null) {
@@ -2808,7 +2803,7 @@ class AnalysisView extends Component {
   }
 
   //show/hide analysis filter panel
-  toggleFiltersPanel(e) {
+  toggleFiltersPanel() {
     this.setState({
       toggleFilterPanel: !this.state.toggleFilterPanel,
     });
@@ -2832,10 +2827,10 @@ class AnalysisView extends Component {
       const requestType = 'PUT';
       const payload = { user_preference_json: sightSettings['user_preference'] };
       APIService.apiRequest(Constants.API_BASE_URL + '/user_preference', payload, false, requestType, null)
-        .then(response => {
+        .then(() => {
           localStorage.setItem(Constants.SITE_PREFIX + 'settings', JSON.stringify(sightSettings));
         })
-        .catch(err => {
+        .catch(() => {
         });
     }
   }
@@ -2920,7 +2915,7 @@ class AnalysisView extends Component {
           });
         }
       })
-      .catch(err => { });
+      .catch(() => { });
   }
 
 
@@ -3125,7 +3120,7 @@ class AnalysisView extends Component {
                           return (
                             <div className={'field ' + item.type} {...draggableProps}  >
                               <div className="field_name">{item.display_title}</div>
-                              {isEditable && <div className="field_edit_icon" onClick={(e) => this.handleCalculatedFieldEdit(item)}></div>}
+                              {isEditable && <div className="field_edit_icon" onClick={() => this.handleCalculatedFieldEdit(item)}></div>}
                             </div>
                           );
                         }}
@@ -3299,7 +3294,7 @@ class AnalysisView extends Component {
                                                     <ul className="option-list">
                                                       {possibleAggregations.map(op => {
                                                         const isSelected = op.id === field.default_action;
-                                                        return <li key={op.id} className={'option' + (isSelected ? ' selected' : '')} onClick={(e) => {this.selectOperation(op.id)}}>{op.name}</li>
+                                                        return <li key={op.id} className={'option' + (isSelected ? ' selected' : '')} onClick={() => {this.selectOperation(op.id)}}>{op.name}</li>
                                                       })}
                                                     </ul>
                                                   </div>
@@ -3330,7 +3325,7 @@ class AnalysisView extends Component {
                         <label className="block-title">Add Filters</label>
                         <div className="fields-selected">
                           <>
-                            {selectedFilters.map((field, index) => {
+                            {selectedFilters.map((field) => {
                               const isExpanded = this.state.currentSelectedFilter && this.state.currentSelectedFilter.title === field.title ? true : false;
                               return (
                                 <div key={field.title} className={'field ' + field.type}>
@@ -3403,7 +3398,7 @@ class AnalysisView extends Component {
                         {(droppableProps) => (
                           <div className={'subtab-grid-item ' + subtab + (isActive ? ' active' : '')} {...droppableProps} >
                             <div className={'subtab-grid-item-inner'}
-                              onClick={(e) => this.setState({ panel_first_tab_current_subtab: subtab, panelConstructorSearchValue: '' })}>
+                              onClick={() => this.setState({ panel_first_tab_current_subtab: subtab, panelConstructorSearchValue: '' })}>
                               <span>{covertUnderscoreToSpaceInString(subtab)}</span>
                               {selectedItemCount > 0 && <span className="icon-selection-count">{selectedItemCount}</span>}
                             </div>
@@ -3416,9 +3411,8 @@ class AnalysisView extends Component {
                   return (
                     <div key={subtab} className={'subtab-grid-item ' + subtab + (isActive ? ' active' : '')}>
                       <div className={'subtab-grid-item-inner'}
-                        onClick={(e) => this.setState({ panel_first_tab_current_subtab: subtab, panelConstructorSearchValue: '' })}>
+                        onClick={() => this.setState({panel_first_tab_current_subtab: subtab, panelConstructorSearchValue: ''})}>
                         <span>{covertUnderscoreToSpaceInString(subtab)}</span>
-                        {/* <span className="icon-selection-count">{2}</span> */}
                       </div>
                     </div>
                   );
@@ -3472,11 +3466,10 @@ class AnalysisView extends Component {
 
                     <div className="fields-available">
                       <h4>Suggested Rows</h4>
-                      {availableRows.map((field, index) => {
-                        // const isSelected = selectedRows.some(f => f.title === field.title);
+                      {availableRows.map((field) => {
                         const isAlreadySelectedInColumns = selectedColumns.some(f => f.title === field.title);
                         return (
-                          <div key={field.title} className={'field ' + field.type + (isAlreadySelectedInColumns ? ' disabled' : '')} onClick={(e) => this.handleRowSelection(field, true)}>
+                          <div key={field.title} className={'field ' + field.type + (isAlreadySelectedInColumns ? ' disabled' : '')} onClick={() => this.handleRowSelection(field, true)}>
                             <span >{field.display_title}{isAlreadySelectedInColumns ? ' (in columns)' : ''}</span>
                           </div>
                         );
@@ -3485,10 +3478,10 @@ class AnalysisView extends Component {
 
                     <div className='fields-others'>
                       <h4>Other Fields</h4>
-                      {availableRowsOthers.map((field, index) => {
+                      {availableRowsOthers.map((field) => {
                         const isAlreadySelectedInColumns = selectedColumns.some(f => f.title === field.title);
                         return (
-                          <div key={field.title} className={'field ' + field.type} onClick={(e) => this.handleRowSelection(field, true)}>
+                          <div key={field.title} className={'field ' + field.type} onClick={() => this.handleRowSelection(field, true)}>
                             <span >{field.display_title}{isAlreadySelectedInColumns ? ' (in columns)' : ''}</span>
                           </div>
                         );
@@ -3534,10 +3527,10 @@ class AnalysisView extends Component {
 
                     <div className="fields-available">
                       <h4>Suggested Columns</h4>
-                      {availableColumns.map((field, index) => {
+                      {availableColumns.map((field) => {
                         const isAlreadySelectedInRows = selectedRows.some(f => f.title === field.title);
                         return (
-                          <div key={field.title} className={'field ' + field.type + (isAlreadySelectedInRows ? ' disabled' : '')} onClick={(e) => this.handleColumnSelection(field, true)}>
+                          <div key={field.title} className={'field ' + field.type + (isAlreadySelectedInRows ? ' disabled' : '')} onClick={() => this.handleColumnSelection(field, true)}>
                             <span>{field.display_title}{isAlreadySelectedInRows ? ' (in rows)' : ''}</span>
                           </div>
                         );
@@ -3546,10 +3539,10 @@ class AnalysisView extends Component {
 
                     <div className={'fields-others'}>
                       <h4>Other Fields</h4>
-                      {availableColumnsOthers.map((field, index) => {
+                      {availableColumnsOthers.map((field) => {
                         const isAlreadySelectedInRows = selectedRows.some(f => f.title === field.title);
                         return (
-                          <div key={field.title} className={'field ' + field.type} onClick={(e) => this.handleColumnSelection(field, true)}>
+                          <div key={field.title} className={'field ' + field.type} onClick={() => this.handleColumnSelection(field, true)}>
                             <span>{field.display_title}{isAlreadySelectedInRows ? ' (in rows)' : ''}</span>
                           </div>
                         );
@@ -3596,7 +3589,7 @@ class AnalysisView extends Component {
                                               <ul className="option-list">
                                                 {possibleAggregations.map(op => {
                                                   const isSelected = op.id === field.default_action;
-                                                  return <li key={op.id} className={'option' + (isSelected ? ' selected' : '')} onClick={(e) => { this.selectOperation(op.id) }}> {op.name}  </li>
+                                                  return <li key={op.id} className={'option' + (isSelected ? ' selected' : '')} onClick={() => { this.selectOperation(op.id) }}> {op.name}</li>
                                                 })}
                                               </ul>
                                             </div>
@@ -3617,12 +3610,11 @@ class AnalysisView extends Component {
                       }}
                     </ReorderableList>
 
-
                     <div className="fields-available">
                       <h4>Suggested Fields</h4>
-                      {availableValues.map((field, index) => {
+                      {availableValues.map((field) => {
                         return (
-                          <div key={field.title} className={'field ' + field.type} onClick={(e) => this.handleValueSelection(field, true)}>
+                          <div key={field.title} className={'field ' + field.type} onClick={() => this.handleValueSelection(field, true)}>
                             <span>{field.display_title}</span>
                           </div>
                         );
@@ -3636,7 +3628,7 @@ class AnalysisView extends Component {
                     <div className="fields-selected">
                       <>
                         <h4>Selected Filters</h4>
-                        {selectedFilters.map((field, index) => {
+                        {selectedFilters.map((field) => {
                           const isExpanded = this.state.currentSelectedFilter && this.state.currentSelectedFilter.title === field.title ? true : false;
                           return (
                             <div key={field.title} className={'field ' + field.type + (isExpanded ? ' expanded' : '')} >
@@ -3682,9 +3674,9 @@ class AnalysisView extends Component {
 
                     <div className="fields-available">
                       <h4>Suggested Fields</h4>
-                      {availableFilters.map((field, index) => {
+                      {availableFilters.map((field) => {
                         return (
-                          <div key={field.title} className={'field ' + field.type} onClick={(e) => this.handleFiltersSelection(field, true)}>
+                          <div key={field.title} className={'field ' + field.type} onClick={() => this.handleFiltersSelection(field, true)}>
                             <span >{field.display_title}</span>
                           </div>
                         );
@@ -3798,8 +3790,6 @@ class AnalysisView extends Component {
 
                       <div className="color-field" onClick={(e) => this.handleToggleColorPicker(e, 'background', i)}>
                         <div className="label">Fill</div>
-                        {/* <input type="color" id={'txt-font-color' + i} name={'txt-font-color' + i} ref={this.state.conditionalColorsRefs[i]['bg']} className="form-control color-control" onChange={(e) => this.handleConditionalFormattingSelect(e, 'background', i)} value={item.background} /> */}
-
                         <div id={'txt-background-color' + i} className="color-control" style={{ backgroundColor: item.background }} onClick={(e) => this.handleToggleColorPicker(e, 'background', i)}></div>
                         {item && item.display_background_picker &&
                           <ClickOutsideListner onOutsideClick={(e) => this.handleToggleColorPicker(e, 'background', i)}>
@@ -3808,7 +3798,7 @@ class AnalysisView extends Component {
                                 {Object.keys(COLOR_PICKER_LIST).map((colorKey) => {
                                   return (<div key={colorKey} className="color-col">
                                     {COLOR_PICKER_LIST[colorKey].map((color) => {
-                                      return (<div className="color" style={{ backgroundColor: color }} onClick={(e) => this.handleColorPickerSelect('background', i, color)}></div>)
+                                      return (<div key={color} className="color" style={{ backgroundColor: color }} onClick={() => this.handleColorPickerSelect('background', i, color)}></div>)
                                     })}
                                   </div>)
                                 })}
@@ -3830,7 +3820,7 @@ class AnalysisView extends Component {
                                 {Object.keys(COLOR_PICKER_LIST).map((colorKey) => {
                                   return (<div key={colorKey} className="color-col">
                                     {COLOR_PICKER_LIST[colorKey].map((color) => {
-                                      return (<div className="color" style={{ backgroundColor: color }} onClick={(e) => this.handleColorPickerSelect('color', i, color)}></div>)
+                                      return (<div key={color} className="color" style={{ backgroundColor: color }} onClick={() => this.handleColorPickerSelect('color', i, color)}></div>)
                                     })}
                                   </div>)
                                 })}
@@ -4035,20 +4025,10 @@ class AnalysisView extends Component {
                               <ul className="auth-list">
                                 {['EDIT', 'COMMENT', 'SHARE', 'DELETE'].map(auth => {
                                   const checked = this.state.shareEditSelectedAuthorizations.includes(auth);
-                                  // const disabled = auth === 'VIEW';
                                   return (
                                     <li key={auth} className={'auth-item'}>
-                                      {/* <div className="option checkbox">
-                                        <input id={`${this.props.analysisSavedSettings.id}-share-${auth}`} type="checkbox"
-                                          checked={checked}
-                                          // disabled={disabled}
-                                          onChange={() => this.handleShareEditAuthSelect(auth)} />
-                                        <label htmlFor={`${this.props.analysisSavedSettings.id}-share-${auth}`}>
-                                          {auth[0] + auth.slice(1).toLowerCase()}</label>
-                                      </div> */}
                                       <Checkbox uniqueHtmlForKey={`d-${this.props.analysisSavedSettings.id}-share-${auth}`} label={auth[0] + auth.slice(1).toLowerCase()} checked={checked}
-                                        onChange={(e) => this.handleShareEditAuthSelect(auth)} />
-
+                                        onChange={() => this.handleShareEditAuthSelect(auth)} />
                                     </li>
                                   );
                                 })}
@@ -4568,7 +4548,7 @@ class AnalysisView extends Component {
                                       {possibleAggregations.map(op => {
                                         const isSelected = op.id === this.state.calculated_expression_aggregations_by_field[item.title];
                                         return <li key={op.id} className={'option' + (isSelected ? ' selected' : '')}
-                                          onClick={(e) => { this.setState({ calculated_expression_aggregations_by_field: { ...this.state.calculated_expression_aggregations_by_field, [item.title]: op.id } }) }}>
+                                          onClick={() => { this.setState({ calculated_expression_aggregations_by_field: { ...this.state.calculated_expression_aggregations_by_field, [item.title]: op.id } }) }}>
                                           {op.name}
                                         </li>
                                       })}
@@ -4717,7 +4697,7 @@ class AnalysisView extends Component {
 
 
   //Back to Home Button
-  handleBackToAnalysisHome(event) {
+  handleBackToAnalysisHome() {
     this.props.history.push('/' + this.state.terminal_type + '/datagrid');
   }
 
@@ -4775,15 +4755,15 @@ class AnalysisView extends Component {
           window.open(file_download_url, "_blank");
         }
       })
-      .catch(err => { });
+      .catch(() => { });
   }
 
   //Toggle Donwload Options
-  handleDownloadToggle_UNUSED(event) {
+  handleDownloadToggle_UNUSED() {
     this.setState({ toggleDownloadOptions: !this.state.toggleDownloadOptions });
   }
 
-  convertToCSV(objArray, isPeriodComparisonEnabled, showBenchmarkInGrid, selected_columns) {
+  convertToCSV(objArray, isPeriodComparisonEnabled, showBenchmarkInGrid) {
     var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
     var str = '';
     var filteredArr = [];
@@ -4798,7 +4778,7 @@ class AnalysisView extends Component {
         }
 
         //append filterd columns (which doesn't include benchmark string)
-        colKeys.forEach((item, i) => {
+        colKeys.forEach((item) => {
           newRow.push(row[item]);
         });
 
@@ -4840,12 +4820,12 @@ class AnalysisView extends Component {
     let formattedRows = [];
 
     // Handle sub level nested rows
-    items.forEach((item, i) => {
+    items.forEach((item) => {
       addNestedLevel(item);
     });
 
     //Remove has_sub_lebel key after being used
-    formattedRows.forEach((item, i) => {
+    formattedRows.forEach((item) => {
       delete item['has_sub_level'];
     });
 
@@ -4853,7 +4833,7 @@ class AnalysisView extends Component {
       formattedRows.push(item);
 
       if (item.has_sub_level !== undefined) {
-        item.has_sub_level.forEach((subitem, j) => {
+        item.has_sub_level.forEach((subitem) => {
           addNestedLevel(subitem)
         });
       }
@@ -4862,7 +4842,7 @@ class AnalysisView extends Component {
     //Add headers
     if (headers) {
       if (Array.isArray(headers[0])) {
-        headers.forEach((item, i) => {
+        headers.forEach((item) => {
           //Period Comparison Specific
           if (this.state.isPeriodComparisonEnabled) {
             if (!this.state.showBenchmarkInGrid && item[2] === 'benchmark') return;
@@ -4881,7 +4861,7 @@ class AnalysisView extends Component {
         });
 
         formattedHeader.reverse();
-        formattedHeader.forEach((item, i) => {
+        formattedHeader.forEach((item) => {
           formattedRows.unshift(item);
         });
       } else {
@@ -4893,7 +4873,7 @@ class AnalysisView extends Component {
 
     // Convert Object to JSON
     var jsonObject = JSON.stringify(formattedRows);
-    var csv = this.convertToCSV(jsonObject, this.state.isPeriodComparisonEnabled, this.state.showBenchmarkInGrid, this.state.selected_columns);
+    var csv = this.convertToCSV(jsonObject, this.state.isPeriodComparisonEnabled, this.state.showBenchmarkInGrid);
     var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
     var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     if (navigator.msSaveBlob) { // IE 10+
@@ -4922,10 +4902,6 @@ class AnalysisView extends Component {
       dateRanges = [this.state.selectedDateRanges[0], [null, null]];
       updatedConditionalFormatTypes = [{ 'id': 'standard', 'name': 'Standard' }, { 'id': 'period_comparison', 'name': 'Period Comparison' }];
     } else {
-      // reset the dateRanges 
-      // reset the selectedDateRanges with the range = last 30 days from last_update_date 
-      // const strtDate = moment(this.state.lastUpdatedDateObj).subtract((29), 'days').toDate();
-      // const dateRange = [strtDate, this.state.lastUpdatedDateObj];
       dateRanges = [this.state.selectedDateRanges[0]];
       updatedConditionalFormatTypes = [{ 'id': 'standard', 'name': 'Standard' }];
     }
@@ -5082,21 +5058,15 @@ class AnalysisView extends Component {
   }
 
   //Handle Add New Conditional Formatting
-  handleAddNewConditionalFormatting(e) {
+  handleAddNewConditionalFormatting() {
     let updatedConditionalFormatting = JSON.parse(JSON.stringify(this.state.tempConditionalFormatting));
     updatedConditionalFormatting.push({ 'format_type': this.defaultConditionalFormatTypes[0], 'cell_value': [], 'condition': '', 'value1': '', 'value2': '', 'color': '#ffffff', 'background': '#000000' });
     let updatedConditionalColorsRefs = [...this.state.conditionalColorsRefs];
     updatedConditionalColorsRefs.push({ 'bg': React.createRef(), 'color': React.createRef() });
 
-    //set condition formatting input wrapper width
-    // let newCondtionalFormattingInputWrapperWidths = JSON.parse(JSON.stringify(this.state.condtionalFormattingInputWrapperWidths));
-    // let maxWidth = Math.max(...this.state.condtionalFormattingInputWrapperWidths);
-    // newCondtionalFormattingInputWrapperWidths.push(maxWidth);
-
     this.setState({
       tempConditionalFormatting: updatedConditionalFormatting,
-      conditionalColorsRefs: updatedConditionalColorsRefs,
-      // condtionalFormattingInputWrapperWidths: newCondtionalFormattingInputWrapperWidths
+      conditionalColorsRefs: updatedConditionalColorsRefs
     }, () => {
       // Insert an entry in panelEventLogs
       this.setPanelEventLogs(this.giveCurrentValuesOfLoggedVariables());
@@ -5107,15 +5077,12 @@ class AnalysisView extends Component {
   handleRemoveNewConditionalFormatting(e, index) {
     let updatedConditionalFormatting = JSON.parse(JSON.stringify(this.state.tempConditionalFormatting));
     let updatedConditionalColorsRefs = [...this.state.conditionalColorsRefs];
-    // let newCondtionalFormattingInputWrapperWidths = JSON.parse(JSON.stringify(this.state.condtionalFormattingInputWrapperWidths));
     updatedConditionalFormatting.splice(index, 1);
     updatedConditionalColorsRefs.splice(index, 1);
-    // newCondtionalFormattingInputWrapperWidths.splice(index, 1);
 
     this.setState({
       tempConditionalFormatting: updatedConditionalFormatting,
-      conditionalColorsRefs: updatedConditionalColorsRefs,
-      // condtionalFormattingInputWrapperWidths: newCondtionalFormattingInputWrapperWidths
+      conditionalColorsRefs: updatedConditionalColorsRefs
     }, () => {
       // Insert an entry in panelEventLogs
       this.setPanelEventLogs(this.giveCurrentValuesOfLoggedVariables());
@@ -5163,9 +5130,9 @@ class AnalysisView extends Component {
 
   //Save Analysis Settings to DB
   saveSettingsToServer() {
-    const saveConfig = this.giveConfig('current');
-    console.log('---------SAVE CONFIG');
-    console.log(saveConfig);
+    const saveConfig = this.giveConfig();
+    // console.log('---------SAVE CONFIG');
+    // console.log(saveConfig);
 
     // dynamic_time_period calculation to keep date ranges in desired format
     let firstRFormatted = this.state.selectedDateRanges[0] && this.state.selectedDateRanges[0][0] && this.state.selectedDateRanges[0][1] ? this.giveISOFormattedDateRange(this.state.selectedDateRanges[0]) : null;
@@ -5211,16 +5178,12 @@ class AnalysisView extends Component {
         console.log(`AUTO SAVE FAILED`);
         console.log('FAIL REASON : ', err.message);
       });
-
   }
 
   /**Returns the initial or current values of some state variables which are required to be saved in config
    * For this, panelEventLogs is used.
    */
-  giveConfig(currentOrInitial = 'current') {
-    // const logIndex = currentOrInitial === 'current' ? this.state.panelEventLogs.length - 1 : 0;
-    // const stateObj = this.state.panelEventLogs[logIndex] || null;
-    // if (stateObj === null) { return {} }
+  giveConfig() {
     const stateObj = {...this.state};
     return {
       rows: stateObj.selected_rows,
@@ -5272,7 +5235,6 @@ class AnalysisView extends Component {
       if (selectedValueForCol.default_show_as === 'percentage_of_row_total' || selectedValueForCol.default_show_as === 'percentage_of_column_total' || selectedValueForCol.default_show_as === 'percentage_of_grand_total') {
         formattedCellValue = formattedCellValue + '%';
       }
-
     }
     return formattedCellValue;
   }
@@ -5527,7 +5489,7 @@ class AnalysisView extends Component {
           this.setState({ loadingNotes: false });
         }
       })
-      .catch(err => {
+      .catch(() => {
         this.setState({ loadingNotes: false });
       });
   }
@@ -5553,7 +5515,7 @@ class AnalysisView extends Component {
             reject();
           }
         })
-        .catch(err => {
+        .catch(() => {
           this.setState({
             insightNotesRepliesLoadings: { ...this.state.insightNotesRepliesLoadings, [parentNoteId]: false }
           });
@@ -5688,7 +5650,7 @@ class AnalysisView extends Component {
           updatedNotesReplies[this.state.insightReplyNoteId] = updatedRepliesList;
 
           // Also update the 'child_notes' property for parent note
-          const updatedNotes = this.state.insightNotes.map(n => n.id !== this.state.insightReplyNoteId ? n : { ...n, child_notes: n.child_notes + 1 });;
+          const updatedNotes = this.state.insightNotes.map(n => n.id !== this.state.insightReplyNoteId ? n : { ...n, child_notes: n.child_notes + 1 });
 
           alertService.showToast('success', 'Note Added Successfully');
 
@@ -5740,7 +5702,7 @@ class AnalysisView extends Component {
     if (this.state.insightNotes && chartId !== null) {
       let notes = [];
       this.state.insightNotes.chart_notes.forEach(cn => {
-        if (cn.chart_id === chartId) { notes.push(cn) };
+        if (cn.chart_id === chartId) { notes.push(cn) }
       });
       return notes;
     }
@@ -5964,7 +5926,7 @@ class AnalysisView extends Component {
                 <div id='dropdown-container' className='dropdown-container'>
                     <ClickOutsideListner onOutsideClick={() => this.setState({ isSelectionValueDropDownSelected: !this.state.isSelectionValueDropDownSelected })}>
                     <div id="selected-values-container" className='selected-values-container'>
-                      {selectedDataColumns.map((keyVar) => <div className='tooltip-dropdown-item'><span className="key" key={keyVar}><i>{keyVar} :</i></span> <span className="value">{this.state.selectedData[keyVar]}</span></div>)}
+                      {selectedDataColumns.map((keyVar) => <div key={keyVar} className='tooltip-dropdown-item'><span className="key" key={keyVar}><i>{keyVar} :</i></span> <span className="value">{this.state.selectedData[keyVar]}</span></div>)}
                     </div>
                   </ClickOutsideListner>
                 </div>
