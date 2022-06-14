@@ -134,7 +134,7 @@
         }
         .nav-link .icon-dropdown {
           &::before{
-            transform: rotate(0deg);
+            transform: rotate(180deg);
           }
         }
       }

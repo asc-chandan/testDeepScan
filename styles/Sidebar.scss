@@ -158,7 +158,9 @@ $control-height: 14px;
         &.expanded{
           .nav-link{
             .icon-dropdown{
-              transform: rotate(180deg);
+              &:before{
+                transform: rotate(180deg);
+              }
             }
           }
         }
@@ -197,6 +199,7 @@ $control-height: 14px;
           mask-position: center center;
           -webkit-mask-size: 14px;
           mask-size: 14px;
+          transform: rotate(180deg);
         }
       }
       &#custom-reports {
@@ -306,7 +309,9 @@ $control-height: 14px;
 
       }
       .nav-link .icon-dropdown {
-        transform: rotate(90deg);
+        &:before{
+          transform: rotate(90deg);
+        }
       }
     }
   }

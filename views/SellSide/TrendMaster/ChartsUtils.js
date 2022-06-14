@@ -4560,6 +4560,7 @@ function drawLineChartFreeCrossHair(args) {
           return lcolor;
         });
     });
+
     // Draw scatter plot circles 
     linePointsWrapper.selectAll('.scatter-pt')
     .data(dataNest.reduce((dataPts, dn) => dataPts.concat(dn.values), []))
@@ -4679,7 +4680,6 @@ function drawLineChartFreeCrossHair(args) {
     .on("mouseout", handleChartMouseOut)
     .on("mousemove", handleChartMouseMove)
     .on("click", handleChartLock);
-
 
   function handleChartLock() {
     if(window.currentSelectedWidget===undefined || !window.currentSelectedWidget || window.currentSelectedWidget!==args.unique_key){
@@ -5066,7 +5066,6 @@ function drawLineChartFreeCrossHair(args) {
   }
 }
 
-
 function drawScatterChart2(args) {
   //chart initial settings variables
   const initialConfig = getInitialChartConfig(args);
@@ -5099,7 +5098,7 @@ function drawScatterChart2(args) {
   let toolTipFontSize = isFitToWidthMode ? Math.round(11 * currentCanvasWidth / args.screen) : 11;
   let circleSize = isFitToWidthMode ? Math.round(1.5 * currentCanvasWidth / args.screen) : 1.5;
   let highlighterCircleSize = isFitToWidthMode ? Math.round(4 * currentCanvasWidth / args.screen) : 4;
-  // let noteCircleSize = isFitToWidthMode ? Math.round(5 * currentCanvasWidth / args.screen) : 5;
+  let noteCircleSize = isFitToWidthMode ? Math.round(5 * currentCanvasWidth / args.screen) : 5;
 
   //Define charts configs
   let isSegmented = (args.chartSegmentation && args.chartSegmentation !== '' && args.chartSegmentation !== 'all' && args.chartSegmentation !== ' ');
@@ -5354,17 +5353,17 @@ function drawScatterChart2(args) {
       .data(dataNest.reduce((dataPts, dn) => dataPts.concat(dn.values), []))
       .enter()
       .append('circle')
-      .attr('class', (i) => `scatter-pt scatter-pt-${args.unique_key}-${i}`)
-      .attr('cx', function (d) { return xScale(d[args.xaxiskey]); })
-      .attr('cy', function (d) { return yScale(d[args.yaxiskey]); })
+      .attr('class', (d, i) => `scatter-pt scatter-pt-${args.unique_key}-${i}`)
+      .attr('cx', function (d, i) { return xScale(d[args.xaxiskey]); })
+      .attr('cy', function (d, i) { return yScale(d[args.yaxiskey]); })
       .attr('r', circleSize)
-      .attr(`data-${chartSegmentation}`, function (d) { return d[chartSegmentation]; })
-      .attr('fill', function (d) { return color(d[chartSegmentation]); });
+      .attr(`data-${chartSegmentation}`, function (d, i) { return d[chartSegmentation]; })
+      .attr('fill', function (d, i) { return color(d[chartSegmentation]); });
 
   } else {
     scatterPointsWrapper.selectAll('.scatter-pt')
       .data(chartMainData).enter().append('circle')
-      .attr('cx', function (d) {
+      .attr('cx', function (d, i) {
         let xVal = d[args.xaxiskey];
         if (xScaleType === 'linear') {
           if (args.chartFormat.xaxis.max && xVal > args.chartFormat.xaxis.max) {
@@ -5376,7 +5375,7 @@ function drawScatterChart2(args) {
         }
         return xScale(xVal);
       })
-      .attr('cy', function (d) {
+      .attr('cy', function (d, i) {
         let yVal = d[args.yaxiskey];
         if (args.chartFormat.yaxis.max && yVal > args.chartFormat.yaxis.max) {
           yVal = parseInt(args.chartFormat.yaxis.max);
@@ -5387,8 +5386,8 @@ function drawScatterChart2(args) {
         return yScale(yVal);
       })
       .attr('r', circleSize)
-      .attr('class', (i) => `scatter-pt scatter-pt-${args.unique_key}-${i}`)
-      .attr('fill', function () { return circleColor; });
+      .attr('class', (d, i) => `scatter-pt scatter-pt-${args.unique_key}-${i}`)
+      .attr('fill', function (d, i) { return circleColor; });
   }
 
   // Draw the marker for notes if chartNotes are available
@@ -5400,8 +5399,8 @@ function drawScatterChart2(args) {
       .attr('font-size', '1.5em')
       .attr('class', 'note-marker')
       .attr('fill', '#ff0000')
-      .attr('x', function (d) { return xScale(d.x_axis_point); })
-      .attr('y', function () { return innerHeight / 2 });
+      .attr('x', function (d, i) { return xScale(d.x_axis_point); })
+      .attr('y', function (d, i) { return innerHeight / 2 });
   }
 
   //tooltip
@@ -5492,13 +5491,15 @@ function drawScatterChart2(args) {
   var pointToFocusOnMouseMove = null;
   var xValOnMouseMove = null;
   var maxTooltipWidth = isFitToWidthMode ? Math.round((initialConfig.maxTooltipWidth * currentCanvasWidth) / args.screen) : initialConfig.maxTooltipWidth;
-  // let tooltipTextXPos = isFitToWidthMode ? Math.round(2 * currentCanvasWidth / args.screen) : 2;
-  // let segmentedTooltipTextXPos = isFitToWidthMode ? Math.round(1 * currentCanvasWidth / args.screen) : 1;
-  // let tooltipTextYPos = isFitToWidthMode ? Math.floor(.2 * currentCanvasWidth / args.screen) : .2;
-  // let tooltipRectPadding = isFitToWidthMode ? Math.round(3 * currentCanvasWidth / args.screen) : 3;
-  // let tooltipPadding = isFitToWidthMode ? Math.round(4 * currentCanvasWidth / args.screen) : 4;
+  let tooltipTextXPos = isFitToWidthMode ? Math.round(2 * currentCanvasWidth / args.screen) : 2;
+  let segmentedTooltipTextXPos = isFitToWidthMode ? Math.round(1 * currentCanvasWidth / args.screen) : 1;
+  let tooltipTextYPos = isFitToWidthMode ? Math.floor(.2 * currentCanvasWidth / args.screen) : .2;
+  let tooltipRectPadding = isFitToWidthMode ? Math.round(3 * currentCanvasWidth / args.screen) : 3;
+  let tooltipPadding = isFitToWidthMode ? Math.round(4 * currentCanvasWidth / args.screen) : 4;
 
   xScale.invert = function (x) {
+    // console.log(this.domain())
+
     if (args.xaxiskey === 'date' || typeof xDomains[0] === 'string') {
       return d3.scaleQuantize().domain(this.range()).range(this.domain())(x);
     } else {
@@ -5609,36 +5610,36 @@ function drawScatterChart2(args) {
 
     // Now change the text of xaxis grp, adjust the position and size of the text and box - START
     let xaxis_text = args.xaxiskey === 'date' ? parsedDateString(new Date(pointToFocusOnMouseMove.xVal)) : pointToFocusOnMouseMove.xVal;
-    // let xaxis_box_width = calculateTextWidth(xaxis_text, tickSliderFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica') + xAxisSliderRectWidthPadding;
-    // let max_xslider_width = innerWidth + initialConfig.inbetweenChartAndXAxisPadding;
+    let xaxis_box_width = calculateTextWidth(xaxis_text, tickSliderFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica') + xAxisSliderRectWidthPadding;
+    let max_xslider_width = innerWidth + initialConfig.inbetweenChartAndXAxisPadding;
     // let xBoxWidth = Math.min(max_xslider_width, xaxis_box_width + (initialConfig.tickSliderPadding * 2));
-    // xaxis_box_width = xaxis_box_width <= max_xslider_width ? xaxis_box_width : max_xslider_width;
+    xaxis_box_width = xaxis_box_width <= max_xslider_width ? xaxis_box_width : max_xslider_width;
 
     const widthAvailableAtLeftOfPointInFocus = xAxisHoverGrpPos + initialConfig.inbetweenChartAndXAxisPadding;
     const widthAvailableAtRightOfPointInFocus = innerWidth + initialConfig.inbetweenChartAndXAxisPadding - widthAvailableAtLeftOfPointInFocus;
 
-    // let xBoxLeftPos;
-    // if (widthAvailableAtLeftOfPointInFocus < xaxis_box_width / 2) {
-    //   xBoxLeftPos = - widthAvailableAtLeftOfPointInFocus;
-    // } else {
-    //   // Enought space is available at left side
-    //   // Now, further check if there is enough space at right side or not
-    //   // if (widthAvailableAtRightOfPointInFocus < xaxis_box_width / 2) {
-    //     // xBoxLeftPos = -  (xaxis_box_width - widthAvailableAtRightOfPointInFocus);
-    //   // } else {
-    //     // xBoxLeftPos = -  xaxis_box_width / 2;
-    //   // }
-    // }
+    let xBoxLeftPos;
+    if (widthAvailableAtLeftOfPointInFocus < xaxis_box_width / 2) {
+      xBoxLeftPos = - widthAvailableAtLeftOfPointInFocus;
+    } else {
+      // Enought space is available at left side
+      // Now, further check if there is enough space at right side or not
+      if (widthAvailableAtRightOfPointInFocus < xaxis_box_width / 2) {
+        xBoxLeftPos = -  (xaxis_box_width - widthAvailableAtRightOfPointInFocus);
+      } else {
+        xBoxLeftPos = -  xaxis_box_width / 2;
+      }
+    }
 
     // Now change the text of xaxis grp, adjust the position and size of the text and box
     // START
-    // const yval_digits_count = getDigitsCount(pointToFocusOnMouseMove.yVal);
-    // const round_var = yval_digits_count - 2;
-    // const rounded_val = Math.round(pointToFocusOnMouseMove.yVal * Math.pow(10, round_var) / Math.pow(10, round_var));
-    // const yTxt = formatNumber(rounded_val);
-    // const yTxtWidth = calculateTextWidth(yTxt, tickFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
-    // const yBoxWidth = yTxtWidth + 4 + 10;
-    // const yBoxLeftPos = 3;
+    const yval_digits_count = getDigitsCount(pointToFocusOnMouseMove.yVal);
+    const round_var = yval_digits_count - 2;
+    const rounded_val = Math.round(pointToFocusOnMouseMove.yVal * Math.pow(10, round_var) / Math.pow(10, round_var));
+    const yTxt = formatNumber(rounded_val);
+    const yTxtWidth = calculateTextWidth(yTxt, tickFontSize + 'px Poppins, "Open Sans", sans-serif, helvetica');
+    const yBoxWidth = yTxtWidth + 4 + 10;
+    const yBoxLeftPos = 3;
 
     //show horizontal line on mouse hover on chart
     hoverYGridLine.style('display', 'block')
@@ -5688,7 +5689,7 @@ function drawScatterChart2(args) {
       }
 
       // adjust starting bars x slider left position
-      // let lockIconXPos = 0;
+      let lockIconXPos = 0;
       let leftMouseXScrollPos = (mouseX - initialConfig.chartLeftPadding - (initialConfig.inbetweenChartAndYAxisPadding + 1));
       xTickValPos = xTickValPosOrg - xaxis_box_width / 2 - xAxisLeftPadding / 2; //default
 
@@ -5696,7 +5697,7 @@ function drawScatterChart2(args) {
         let leftAvailableWidth = xTickValPosOrg - initialConfig.chartLeftPadding - initialConfig.inbetweenChartAndYAxisPadding;
         xTickValPos = xTickValPosOrg - leftAvailableWidth;
         xAxisLeftPadding = 0;
-        // lockIconXPos = xaxis_box_width + 2;
+        lockIconXPos = xaxis_box_width + 2;
       }
       // adjust end bars x slider right position
       if (xTickValAvailableWidth <= xaxis_box_width / 2) { // adjust end bars x slider right position
@@ -5863,7 +5864,7 @@ function drawScatterChart2(args) {
   .on("click", handleChartLock);
 
   //Place a  background of chart area just to hide the points which goes out of its boundary
-  chart.append("defs").append("clipPath")
+  const brushClipArea = chart.append("defs").append("clipPath")
     .attr("id", `clip-${args.unique_key}`)
     .append("rect")
     .attr("width", innerWidth)
@@ -5888,7 +5889,7 @@ function drawScatterChart2(args) {
     chartHoverLocked = false;
     
 
-    let xDomainNew;
+    let xScaleNew, xDomainNew;
       if(!extent){
         if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
         xDomainNew = [ 4,8];
@@ -5929,13 +5930,13 @@ function drawScatterChart2(args) {
 
     scatterPointsWrapper
       .selectAll(".scatter-pt")
-      .attr('cx', function (d) {
+      .attr('cx', function (d, i) {
         return xScale(d[args.xaxiskey]); 
       })
-      .attr('cy', function (d) { return yScale(d[args.yaxiskey]); });
+      .attr('cy', function (d, i) { return yScale(d[args.yaxiskey]); });
 
 
-    let newXTickValues = getStringTickValues(newXDomains, 0, newXDomains.length, x_steps);
+      let newXTickValues = getStringTickValues(newXDomains, 0, newXDomains.length, x_steps);
 
     async function defineNewXAxis() {
       let newXAxis = d3.axisBottom(xScale)
@@ -5985,10 +5986,10 @@ function drawScatterChart2(args) {
     async function setPoints() {
     scatterPointsWrapper
       .selectAll(".scatter-pt")
-      .attr('cx', function (d) {
+      .attr('cx', function (d, i) {
           return xScale(d[args.xaxiskey]); 
       })
-      .attr('cy', function (d) { return yScale(d[args.yaxiskey]); });
+      .attr('cy', function (d, i) { return yScale(d[args.yaxiskey]); });
     }
 
     setPoints().then(() => {trackAllScatterPoints()});
@@ -6044,12 +6045,7 @@ function drawScatterChart2(args) {
   })
 }
 
-//Setting color pallet for Pie chart
-// const colorScaleForPieChart = d3
-//   .scaleSequential()
-//   .interpolator(d3.interpolateCool);
 
-//Draw Pie Chart
 function drawPieChart(args, isDountChart) {
   //chart initial settings variables
   const initialConfig = getInitialChartConfig(args);
